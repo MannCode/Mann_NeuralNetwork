@@ -119,11 +119,13 @@ namespace Mann
         size_t cols = other.m_data[0].size();
         Matrix result(rows, cols);
         
-        // Ensure Metal framework is included and properly configured
-        // MTL::Device* device = MTL::CreateSystemDefaultDevice();
-        // if (!device)
-        //     throw std::runtime_error("Metal device not available.");
-        // MTL::CommandQueue* commandQueue = device->newCommandQueue();
+        // Initialize Metal
+//        MTL:: device = MTL::CreateSystemDefaultDevice();
+//        if (!device) {
+//            throw std::runtime_error("Metal device not available.");
+//        }   
+//
+//        id<MTL::CommandQueue> commandQueue = [device newCommandQueue];
 
         std::function<void(int, int)> multiplyTile = [&](int rowStart, int colStart)
             {
