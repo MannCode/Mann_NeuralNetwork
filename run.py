@@ -13,10 +13,4 @@ def compile_cpp_files(cpp_files):
 compile_cpp_files(get_cpp_files())
 
 run_cmd = [f"./{executable}"]
-run_result = subprocess.run(run_cmd, capture_output=True, text=True)
-
-print("Program output:")
-print(run_result.stdout)
-if run_result.stderr:
-    print("Program errors:")
-    print(run_result.stderr)
+subprocess.run(run_cmd, shell=True)
