@@ -58,6 +58,14 @@ namespace Mann
         return result;
     }
 
+// For windows
+#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    Matrix::~Matrix() 
+    {
+        cudaFree(data);
+    }
+// For Macos
+#elif defined(__APPLE__) && defined(__MACH__)
     Matrix Matrix::operator*(const Matrix& other) const
     {
         static MU_SHORTC TS = 8;
@@ -104,6 +112,7 @@ namespace Mann
 
         return result;
     }
+#endif
 
     Matrix Matrix::operator*(float scalar) const
     {
