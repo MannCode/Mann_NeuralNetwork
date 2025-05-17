@@ -15,7 +15,6 @@
 #include "os_utils.h"
 
 #define MU_SHORTC const unsigned short
-
 #define MU_SHORT unsigned short
 
 namespace Mann

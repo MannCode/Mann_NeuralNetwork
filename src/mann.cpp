@@ -56,8 +56,8 @@ namespace Mann
         }
 
         return result;
-    } 
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+    }
+
     Matrix Matrix::operator*(const Matrix& other) const
     {
         static MU_SHORTC TS = 8;
@@ -72,20 +72,20 @@ namespace Mann
         Matrix result(rows, cols);
 
         std::function<void(int, int)> multiplyTile = [&](int rowStart, int colStart)
+        {
+            for (int i = rowStart; i < rowStart + TS && i < rows; ++i)
             {
-                for (int i = rowStart; i < rowStart + TS && i < rows; ++i)
+                for (int j = colStart; j < colStart + TS && j < cols; ++j)
                 {
-                    for (int j = colStart; j < colStart + TS && j < cols; ++j)
+                    float sum = 0.0f;
+                    for (int k = 0; k < m_data[0].size(); ++k)
                     {
-                        float sum = 0.0f;
-                        for (int k = 0; k < m_data[0].size(); ++k)
-                        {
-                            sum += m_data[i][k] * other.m_data[k][j];
-                        }
-                        result[i][j] += sum;
+                        sum += m_data[i][k] * other.m_data[k][j];
                     }
+                    result[i][j] += sum;
                 }
-            };
+            }
+        };
 
         std::vector<std::future<void>> tasks;
 
@@ -104,64 +104,6 @@ namespace Mann
 
         return result;
     }
-
-#elif defined(__APPLE__) && defined(__MACH__)
-    Matrix Matrix::operator*(const Matrix& other) const
-    {
-        static MU_SHORTC TS = 8;
-
-        if (m_data[0].size() != other.m_data.size())
-        {
-            throw std::invalid_argument("Matrix dimensions do not allow multiplication.");
-        }
-
-        size_t rows = m_data.size();
-        size_t cols = other.m_data[0].size();
-        Matrix result(rows, cols);
-        
-        // Initialize Metal
-//        MTL:: device = MTL::CreateSystemDefaultDevice();
-//        if (!device) {
-//            throw std::runtime_error("Metal device not available.");
-//        }   
-//
-//        id<MTL::CommandQueue> commandQueue = [device newCommandQueue];
-
-        std::function<void(int, int)> multiplyTile = [&](int rowStart, int colStart)
-            {
-                for (int i = rowStart; i < rowStart + TS && i < rows; ++i)
-                {
-                    for (int j = colStart; j < colStart + TS && j < cols; ++j)
-                    {
-                        float sum = 0.0f;
-                        for (int k = 0; k < m_data[0].size(); ++k)
-                        {
-                            sum += m_data[i][k] * other.m_data[k][j];
-                        }
-                        result[i][j] += sum;
-                    }
-                }
-            };
-
-        std::vector<std::future<void>> tasks;
-
-        for (int i = 0; i < rows; i += TS)
-        {
-            for (int j = 0; j < cols; j += TS)
-            {
-                tasks.emplace_back(std::async(std::launch::async, multiplyTile, i, j));
-            }
-        }
-
-        for (auto& thread : tasks)
-        {
-            thread.get();
-        }
-
-        return result;
-    }
-
-#endif
 
     Matrix Matrix::operator*(float scalar) const
     {
