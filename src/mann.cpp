@@ -4,6 +4,15 @@ namespace Mann
 {
     Matrix::Matrix(size_t rows, size_t cols) : m_rows(rows), m_cols(cols), m_data(rows, std::vector<float>(cols, 0.0f)) {}
 
+    int Matrix::rows() const
+    {
+        return m_rows;
+    }
+    int Matrix::cols() const
+    {
+        return m_cols;
+    }
+
     std::vector<float>& Matrix::operator[](int index)
     {
         return m_data[index];
@@ -58,14 +67,45 @@ namespace Mann
         return result;
     }
 
-// For windows
-#if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
-    Matrix::~Matrix() 
+    Matrix Matrix::operator+(float scaler) const
     {
-        cudaFree(data);
+        size_t rows = m_data.size();
+        size_t cols = m_data[0].size();
+        Matrix result(rows, cols);
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i][j] = m_data[i][j] + scaler;
+            }
+        }
+
+        return result;
     }
+
+    Matrix Matrix::operator-(float scaler) const
+    {
+        size_t rows = m_data.size();
+        size_t cols = m_data[0].size();
+        Matrix result(rows, cols);
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i][j] = m_data[i][j] - scaler;
+            }
+        }
+
+        return result;
+    }
+
+// For windows
+// #if defined(_WIN32) || defined(_WIN64) || defined(__linux__)
+
 // For Macos
-#elif defined(__APPLE__) && defined(__MACH__)
+// #elif defined(__APPLE__) && defined(__MACH__)
     Matrix Matrix::operator*(const Matrix& other) const
     {
         static MU_SHORTC TS = 8;
@@ -112,9 +152,9 @@ namespace Mann
 
         return result;
     }
-#endif
+// #endif
 
-    Matrix Matrix::operator*(float scalar) const
+    Matrix Matrix::operator*(double scalar) const
     {
         size_t rows = m_data.size();
         size_t cols = m_data[0].size();
@@ -131,7 +171,31 @@ namespace Mann
         return result;
     }
 
-    Matrix Matrix::operator/(float scalar) const
+    Matrix Matrix::operator^(const Matrix& other) const
+    {
+        // Element-wise multiplication
+        if (m_data.size() != other.m_data.size() || m_data[0].size() != other.m_data[0].size())
+        {
+            throw std::invalid_argument("Matrix dimensions do not match for element-wise multiplication.");
+        }
+
+        size_t rows = m_data.size();
+        size_t cols = m_data[0].size();
+        Matrix result(rows, cols);
+
+
+        for (size_t i = 0; i < m_rows; ++i)
+        {
+            for (size_t j = 0; j < m_cols; ++j)
+            {
+                result[i][j] = m_data[i][j] * other.m_data[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    Matrix Matrix::operator/(double scalar) const
     {
         if (scalar == 0)
         {
@@ -158,13 +222,9 @@ namespace Mann
         m_rows = init.size();
 
         if (m_rows > 0)
-        {
             m_cols = init.begin()->size();
-        }
         else
-        {
             m_cols = 0;
-        }
 
         m_data.resize(m_rows);
 
@@ -191,11 +251,12 @@ namespace Mann
 
     Matrix Matrix::randomize()
     {
-        for (int i = 0; i < m_rows; i++)
-        {
-            for (int j = 0; j < m_cols; j++)
-            {
-                m_data[i][j] = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        std::random_device rd;
+        std::mt19937 eng(rd());
+        std::uniform_real_distribution<float> distr(0.0f, 1.0f);
+        for (size_t i = 0; i < m_rows; ++i) {
+            for (size_t j = 0; j < m_cols; ++j) {
+                m_data[i][j] = distr(eng);
             }
         }
         return *this;
@@ -203,12 +264,12 @@ namespace Mann
 
     Matrix Matrix::randomize(float min, float max)
     {
-        srand(static_cast<unsigned int>(time(0)));
-        for (int i = 0; i < m_rows; i++)
-        {
-            for (int j = 0; j < m_cols; j++)
-            {
-                m_data[i][j] = min + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX / (max - min)));
+        std::random_device rd;
+        std::mt19937 eng(rd());
+        std::uniform_real_distribution<float> distr(min, max);
+        for (size_t i = 0; i < m_rows; ++i) {
+            for (size_t j = 0; j < m_cols; ++j) {
+                m_data[i][j] = distr(eng);
             }
         }
         return *this;
@@ -216,12 +277,8 @@ namespace Mann
 
     Matrix Matrix::nullMatrix()
     {
-        for (int i = 0; i < m_rows; i++)
-        {
-            for (int j = 0; j < m_cols; j++)
-            {
-                m_data[i][j] = 0.0f;
-            }
+        for (size_t i = 0; i < m_rows; ++i) {
+            std::fill(m_data[i].begin(), m_data[i].end(), 0.0f);
         }
         return *this;
     }
