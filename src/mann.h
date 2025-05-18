@@ -43,6 +43,7 @@ namespace Mann
         Matrix& operator=(std::initializer_list<std::vector<float>> init);
 
         friend std::ostream& operator<<(std::ostream& os, const Matrix& matrix);
+        friend std::ostream& operator<<(std::ostream& os, const std::vector<float>& row);
 
         Matrix randomize();
         Matrix randomize(float min, float max);
