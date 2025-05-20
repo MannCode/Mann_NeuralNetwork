@@ -1,4 +1,5 @@
 #include "mann.h"
+#include <iomanip>
 
 namespace Mann
 {
@@ -242,7 +243,10 @@ namespace Mann
         {
             for (const auto& elem : row)
             {
-                os << elem << " ";
+                if(elem > 0) {
+                    os << "+";
+                }
+                os << std::fixed << std::setprecision(6) << elem << " ";
             }
             os << std::endl;
         }
@@ -253,7 +257,7 @@ namespace Mann
     {
         std::random_device rd;
         std::mt19937 eng(rd());
-        std::uniform_real_distribution<float> distr(0.0f, 1.0f);
+        std::uniform_real_distribution<float> distr(-1.0f, 1.0f);
         for (size_t i = 0; i < m_rows; ++i) {
             for (size_t j = 0; j < m_cols; ++j) {
                 m_data[i][j] = distr(eng);
