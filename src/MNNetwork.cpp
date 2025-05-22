@@ -16,35 +16,26 @@ void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size, s
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
     
-    std::vector<std::vector<Mann::Matrix>> MNN_d_weights_arr;
-    std::vector<std::vector<Mann::Matrix>> MNN_d_biases_arr;
-    for(int b=0; b < batch_size; b++) {
-        MNN_d_weights_arr.push_back(MNN_Weights);
-        MNN_d_biases_arr.push_back(MNN_Bias);
-    }
-
-    
+    std::vector<Mann::Matrix> MNN_d_weights = MNN_Weights;
+    std::vector<Mann::Matrix> MNN_d_biases = MNN_Bias;
 
     for(int n = 0; n < iterations; n++) {
         float avg_cost_bulk = 0;
         for(int batch = 0; batch < images_data.size()/batch_size; batch++) {
-            auto start_time = std::chrono::high_resolution_clock::now();
-            for (int b=0; b < batch_size; b++) {
-                for (int j = 0; j < MNN_d_weights_arr[0].size(); j++) {
-                    MNN_d_weights_arr[b][j].nullMatrix();
-                    MNN_d_biases_arr[b][j].nullMatrix();
-                }
+            for (int j = 0; j < MNN_d_weights.size(); j++) {
+                MNN_d_weights[j].nullMatrix();
+                MNN_d_biases[j].nullMatrix();
             }
-            std::function<void(int)> trainOneCycle = [&](int i) {
-                std::cout << i << std::endl;
-                
+
+            for (int i = batch * batch_size; i < (batch + 1) * batch_size; i++) {
+                // load image data in network
                 for (int j =0; j < MNN_Nodes[0].rows(); j++) {
                     MNN_Nodes[0][j][0] = images_data[i][j];
                 }
-                for (int j = 0; j < MNN_y.rows(); j++) { 
+                for (int j = 0; j < MNN_y.rows(); j++) {
                     MNN_y[j][0] = labels_data[i][j];
                 }
-                
+
                 feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
 
                 Mann::Matrix MNN_cost = (MNN_Nodes[MNN_Nodes.size() - 1] - MNN_y);
@@ -56,44 +47,12 @@ void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size, s
                 avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
 
                 std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
-                for(int j = 0; j < MNN_d_weights_arr[0].size(); j++) {
-                    std::cout << "yoo" << std::endl;
-                    MNN_d_weights_arr[i%batch_size][j] = MNN_d_weights_biases[0][j]/2;
-                    MNN_d_biases_arr[i%batch_size][j] = MNN_d_weights_biases[1][j]/2;
-                }
-            };
-
-
-            std::vector<std::future<void>> threads;
-            for (int i = batch*batch_size; i < (batch+1)*batch_size+1; i++) {
-                threads.emplace_back(std::async(std::launch::async, trainOneCycle, i));
-            }
-            for (auto& thread : threads) {
-                thread.wait();
-            }
-
-
-
-            // calculte the average of MNN_d_weights_arr
-            std::vector<Mann::Matrix> MNN_d_weights = MNN_d_weights_arr[100000];
-            std::vector<Mann::Matrix> MNN_d_biases = MNN_d_biases_arr[0];
-            for (std::vector<Mann::Matrix> &d_weights : MNN_d_weights_arr) {
-                for (int j = 0; j < d_weights.size(); j++) {
-                    MNN_d_weights[j] = (MNN_d_weights[j] + d_weights[j]) / 2;
+                for(int j = 0; j < MNN_d_weights.size(); j++) {
+                    MNN_d_weights[j] = (MNN_d_weights[j] + MNN_d_weights_biases[0][j])/2;
+                    MNN_d_biases[j] = (MNN_d_biases[j] + MNN_d_weights_biases[1][j])/2;
                 }
             }
-            for (std::vector<Mann::Matrix> &d_biases : MNN_d_biases_arr) {
-                for (int j = 0; j < d_biases.size(); j++) {
-                    MNN_d_biases[j] = (MNN_d_biases[j] + d_biases[j]) / 2;
-                }
-            }
-
-            auto end_time = std::chrono::high_resolution_clock::now();
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-            std::cout << "Elapsed time: " << std::fixed << std::setprecision(6) << duration.count()/1000000.0 << " seconds" << std::endl;
             
-
-
             // time to update the weights and biases
             for (int j = 0; j < MNN_Weights.size(); j++) {
                 MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * learning_rate);
@@ -230,7 +189,10 @@ void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes, std::vector<Mann::
 {
     for (size_t i = 0; i < nodes.size() - 1; ++i)
     {
+        // weighted_sum[i].randomize();
+        // std::cout << weighted_sum[i] + biases[i] << std::endl;
         weighted_sum[i] = weights[i] * nodes[i] + biases[i];
+        // weighted_sum[i] = weighted_sum[i] + biases[i];
         activationFunction(nodes[i + 1], weighted_sum[i]);
     }
 }
@@ -249,6 +211,7 @@ void MNNetwork::activationFunction(Mann::Matrix &matrix, const Mann::Matrix &wei
 void MNNetwork::der_activationFunction(Mann::Matrix &matrix, const Mann::Matrix &nodes)
 {
     matrix = nodes ^ ((nodes * -1) + 1);
+    
 }
 
 std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Mann::Matrix> &nodes, std::vector<Mann::Matrix> &weighted_sum, std::vector<Mann::Matrix> &weights, std::vector<Mann::Matrix> &biases, const Mann::Matrix &target)
