@@ -12,7 +12,7 @@ class MannUI
 {
 public:
     MannUI(GLFWwindow* window, float learning_rate, size_t iterations_rate, size_t batch_size);
-    ~MannUI();
+    virtual ~MannUI();
 
     void Render();
 
