@@ -21,6 +21,7 @@ void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size, s
 
     for(int n = 0; n < iterations; n++) {
         float avg_cost_bulk = 0;
+        saveNetwork(MNN_Layers_size ,MNN_Weights, MNN_Bias, filename);
         for(int batch = 0; batch < images_data.size()/batch_size; batch++) {
             for (int j = 0; j < MNN_d_weights.size(); j++) {
                 MNN_d_weights[j].nullMatrix();
@@ -61,8 +62,6 @@ void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size, s
         }
         float accuracy = (10 - avg_cost_bulk) * 10;
         std::cout << "Iteration: " << n+1 << ", Average Cost: " << avg_cost_bulk << ", Accuracy: " << accuracy << std::endl;
-
-        saveNetwork(MNN_Layers_size ,MNN_Weights, MNN_Bias, filename);
     }
 }
 
@@ -117,11 +116,13 @@ void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data,
                     num = j;
                 }
             }
+            std::cout << num << std::endl;
             std::cout << std::endl;
-            std::cout << "Predicted Labels: ";
-            for (int j = 0; j < MNN_Nodes[MNN_Nodes.size() - 1].rows(); j++) {
-                std::cout << MNN_Nodes[MNN_Nodes.size() - 1][j][0] << " ";
-            }
+            printLables(MNN_Nodes[MNN_Nodes.size() - 1]);
+            // std::cout << "Predicted Labels: ";
+            // for (int j = 0; j < MNN_Nodes[MNN_Nodes.size() - 1].rows(); j++) {
+            //     std::cout << MNN_Nodes[MNN_Nodes.size() - 1][j][0] << " ";
+            // }
             std::cout << std::endl;
             std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
 
@@ -189,10 +190,7 @@ void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes, std::vector<Mann::
 {
     for (size_t i = 0; i < nodes.size() - 1; ++i)
     {
-        // weighted_sum[i].randomize();
-        // std::cout << weighted_sum[i] + biases[i] << std::endl;
         weighted_sum[i] = weights[i] * nodes[i] + biases[i];
-        // weighted_sum[i] = weighted_sum[i] + biases[i];
         activationFunction(nodes[i + 1], weighted_sum[i]);
     }
 }
@@ -211,7 +209,6 @@ void MNNetwork::activationFunction(Mann::Matrix &matrix, const Mann::Matrix &wei
 void MNNetwork::der_activationFunction(Mann::Matrix &matrix, const Mann::Matrix &nodes)
 {
     matrix = nodes ^ ((nodes * -1) + 1);
-    
 }
 
 std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Mann::Matrix> &nodes, std::vector<Mann::Matrix> &weighted_sum, std::vector<Mann::Matrix> &weights, std::vector<Mann::Matrix> &biases, const Mann::Matrix &target)
@@ -248,9 +245,6 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
             }
         }
 
-
-        
-        
         for(int j = 0; j < nodes[i].rows(); j++)
         {
             for(int k = 0; k < nodes[i+1].rows(); k++)
@@ -354,7 +348,7 @@ void MNNetwork::saveImageDataToFile(const std::vector<double>& image_data, const
             for (int j = 0; j < 28; j++)
             {
                 // only 2 decimal points
-                if (image_data[i * 28 + j] == 0)
+                if (image_data[i * 28 + j] < 0.1)
                 {
                     file << ".....";
                 }
@@ -375,5 +369,21 @@ void MNNetwork::saveImageDataToFile(const std::vector<double>& image_data, const
         }
         file << std::endl;
         file.close();
+    }
+}
+
+void MNNetwork::printLables(const Mann::Matrix &matrix)
+{
+    std::cout << "Predicted Labels: " << std::endl;
+    for (int j = 0; j < matrix.rows(); j++) {
+        std::cout << j << ": " << " ";
+        int _char = matrix[j][0] * 50;
+        if (_char == 0) {
+            _char = 1;
+        }
+        for (int i = 0; i < _char; i++) {
+            std::cout << "*";
+        }
+        std::cout << std::endl;
     }
 }

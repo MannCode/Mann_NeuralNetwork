@@ -19,4 +19,5 @@ public:
     void saveNetwork(const std::vector<size_t>& layers_size, const std::vector<Mann::Matrix> &weights, const std::vector<Mann::Matrix> &biases, const std::string &filename);
     void loadNetwork(std::vector<size_t> &layers_size,  std::vector<Mann::Matrix> &nodes, std::vector<Mann::Matrix> &weights, std::vector<Mann::Matrix> &biases, const std::string &filename);
     void saveImageDataToFile(const std::vector<double>& image_data, const std::vector<double>& lable_data, const std::string& filename);
+    void printLables(const Mann::Matrix &matrix);
 };
