@@ -26,9 +26,18 @@ set(IMGUI_SOURCES
     dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
 )
 
+# set(boost_min_ver 1.50.0)
+# set(boost_libs system filesystem)
+
 # Find required packages
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
+# find_package(Boost ${boost_min_ver})
+
+
+# if(Boost_FOUND)
+#     find_package(Boost ${boost_min_ver} COMPONENTS ${boost_libs})
+# endif()
 
 # Add executable
 add_executable(NN ${SOURCES} ${IMGUI_SOURCES})

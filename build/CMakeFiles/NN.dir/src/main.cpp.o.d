@@ -1,6 +1,6 @@
 CMakeFiles/NN.dir/src/main.cpp.o: \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/main.cpp \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/main.cpp \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/fstream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/max.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/comp.h \
@@ -880,24 +880,24 @@ CMakeFiles/NN.dir/src/main.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/forward_list \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/future \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iostream \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/MNNetwork.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mnist.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mannui.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/utils.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imgui.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imconfig.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.hpp \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/utils.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imgui.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imconfig.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/float.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/float.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/float.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/../dependencies/includes/GLFW/include/GLFW/glfw3.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/GLFW/include/GLFW/glfw3.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gltypes.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/OpenGLAvailability.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/os/availability.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/../dependencies/includes/imgui/backends/imgui_impl_glfw.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/../dependencies/includes/imgui/backends/imgui_impl_opengl3.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/backends/imgui_impl_glfw.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/backends/imgui_impl_opengl3.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h

@@ -1,7 +1,7 @@
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o: \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imconfig.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imconfig.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/float.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config_site \
@@ -116,7 +116,7 @@ CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_mode_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.h \
   /opt/homebrew/include/GLFW/glfw3.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/__stddef_rsize_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework/Headers/gl.h \

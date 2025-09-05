@@ -53,10 +53,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork
+CMAKE_SOURCE_DIR = /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build
+CMAKE_BINARY_DIR = /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/NN.dir/depend.make
@@ -73,172 +73,172 @@ CMakeFiles/NN.dir/codegen:
 .PHONY : CMakeFiles/NN.dir/codegen
 
 CMakeFiles/NN.dir/src/main.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/src/main.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/main.cpp
+CMakeFiles/NN.dir/src/main.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/main.cpp
 CMakeFiles/NN.dir/src/main.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/NN.dir/src/main.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/main.cpp.o -MF CMakeFiles/NN.dir/src/main.cpp.o.d -o CMakeFiles/NN.dir/src/main.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/NN.dir/src/main.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/main.cpp.o -MF CMakeFiles/NN.dir/src/main.cpp.o.d -o CMakeFiles/NN.dir/src/main.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/main.cpp
 
 CMakeFiles/NN.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/src/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/main.cpp > CMakeFiles/NN.dir/src/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/main.cpp > CMakeFiles/NN.dir/src/main.cpp.i
 
 CMakeFiles/NN.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/src/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/main.cpp -o CMakeFiles/NN.dir/src/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/main.cpp -o CMakeFiles/NN.dir/src/main.cpp.s
 
 CMakeFiles/NN.dir/src/mannui.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/src/mannui.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mannui.cpp
+CMakeFiles/NN.dir/src/mannui.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.cpp
 CMakeFiles/NN.dir/src/mannui.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/NN.dir/src/mannui.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/mannui.cpp.o -MF CMakeFiles/NN.dir/src/mannui.cpp.o.d -o CMakeFiles/NN.dir/src/mannui.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mannui.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/NN.dir/src/mannui.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/mannui.cpp.o -MF CMakeFiles/NN.dir/src/mannui.cpp.o.d -o CMakeFiles/NN.dir/src/mannui.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.cpp
 
 CMakeFiles/NN.dir/src/mannui.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/src/mannui.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mannui.cpp > CMakeFiles/NN.dir/src/mannui.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.cpp > CMakeFiles/NN.dir/src/mannui.cpp.i
 
 CMakeFiles/NN.dir/src/mannui.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/src/mannui.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mannui.cpp -o CMakeFiles/NN.dir/src/mannui.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.cpp -o CMakeFiles/NN.dir/src/mannui.cpp.s
 
 CMakeFiles/NN.dir/src/mann.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/src/mann.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.cpp
+CMakeFiles/NN.dir/src/mann.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.cpp
 CMakeFiles/NN.dir/src/mann.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/NN.dir/src/mann.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/mann.cpp.o -MF CMakeFiles/NN.dir/src/mann.cpp.o.d -o CMakeFiles/NN.dir/src/mann.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/NN.dir/src/mann.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/mann.cpp.o -MF CMakeFiles/NN.dir/src/mann.cpp.o.d -o CMakeFiles/NN.dir/src/mann.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.cpp
 
 CMakeFiles/NN.dir/src/mann.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/src/mann.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.cpp > CMakeFiles/NN.dir/src/mann.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.cpp > CMakeFiles/NN.dir/src/mann.cpp.i
 
 CMakeFiles/NN.dir/src/mann.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/src/mann.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.cpp -o CMakeFiles/NN.dir/src/mann.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.cpp -o CMakeFiles/NN.dir/src/mann.cpp.s
 
 CMakeFiles/NN.dir/src/mnist.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/src/mnist.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mnist.cpp
+CMakeFiles/NN.dir/src/mnist.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.cpp
 CMakeFiles/NN.dir/src/mnist.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/NN.dir/src/mnist.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/mnist.cpp.o -MF CMakeFiles/NN.dir/src/mnist.cpp.o.d -o CMakeFiles/NN.dir/src/mnist.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mnist.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/NN.dir/src/mnist.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/mnist.cpp.o -MF CMakeFiles/NN.dir/src/mnist.cpp.o.d -o CMakeFiles/NN.dir/src/mnist.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.cpp
 
 CMakeFiles/NN.dir/src/mnist.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/src/mnist.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mnist.cpp > CMakeFiles/NN.dir/src/mnist.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.cpp > CMakeFiles/NN.dir/src/mnist.cpp.i
 
 CMakeFiles/NN.dir/src/mnist.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/src/mnist.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mnist.cpp -o CMakeFiles/NN.dir/src/mnist.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.cpp -o CMakeFiles/NN.dir/src/mnist.cpp.s
 
 CMakeFiles/NN.dir/src/MNNetwork.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/src/MNNetwork.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/MNNetwork.cpp
+CMakeFiles/NN.dir/src/MNNetwork.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.cpp
 CMakeFiles/NN.dir/src/MNNetwork.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/NN.dir/src/MNNetwork.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/MNNetwork.cpp.o -MF CMakeFiles/NN.dir/src/MNNetwork.cpp.o.d -o CMakeFiles/NN.dir/src/MNNetwork.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/MNNetwork.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/NN.dir/src/MNNetwork.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/src/MNNetwork.cpp.o -MF CMakeFiles/NN.dir/src/MNNetwork.cpp.o.d -o CMakeFiles/NN.dir/src/MNNetwork.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.cpp
 
 CMakeFiles/NN.dir/src/MNNetwork.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/src/MNNetwork.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/MNNetwork.cpp > CMakeFiles/NN.dir/src/MNNetwork.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.cpp > CMakeFiles/NN.dir/src/MNNetwork.cpp.i
 
 CMakeFiles/NN.dir/src/MNNetwork.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/src/MNNetwork.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/MNNetwork.cpp -o CMakeFiles/NN.dir/src/MNNetwork.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.cpp -o CMakeFiles/NN.dir/src/MNNetwork.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_demo.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_demo.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_draw.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_draw.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_tables.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_tables.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui_widgets.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.s
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o: CMakeFiles/NN.dir/flags.make
-CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
+CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o: /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o: CMakeFiles/NN.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o -MF CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o.d -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o -c /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp > CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.i
 
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp -o CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.s
 
 # Object files for target NN
 NN_OBJECTS = \
@@ -274,7 +274,7 @@ NN: CMakeFiles/NN.dir/build.make
 NN: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
 NN: /opt/homebrew/lib/libglfw.3.4.dylib
 NN: CMakeFiles/NN.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable NN"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable NN"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/NN.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -286,6 +286,6 @@ CMakeFiles/NN.dir/clean:
 .PHONY : CMakeFiles/NN.dir/clean
 
 CMakeFiles/NN.dir/depend:
-	cd /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/build/CMakeFiles/NN.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles/NN.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/NN.dir/depend
 

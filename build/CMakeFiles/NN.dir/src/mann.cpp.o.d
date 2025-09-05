@@ -1,6 +1,6 @@
 CMakeFiles/NN.dir/src/mann.cpp.o: \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.cpp \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/src/mann.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.cpp \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/fstream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/max.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/comp.h \

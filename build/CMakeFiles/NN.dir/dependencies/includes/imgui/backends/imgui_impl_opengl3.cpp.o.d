@@ -1,7 +1,7 @@
 CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o: \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/imconfig.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imconfig.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/float.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__config_site \
@@ -116,7 +116,7 @@ CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o:
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_mode_t.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_assert.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_static_assert.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/stdio.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/stdio.h \
@@ -127,7 +127,7 @@ CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o:
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_seek_set.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/_ctermid.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/_types/_off_t.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3_loader.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/backends/imgui_impl_opengl3_loader.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/dlfcn.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/stdbool.h \
   /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include/stdbool.h

@@ -1,6 +1,7 @@
-#include "mannui.h"
+#include "mannui.hpp"
 
-#include <string>
+
+std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
 
 MannUI::MannUI(GLFWwindow *window, float learning_rate, size_t iterations_rate, size_t batch_size)
     : window(window), learning_rate(learning_rate), iterations_rate(iterations_rate),
@@ -26,6 +27,10 @@ inline MannUI::~MannUI()
     ImGui::DestroyContext();
 }
 
+// PROTOTYPES
+void ShowAvalModels(std::string &outputText);
+
+
 void MannUI::Render()
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -44,32 +49,64 @@ void MannUI::Render()
     ImGui::End();
 
     // Control Panel
-    ImGui::Begin("Control Panel");
-    if (ImGui::Button("Run"))
-    {
-        outputText += "AHH AHH YEH MOMMY Ahh...\n";
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Test"))
-    {
-        outputText += "Testing Model...\n";
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Train"))
-    {
-        outputText += "Training model with LR=" + std::to_string(learning_rate) +
-                      ", Iterations=" + std::to_string(iterations_rate) +
-                      ", Batch Size=" + std::to_string(batch_size) + "\n";
-    }
-
-    ImGui::Text("Training Parameters");
-    ImGui::InputFloat("Learning Rate", &learning_rate, 0.001f, 0.1f, "%.3f");
-    ImGui::InputScalar("Iterations", ImGuiDataType_U64, &iterations_rate, nullptr, nullptr, "%zu");
-    ImGui::InputScalar("Batch Size", ImGuiDataType_U64, &batch_size, nullptr, nullptr, "%zu");
+    ImGui::Begin("Models");
+    ShowAvalModels(outputText);
     ImGui::End();
-
+    
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ShowAvalModels(std::string &outputText)
+{
+    for (const std::string& name : filenames)
+    {
+        if (ImGui::Button(name.c_str()))
+        {
+            outputText += (name + "\n");
+        }
+    }
+
+    if (ImGui::Button("Create New Model"))
+    {
+        ImGui::OpenPopup("CreateModelPopup");
+    }
+
+    if (ImGui::BeginPopupModal("CreateModelPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Enter new model details here.");
+
+        static std::string modelName = "";
+        
+        std::vector<char> buffer(modelName.begin(), modelName.end());
+        buffer.resize(256);
+        buffer.push_back('\0');
+        
+        if (ImGui::InputText("Model Name", buffer.data(), buffer.size()))
+        {
+            modelName = buffer.data();
+        }
+
+        if (ImGui::Button("Create"))
+        {
+            outputText += ("Creating Model: " + modelName + "\n");
+            // outputText << "Creating Model: " << modelName << std::endl;
+            filenames.push_back(modelName);
+
+            ImGui::CloseCurrentPopup();
+
+            modelName[0] = '\0';
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 // GLuint LoadTexture(const std::string &filepath)

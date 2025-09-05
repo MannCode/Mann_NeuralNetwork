@@ -1,7 +1,7 @@
 #include "mann.h"
 #include "MNNetwork.h"
 #include "mnist.h"
-#include "mannui.h"
+#include "mannui.hpp"
 
 using namespace std;
 
@@ -42,7 +42,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Create window
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "MannUI", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1920, 1080, "MannUI", nullptr, nullptr);
     if (!window)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
@@ -52,9 +52,6 @@ int main()
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
-
-    mnist_images_data[654];
-    mnist_labels_data[654];
 
     // Initialize MannUI
     MannUI ui(window, learning_rate, iterations, batch_size);
