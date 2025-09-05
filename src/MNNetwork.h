@@ -1,11 +1,14 @@
 #pragma once
 
+#include <fstream>
+
 #include "mann.h"
 
 class MNNetwork
 {
 public:
-    MNNetwork();
+    MNNetwork(std::string filename);
+    MNNetwork(std::string filename, std::vector<size_t> hidden_layers_size);
     ~MNNetwork();
 
     void trainNetwork(const size_t iterations, const size_t batch_size, std::vector<std::vector<double>> &images_data, std::vector<std::vector<double>> &labels_data, const std::string &filename, float learning_rate);
@@ -20,4 +23,16 @@ public:
     void loadNetwork(std::vector<size_t> &layers_size,  std::vector<Mann::Matrix> &nodes, std::vector<Mann::Matrix> &weights, std::vector<Mann::Matrix> &biases, const std::string &filename);
     void saveImageDataToFile(const std::vector<double>& image_data, const std::vector<double>& lable_data, const std::string& filename);
     void printLables(const Mann::Matrix &matrix);
+    void CreateNetwork(std::vector<size_t> &layers_size, std::vector<Mann::Matrix> &nodes, std::vector<Mann::Matrix> &weights, std::vector<Mann::Matrix> &biases, std::vector<size_t> &hidden_layers_size, const std::string &modelName);
+
+public:
+    struct Networks
+    {
+        std::vector<std::string> modelName;
+        std::vector<MNNetwork> network;
+    };
+
+private:
+    std::vector<size_t> MNN_Layers_size;
+    std::vector<Mann::Matrix> MNN_Nodes, MNN_Weights, MNN_Bias;
 };

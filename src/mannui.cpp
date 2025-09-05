@@ -1,6 +1,5 @@
 #include "mannui.hpp"
 
-
 std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
 
 MannUI::MannUI(GLFWwindow *window, float learning_rate, size_t iterations_rate, size_t batch_size)
@@ -28,8 +27,7 @@ inline MannUI::~MannUI()
 }
 
 // PROTOTYPES
-void ShowAvalModels(std::string &outputText);
-
+void ShowAvalModels(std::stringstream &outputText);
 
 void MannUI::Render()
 {
@@ -41,7 +39,7 @@ void MannUI::Render()
 
     // Output Window
     ImGui::Begin("Output");
-    ImGui::TextWrapped("%s", outputText.c_str());
+    ImGui::TextWrapped("%s", outputText.str().c_str());
     if (ImGui::Button("Clear Output"))
     {
         outputText.clear();
@@ -57,13 +55,13 @@ void MannUI::Render()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ShowAvalModels(std::string &outputText)
+void ShowAvalModels(std::stringstream &outputText)
 {
     for (const std::string& name : filenames)
     {
         if (ImGui::Button(name.c_str()))
         {
-            outputText += (name + "\n");
+            outputText << name << std::endl;
         }
     }
 
@@ -89,10 +87,15 @@ void ShowAvalModels(std::string &outputText)
 
         if (ImGui::Button("Create"))
         {
-            outputText += ("Creating Model: " + modelName + "\n");
-            // outputText << "Creating Model: " << modelName << std::endl;
+            if (modelName.empty()) modelName = getRandomModelName();
+            outputText << "Creating Model: " << modelName << std::endl;
             filenames.push_back(modelName);
+            MNNetwork network(modelName, std::vector<size_t>{100, 20}); // Example hidden layers
+            MNNetwork::Networks networks;
+            networks.modelName.push_back(modelName);
+            networks.network.push_back(network);
 
+            // network.CreateNewModel(modelName);
             ImGui::CloseCurrentPopup();
 
             modelName[0] = '\0';

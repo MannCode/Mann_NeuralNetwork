@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-    MNNetwork network;
+    // MNNetwork network;
     Mnist mnist;
 
     
@@ -17,7 +17,7 @@ int main()
     mnist.ReadMNISTlabels(10000, mnist_labels_data);
     
     
-    std::string MNN_network_file = "MNN_Network_784_50_10_10.txt";
+    // std::string MNN_network_file = "MNN_Network_784_50_10_10.mms";
     float learning_rate = 0.01;
     size_t iterations = 10000;
     size_t batch_size = 20;
@@ -42,7 +42,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // Create window
-    GLFWwindow* window = glfwCreateWindow(1920, 1080, "MannUI", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "MannUI", nullptr, nullptr);
     if (!window)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
