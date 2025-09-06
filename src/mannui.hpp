@@ -17,6 +17,8 @@
 #include "MNNetwork.h"
 #include "mann.h"
 
+#include "../dependencies/includes/imgui/imgui_internal.h"
+
 #include <iostream>
 #include <vector>
 #include <string>

@@ -69,7 +69,42 @@ void MannUI::Render()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+    // ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
+
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+    ImGuiWindowFlags host_window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
+                                         ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+                                         ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    // Begin a full-screen window to hold the dockspace
+    ImGui::Begin("DockSpace Demo", nullptr, host_window_flags);
+
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    static bool first_time = true;
+
+    if (first_time)
+    {
+        first_time = false;
+        ImGui::DockBuilderRemoveNode(dockspace_id);
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+        // Split dockspace into two nodes: left and right
+        ImGuiID dock_main_id = dockspace_id;
+        ImGuiID dock_id_left;
+        ImGuiID dock_id_right;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.3f, &dock_id_left, &dock_id_right);
+        // Dock your windows into the nodes
+        ImGui::DockBuilderDockWindow("Models", dock_id_left);
+        ImGui::DockBuilderDockWindow("Output", dock_id_right);
+        // Finish dock builder
+        ImGui::DockBuilderFinish(dockspace_id);
+    }
+
+    ImGui::End();
 
     // Output Window
     ImGui::Begin("Output");
