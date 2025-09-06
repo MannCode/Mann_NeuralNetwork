@@ -1,29 +1,75 @@
+/**
+ * @file mann.cpp
+ * @brief Implementation of the Matrix class in the Mann namespace for neural network operations.
+ * @author Jayansh Devgan, Mandeep Singh Warwal
+ * @date 2025-09-06
+ * @version 1.0
+ *
+ * This file contains the implementation of the Matrix class, providing functionality
+ * for matrix operations such as addition, subtraction, multiplication, randomization,
+ * and output formatting used in neural network computations.
+ */
+
 #include "mann.h"
 #include <iomanip>
 
+/**
+ * @namespace Mann
+ * @brief Namespace for matrix-related classes and utilities used in neural networks.
+ */
 namespace Mann
 {
+    /**
+     * @brief Constructs a matrix with specified dimensions, initialized to zero.
+     * @param rows The number of rows in the matrix.
+     * @param cols The number of columns in the matrix.
+     */
     Matrix::Matrix(size_t rows, size_t cols) : m_rows(rows), m_cols(cols), m_data(rows, std::vector<float>(cols, 0.0f)) {}
 
+    /**
+     * @brief Gets the number of rows in the matrix.
+     * @return The number of rows.
+     */
     int Matrix::rows() const
     {
         return m_rows;
     }
+
+    /**
+     * @brief Gets the number of columns in the matrix.
+     * @return The number of columns.
+     */
     int Matrix::cols() const
     {
         return m_cols;
     }
 
+    /**
+     * @brief Accesses a row of the matrix for modification.
+     * @param index The row index.
+     * @return A reference to the row as a vector of floats.
+     */
     std::vector<float>& Matrix::operator[](int index)
     {
         return m_data[index];
     }
 
+    /**
+     * @brief Accesses a row of the matrix for read-only access.
+     * @param index The row index.
+     * @return A const reference to the row as a vector of floats.
+     */
     const std::vector<float>& Matrix::operator[](int index) const
     {
         return m_data[index];
     }
 
+    /**
+     * @brief Adds two matrices element-wise.
+     * @param other The matrix to add.
+     * @return A new matrix containing the element-wise sum.
+     * @throws std::invalid_argument If the matrix dimensions do not match.
+     */
     Matrix Matrix::operator+(const Matrix& other) const
     {
         if (m_data.size() != other.m_data.size() || m_data[0].size() != other.m_data[0].size())
@@ -46,6 +92,12 @@ namespace Mann
         return result;
     }
 
+    /**
+     * @brief Subtracts a matrix from this matrix element-wise.
+     * @param other The matrix to subtract.
+     * @return A new matrix containing the element-wise difference.
+     * @throws std::invalid_argument If the matrix dimensions do not match.
+     */
     Matrix Matrix::operator-(const Matrix& other) const
     {
         if (m_data.size() != other.m_data.size() || m_data[0].size() != other.m_data[0].size())
@@ -68,6 +120,11 @@ namespace Mann
         return result;
     }
 
+    /**
+     * @brief Adds a scalar to each element of the matrix.
+     * @param scaler The scalar value to add.
+     * @return A new matrix with the scalar added to each element.
+     */
     Matrix Matrix::operator+(float scaler) const
     {
         size_t rows = m_data.size();
@@ -85,6 +142,11 @@ namespace Mann
         return result;
     }
 
+    /**
+     * @brief Subtracts a scalar from each element of the matrix.
+     * @param scaler The scalar value to subtract.
+     * @return A new matrix with the scalar subtracted from each element.
+     */
     Matrix Matrix::operator-(float scaler) const
     {
         size_t rows = m_data.size();
@@ -107,6 +169,12 @@ namespace Mann
 
 // For Macos
 // #elif defined(__APPLE__) && defined(__MACH__)
+    /**
+     * @brief Performs matrix multiplication with another matrix.
+     * @param other The matrix to multiply with.
+     * @return A new matrix containing the result of matrix multiplication.
+     * @throws std::invalid_argument If the matrix dimensions do not allow multiplication.
+     */
     Matrix Matrix::operator*(const Matrix& other) const
     {
         static MU_SHORTC TS = 8;
@@ -155,6 +223,11 @@ namespace Mann
     }
 // #endif
 
+    /**
+     * @brief Multiplies each element of the matrix by a scalar.
+     * @param scalar The scalar value to multiply by.
+     * @return A new matrix with each element scaled.
+     */
     Matrix Matrix::operator*(double scalar) const
     {
         size_t rows = m_data.size();
@@ -172,6 +245,12 @@ namespace Mann
         return result;
     }
 
+    /**
+     * @brief Performs element-wise multiplication (Hadamard product) with another matrix.
+     * @param other The matrix to multiply element-wise.
+     * @return A new matrix containing the element-wise product.
+     * @throws std::invalid_argument If the matrix dimensions do not match.
+     */
     Matrix Matrix::operator^(const Matrix& other) const
     {
         // Element-wise multiplication
@@ -196,6 +275,12 @@ namespace Mann
         return result;
     }
 
+    /**
+     * @brief Divides each element of the matrix by a scalar.
+     * @param scalar The scalar value to divide by.
+     * @return A new matrix with each element divided by the scalar.
+     * @throws std::invalid_argument If the scalar is zero.
+     */
     Matrix Matrix::operator/(double scalar) const
     {
         if (scalar == 0)
@@ -218,6 +303,11 @@ namespace Mann
         return result;
     }
 
+    /**
+     * @brief Assigns values to the matrix using an initializer list.
+     * @param init The initializer list of vectors containing matrix data.
+     * @return A reference to the modified matrix.
+     */
     Matrix& Matrix::operator=(std::initializer_list<std::vector<float>> init)
     {
         m_rows = init.size();
@@ -237,6 +327,12 @@ namespace Mann
         return *this;
     }
 
+    /**
+     * @brief Outputs the matrix to an output stream.
+     * @param os The output stream.
+     * @param matrix The matrix to output.
+     * @return The output stream.
+     */
     std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
     {
         for (const auto& row : matrix.m_data)
@@ -253,6 +349,10 @@ namespace Mann
         return os;
     }
 
+    /**
+     * @brief Randomizes the matrix elements with values between -1.0 and 1.0.
+     * @return A reference to the modified matrix.
+     */
     Matrix Matrix::randomize()
     {
         std::random_device rd;
@@ -265,7 +365,13 @@ namespace Mann
         }
         return *this;
     }
-
+    
+    /**
+     * @brief Randomizes the matrix elements within a specified range.
+     * @param min The minimum value for randomization.
+     * @param max The maximum value for randomization.
+     * @return A reference to the modified matrix.
+     */
     Matrix Matrix::randomize(float min, float max)
     {
         std::random_device rd;
@@ -279,6 +385,10 @@ namespace Mann
         return *this;
     }
 
+    /**
+     * @brief Sets all matrix elements to zero.
+     * @return A reference to the modified matrix.
+     */
     Matrix Matrix::nullMatrix()
     {
         for (size_t i = 0; i < m_rows; ++i) {

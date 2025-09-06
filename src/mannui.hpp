@@ -1,3 +1,15 @@
+/**
+ * @file mann_ui.h
+ * @brief Header file for the MannUI class and utility functions for managing neural network UI.
+ * @author JayanshDevgan
+ * @date 2025-09-06
+ * @version 1.0
+ *
+ * This file defines the MannUI class, which provides a graphical user interface for
+ * interacting with the neural network, along with utility functions for handling
+ * model file names and random model name generation.
+ */
+
 #ifndef MANN_UI_H
 #define MANN_UI_H
 
@@ -8,7 +20,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstdio>
 #include <memory>
 #include <stdexcept>
 #include <sstream>
@@ -18,6 +29,22 @@
 #include <random>
 #include <stdexcept>
 
+/**
+ * @brief Platform-specific includes for file system operations.
+ */
+#ifdef _WIN32
+    #include <cstdio>
+    #define popen _popen
+    #define pclose _pclose
+#else
+    #include <cstdio>
+#endif
+
+/**
+ * @brief Checks if a string ends with the ".mms" extension.
+ * @param str The string to check.
+ * @return True if the string ends with ".mms", false otherwise.
+ */
 inline bool endsWithTxt(const std::string& str) {
     const std::string ext = ".mms";
     if (str.length() >= ext.length()) {
@@ -26,6 +53,11 @@ inline bool endsWithTxt(const std::string& str) {
     return false;
 }
 
+/**
+ * @brief Removes the ".mms" extension from a filename.
+ * @param filename The filename to process.
+ * @return The filename without the ".mms" extension, or the original filename if no extension.
+ */
 inline std::string removeTxtExtension(const std::string& filename) {
     if (endsWithTxt(filename)) {
         return filename.substr(0, filename.length() - 4);
@@ -33,6 +65,10 @@ inline std::string removeTxtExtension(const std::string& filename) {
     return filename;
 }
 
+/**
+ * @brief Retrieves a list of model filenames without the ".mms" extension from the models directory.
+ * @return A vector of model filenames without extensions.
+ */
 inline std::vector<std::string> getTxtFileNamesWithoutExtension() {
     std::vector<std::string> filenames;
 
@@ -74,7 +110,11 @@ inline std::vector<std::string> getTxtFileNamesWithoutExtension() {
     return filenames;
 }
 
-
+/**
+ * @brief Removes whitespace from a string.
+ * @param s The input string to trim.
+ * @return The string with all spaces removed.
+ */
 inline std::string trim(const std::string& s)
 {
     std::string str;
@@ -85,6 +125,11 @@ inline std::string trim(const std::string& s)
     return str;
 }
 
+/**
+ * @brief Retrieves a random model name from a file.
+ * @return A randomly selected model name from modelnames.txt.
+ * @throws std::runtime_error If the file cannot be opened or is empty.
+ */
 inline std::string getRandomModelName()
 {
     std::ifstream file("../src/modelnames.txt");
@@ -117,20 +162,44 @@ inline std::string getRandomModelName()
     return lines[dis(gen)];
 }
 
+/**
+ * @class MannUI
+ * @brief A class for managing the graphical user interface for the neural network.
+ *
+ * This class integrates with GLFW and ImGui to provide a user interface for
+ * interacting with the MNNetwork class, allowing configuration of training
+ * parameters and visualization of results.
+ */
 class MannUI
 {
 public:
+    /**
+     * @brief Constructs a MannUI object with specified parameters.
+     * @param window The GLFW window for rendering the UI.
+     * @param learning_rate The learning rate for neural network training.
+     * @param iterations_rate The number of iterations for training.
+     * @param batch_size The batch size for training.
+     */
     MannUI(GLFWwindow* window, float learning_rate, size_t iterations_rate, size_t batch_size);
+    
+    /**
+     * @brief Destructor for the MannUI class.
+     *
+     * Cleans up resources used by the UI.
+     */
     virtual ~MannUI();
 
+    /**
+     * @brief Renders the UI using ImGui and GLFW.
+     */
     void Render();
 
 private:
-    GLFWwindow* window;
-    std::stringstream outputText;
-    float learning_rate;
-    size_t iterations_rate;
-    size_t batch_size;
+    GLFWwindow* window;              ///< The GLFW window for rendering the UI.
+    std::stringstream outputText;    ///< Stream for capturing UI output text.
+    float learning_rate;             ///< Learning rate for neural network training.
+    size_t iterations_rate;          ///< Number of iterations for training.
+    size_t batch_size;               ///< Batch size for training.
 };
 
 #endif // MANN_UI_H

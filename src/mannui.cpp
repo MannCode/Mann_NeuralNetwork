@@ -1,7 +1,30 @@
+/**
+ * @file mannui.cpp
+ * @brief Implementation of the MannUI class for rendering a neural network GUI.
+ * @author Jayansh Devgan, Mandeep Singh Warwal
+ * @date 2025-09-06
+ * @version 1.0
+ *
+ * This file contains the implementation of the MannUI class, which provides a
+ * graphical user interface using ImGui and GLFW for interacting with the neural
+ * network. It includes functionality for displaying available models, creating new
+ * models, and rendering output.
+ */
+
 #include "mannui.hpp"
 
+/**
+ * @brief Global vector of model filenames retrieved from the models directory.
+ */
 std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
 
+/**
+ * @brief Constructs a MannUI object and initializes ImGui with GLFW and OpenGL.
+ * @param window The GLFW window for rendering the UI.
+ * @param learning_rate The learning rate for neural network training.
+ * @param iterations_rate The number of iterations for training.
+ * @param batch_size The batch size for training.
+ */
 MannUI::MannUI(GLFWwindow *window, float learning_rate, size_t iterations_rate, size_t batch_size)
     : window(window), learning_rate(learning_rate), iterations_rate(iterations_rate),
       batch_size(batch_size)
@@ -17,6 +40,11 @@ MannUI::MannUI(GLFWwindow *window, float learning_rate, size_t iterations_rate, 
     ImGui_ImplOpenGL3_Init("#version 150");
 }
 
+/**
+ * @brief Destructor for the MannUI class.
+ *
+ * Cleans up ImGui and its backends.
+ */
 inline MannUI::~MannUI()
 {
 
@@ -29,6 +57,12 @@ inline MannUI::~MannUI()
 // PROTOTYPES
 void ShowAvalModels(std::stringstream &outputText);
 
+/**
+ * @brief Renders the ImGui-based user interface.
+ *
+ * Sets up a new ImGui frame, renders the output window and control panel,
+ * and handles docking and rendering of draw data.
+ */
 void MannUI::Render()
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -55,6 +89,10 @@ void MannUI::Render()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+/**
+ * @brief Displays available models and a button to create a new model.
+ * @param outputText A stringstream to append output messages for display in the UI.
+ */
 void ShowAvalModels(std::stringstream &outputText)
 {
     for (const std::string& name : filenames)

@@ -1,11 +1,38 @@
+/**
+ * @file Mnist.cpp
+ * @brief Implementation of the Mnist class for reading MNIST dataset images and labels.
+ * @author Mandeep Singh Warwal
+ * @date 2025-09-06
+ * @version 1.0
+ *
+ * This file contains the implementation of the Mnist class, which provides
+ * functionality for reading MNIST image and label data from binary files
+ * and converting them into vectors of doubles for neural network processing.
+ */
+
+
 #include "mnist.h"
 #include "mann.h"
 
-using namespace std;
-
+/**
+ * @brief Default constructor for the Mnist class.
+ *
+ * Initializes the Mnist object for reading MNIST dataset files.
+ */
 Mnist::Mnist() {};
+
+/**
+ * @brief Destructor for the Mnist class.
+ *
+ * Cleans up resources used by the Mnist object.
+ */
 Mnist::~Mnist() {};
 
+/**
+ * @brief Reverses the byte order of an integer to handle endianness.
+ * @param i The integer to reverse.
+ * @return The integer with its byte order reversed.
+ */
 int Mnist::ReverseInt (int i)
 {
     unsigned char ch1, ch2, ch3, ch4;
@@ -16,10 +43,16 @@ int Mnist::ReverseInt (int i)
     return((int)ch1<<24)+((int)ch2<<16)+((int)ch3<<8)+ch4;
 }
 
-void Mnist::ReadMNISTimages(int NumberOfImages, int DataOfAnImage, vector<vector<double>> &arr)
+/**
+ * @brief Reads MNIST image data from a binary file into a vector.
+ * @param NumberOfImages The number of images to read.
+ * @param DataOfAnImage The number of pixels per image (e.g., 784 for 28x28 images).
+ * @param arr A vector of vectors to store the image data as normalized doubles.
+ */
+void Mnist::ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<std::vector<double>> &arr)
 {
-    arr.resize(NumberOfImages,vector<double>(DataOfAnImage));
-    ifstream file ("dependencies/includes/t10k-images-idx3-ubyte",ios::binary);
+    arr.resize(NumberOfImages, std::vector<double>(DataOfAnImage));
+    std::ifstream file ("dependencies/includes/t10k-images-idx3-ubyte", std::ios::binary);
     if (file.is_open())
     {
         
@@ -49,10 +82,15 @@ void Mnist::ReadMNISTimages(int NumberOfImages, int DataOfAnImage, vector<vector
     }
 }
 
-void Mnist::ReadMNISTlabels(int NumberOfImages, vector<vector<double>> &arr)
+/**
+ * @brief Reads MNIST label data from a binary file into a vector.
+ * @param NumberOfImages The number of images (labels) to read.
+ * @param arr A vector of vectors to store the label data as one-hot encoded doubles.
+ */
+void Mnist::ReadMNISTlabels(int NumberOfImages, std::vector<std::vector<double>> &arr)
 {
-    arr.resize(NumberOfImages,vector<double>(10));
-    ifstream file ("dependencies/includes/t10k-labels-idx1-ubyte",ios::binary);
+    arr.resize(NumberOfImages,std::vector<double>(10));
+    std::ifstream file ("dependencies/includes/t10k-labels-idx1-ubyte", std::ios::binary);
     if (file.is_open())
     {
         int magic_number=0;
