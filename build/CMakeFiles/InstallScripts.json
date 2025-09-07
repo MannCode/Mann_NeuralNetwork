@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/dev/Mann_NeuralNetwork/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -1,0 +1,3 @@
+C:/dev/Mann_NeuralNetwork/build/CMakeFiles/NN.dir
+C:/dev/Mann_NeuralNetwork/build/CMakeFiles/ALL_BUILD.dir
+C:/dev/Mann_NeuralNetwork/build/CMakeFiles/ZERO_CHECK.dir
