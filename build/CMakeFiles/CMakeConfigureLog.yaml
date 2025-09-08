@@ -24,7 +24,7 @@ events:
       The output was:
       0
       MSBuild version 17.14.18+a338add32 for .NET Framework
-      Build started 9/8/2025 1:04:33 PM.
+      Build started 9/8/2025 10:03:20 PM.
       
       Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\4.0.1\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -72,8 +72,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-u4wh0c"
-      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-u4wh0c"
+      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-d5ztif"
+      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-d5ztif"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /W3 /GR /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -83,40 +83,40 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-u4wh0c'
+        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-d5ztif'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_494b6.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_54e68.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.18+a338add32 for .NET Framework
-        Build started 9/8/2025 1:04:35 PM.
+        Build started 9/8/2025 10:03:22 PM.
         
-        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4wh0c\\cmTC_494b6.vcxproj" on node 1 (default targets).
+        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-d5ztif\\cmTC_54e68.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_494b6.dir\\Debug\\".
+          Creating directory "cmTC_54e68.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4wh0c\\Debug\\".
-          Creating directory "cmTC_494b6.dir\\Debug\\cmTC_494b6.tlog\\".
+          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-d5ztif\\Debug\\".
+          Creating directory "cmTC_54e68.dir\\Debug\\cmTC_54e68.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_494b6.dir\\Debug\\cmTC_494b6.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_494b6.dir\\Debug\\cmTC_494b6.tlog\\unsuccessfulbuild".
+          Creating "cmTC_54e68.dir\\Debug\\cmTC_54e68.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_54e68.dir\\Debug\\cmTC_54e68.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_494b6.dir\\Debug\\\\" /Fd"cmTC_494b6.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_54e68.dir\\Debug\\\\" /Fd"cmTC_54e68.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35213 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_494b6.dir\\Debug\\\\" /Fd"cmTC_494b6.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR /Fo"cmTC_54e68.dir\\Debug\\\\" /Fd"cmTC_54e68.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCXXCompilerABI.cpp"
           CMakeCXXCompilerABI.cpp
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4wh0c\\Debug\\cmTC_494b6.exe" /INCREMENTAL /ILK:"cmTC_494b6.dir\\Debug\\cmTC_494b6.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-u4wh0c/Debug/cmTC_494b6.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-u4wh0c/Debug/cmTC_494b6.lib" /MACHINE:X64  /machine:x64 cmTC_494b6.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_494b6.vcxproj -> C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4wh0c\\Debug\\cmTC_494b6.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-d5ztif\\Debug\\cmTC_54e68.exe" /INCREMENTAL /ILK:"cmTC_54e68.dir\\Debug\\cmTC_54e68.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-d5ztif/Debug/cmTC_54e68.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-d5ztif/Debug/cmTC_54e68.lib" /MACHINE:X64  /machine:x64 cmTC_54e68.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_54e68.vcxproj -> C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-d5ztif\\Debug\\cmTC_54e68.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_494b6.dir\\Debug\\cmTC_494b6.tlog\\unsuccessfulbuild".
-          Touching "cmTC_494b6.dir\\Debug\\cmTC_494b6.tlog\\cmTC_494b6.lastbuildstate".
-        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4wh0c\\cmTC_494b6.vcxproj" (default targets).
+          Deleting file "cmTC_54e68.dir\\Debug\\cmTC_54e68.tlog\\unsuccessfulbuild".
+          Touching "cmTC_54e68.dir\\Debug\\cmTC_54e68.tlog\\cmTC_54e68.lastbuildstate".
+        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-d5ztif\\cmTC_54e68.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.68
+        Time Elapsed 00:00:00.75
         
       exitCode: 0
   -
@@ -163,7 +163,7 @@ events:
       The output was:
       0
       MSBuild version 17.14.18+a338add32 for .NET Framework
-      Build started 9/8/2025 1:04:38 PM.
+      Build started 9/8/2025 10:03:25 PM.
       
       Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\4.0.1\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
@@ -192,7 +192,7 @@ events:
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.69
+      Time Elapsed 00:00:00.68
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -211,8 +211,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-hbm3d6"
-      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-hbm3d6"
+      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-krosvi"
+      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-krosvi"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_C_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -221,40 +221,40 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-hbm3d6'
+        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-krosvi'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_eb42c.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_992a4.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.18+a338add32 for .NET Framework
-        Build started 9/8/2025 1:04:39 PM.
+        Build started 9/8/2025 10:03:26 PM.
         
-        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hbm3d6\\cmTC_eb42c.vcxproj" on node 1 (default targets).
+        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-krosvi\\cmTC_992a4.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_eb42c.dir\\Debug\\".
+          Creating directory "cmTC_992a4.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hbm3d6\\Debug\\".
-          Creating directory "cmTC_eb42c.dir\\Debug\\cmTC_eb42c.tlog\\".
+          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-krosvi\\Debug\\".
+          Creating directory "cmTC_992a4.dir\\Debug\\cmTC_992a4.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_eb42c.dir\\Debug\\cmTC_eb42c.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_eb42c.dir\\Debug\\cmTC_eb42c.tlog\\unsuccessfulbuild".
+          Creating "cmTC_992a4.dir\\Debug\\cmTC_992a4.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_992a4.dir\\Debug\\cmTC_992a4.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_eb42c.dir\\Debug\\\\" /Fd"cmTC_eb42c.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_992a4.dir\\Debug\\\\" /Fd"cmTC_992a4.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35213 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_eb42c.dir\\Debug\\\\" /Fd"cmTC_eb42c.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_992a4.dir\\Debug\\\\" /Fd"cmTC_992a4.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-4.0\\Modules\\CMakeCCompilerABI.c"
           CMakeCCompilerABI.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hbm3d6\\Debug\\cmTC_eb42c.exe" /INCREMENTAL /ILK:"cmTC_eb42c.dir\\Debug\\cmTC_eb42c.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-hbm3d6/Debug/cmTC_eb42c.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-hbm3d6/Debug/cmTC_eb42c.lib" /MACHINE:X64  /machine:x64 cmTC_eb42c.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_eb42c.vcxproj -> C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hbm3d6\\Debug\\cmTC_eb42c.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-krosvi\\Debug\\cmTC_992a4.exe" /INCREMENTAL /ILK:"cmTC_992a4.dir\\Debug\\cmTC_992a4.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-krosvi/Debug/cmTC_992a4.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-krosvi/Debug/cmTC_992a4.lib" /MACHINE:X64  /machine:x64 cmTC_992a4.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_992a4.vcxproj -> C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-krosvi\\Debug\\cmTC_992a4.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_eb42c.dir\\Debug\\cmTC_eb42c.tlog\\unsuccessfulbuild".
-          Touching "cmTC_eb42c.dir\\Debug\\cmTC_eb42c.tlog\\cmTC_eb42c.lastbuildstate".
-        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-hbm3d6\\cmTC_eb42c.vcxproj" (default targets).
+          Deleting file "cmTC_992a4.dir\\Debug\\cmTC_992a4.tlog\\unsuccessfulbuild".
+          Touching "cmTC_992a4.dir\\Debug\\cmTC_992a4.tlog\\cmTC_992a4.lastbuildstate".
+        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-krosvi\\cmTC_992a4.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.63
+        Time Elapsed 00:00:00.67
         
       exitCode: 0
   -
@@ -296,8 +296,8 @@ events:
     checks:
       - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
     directories:
-      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ev7gz9"
-      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ev7gz9"
+      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-jjwmja"
+      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-jjwmja"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_C_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -307,40 +307,40 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ev7gz9'
+        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-jjwmja'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_af6b9.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_64a9b.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.18+a338add32 for .NET Framework
-        Build started 9/8/2025 1:04:40 PM.
+        Build started 9/8/2025 10:03:27 PM.
         
-        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\cmTC_af6b9.vcxproj" on node 1 (default targets).
+        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\cmTC_64a9b.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_af6b9.dir\\Debug\\".
+          Creating directory "cmTC_64a9b.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\Debug\\".
-          Creating directory "cmTC_af6b9.dir\\Debug\\cmTC_af6b9.tlog\\".
+          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\Debug\\".
+          Creating directory "cmTC_64a9b.dir\\Debug\\cmTC_64a9b.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_af6b9.dir\\Debug\\cmTC_af6b9.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_af6b9.dir\\Debug\\cmTC_af6b9.tlog\\unsuccessfulbuild".
+          Creating "cmTC_64a9b.dir\\Debug\\cmTC_64a9b.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_64a9b.dir\\Debug\\cmTC_64a9b.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_af6b9.dir\\Debug\\\\" /Fd"cmTC_af6b9.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\src.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_64a9b.dir\\Debug\\\\" /Fd"cmTC_64a9b.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\src.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35213 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_af6b9.dir\\Debug\\\\" /Fd"cmTC_af6b9.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\src.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CMAKE_HAVE_LIBC_PTHREAD /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_64a9b.dir\\Debug\\\\" /Fd"cmTC_64a9b.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\src.c"
           src.c
-        C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\cmTC_af6b9.vcxproj]
-        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\cmTC_af6b9.vcxproj" (default targets) -- FAILED.
+        C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\cmTC_64a9b.vcxproj]
+        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\cmTC_64a9b.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\cmTC_af6b9.vcxproj" (default target) (1) ->
+        "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\cmTC_64a9b.vcxproj" (default target) (1) ->
         (ClCompile target) -> 
-          C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ev7gz9\\cmTC_af6b9.vcxproj]
+          C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\src.c(1,10): error C1083: Cannot open include file: 'pthread.h': No such file or directory [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-jjwmja\\cmTC_64a9b.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.39
+        Time Elapsed 00:00:00.51
         
       exitCode: 1
   -
@@ -353,8 +353,8 @@ events:
     checks:
       - "Looking for pthread_create in pthreads"
     directories:
-      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ipyx1h"
-      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ipyx1h"
+      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-qhntlv"
+      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-qhntlv"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_C_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -364,42 +364,42 @@ events:
       variable: "CMAKE_HAVE_PTHREADS_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ipyx1h'
+        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-qhntlv'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_8274d.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_d4653.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.18+a338add32 for .NET Framework
-        Build started 9/8/2025 1:04:41 PM.
+        Build started 9/8/2025 10:03:28 PM.
         
-        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\cmTC_8274d.vcxproj" on node 1 (default targets).
+        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\cmTC_d4653.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_8274d.dir\\Debug\\".
+          Creating directory "cmTC_d4653.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\Debug\\".
-          Creating directory "cmTC_8274d.dir\\Debug\\cmTC_8274d.tlog\\".
+          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\Debug\\".
+          Creating directory "cmTC_d4653.dir\\Debug\\cmTC_d4653.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_8274d.dir\\Debug\\cmTC_8274d.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_8274d.dir\\Debug\\cmTC_8274d.tlog\\unsuccessfulbuild".
+          Creating "cmTC_d4653.dir\\Debug\\cmTC_d4653.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_d4653.dir\\Debug\\cmTC_d4653.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_8274d.dir\\Debug\\\\" /Fd"cmTC_8274d.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\CheckFunctionExists.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_d4653.dir\\Debug\\\\" /Fd"cmTC_d4653.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\CheckFunctionExists.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35213 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_8274d.dir\\Debug\\\\" /Fd"cmTC_8274d.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\CheckFunctionExists.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_d4653.dir\\Debug\\\\" /Fd"cmTC_d4653.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\CheckFunctionExists.c"
           CheckFunctionExists.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\Debug\\cmTC_8274d.exe" /INCREMENTAL /ILK:"cmTC_8274d.dir\\Debug\\cmTC_8274d.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ipyx1h/Debug/cmTC_8274d.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-ipyx1h/Debug/cmTC_8274d.lib" /MACHINE:X64  /machine:x64 cmTC_8274d.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\cmTC_8274d.vcxproj]
-        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\cmTC_8274d.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\Debug\\cmTC_d4653.exe" /INCREMENTAL /ILK:"cmTC_d4653.dir\\Debug\\cmTC_d4653.ilk" /NOLOGO pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-qhntlv/Debug/cmTC_d4653.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-qhntlv/Debug/cmTC_d4653.lib" /MACHINE:X64  /machine:x64 cmTC_d4653.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\cmTC_d4653.vcxproj]
+        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\cmTC_d4653.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\cmTC_8274d.vcxproj" (default target) (1) ->
+        "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\cmTC_d4653.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-ipyx1h\\cmTC_8274d.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthreads.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-qhntlv\\cmTC_d4653.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.61
+        Time Elapsed 00:00:00.52
         
       exitCode: 1
   -
@@ -412,8 +412,8 @@ events:
     checks:
       - "Looking for pthread_create in pthread"
     directories:
-      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-on4wj0"
-      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-on4wj0"
+      source: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-gd1q8b"
+      binary: "C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-gd1q8b"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W3"
       CMAKE_C_FLAGS_DEBUG: "/MDd /Zi /Ob0 /Od /RTC1"
@@ -423,42 +423,42 @@ events:
       variable: "CMAKE_HAVE_PTHREAD_CREATE"
       cached: true
       stdout: |
-        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-on4wj0'
+        Change Dir: 'C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-gd1q8b'
         
-        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_2cc5c.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_00bcc.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
         MSBuild version 17.14.18+a338add32 for .NET Framework
-        Build started 9/8/2025 1:04:42 PM.
+        Build started 9/8/2025 10:03:29 PM.
         
-        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\cmTC_2cc5c.vcxproj" on node 1 (default targets).
+        Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\cmTC_00bcc.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_2cc5c.dir\\Debug\\".
+          Creating directory "cmTC_00bcc.dir\\Debug\\".
           Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
-          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\Debug\\".
-          Creating directory "cmTC_2cc5c.dir\\Debug\\cmTC_2cc5c.tlog\\".
+          Creating directory "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\Debug\\".
+          Creating directory "cmTC_00bcc.dir\\Debug\\cmTC_00bcc.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_2cc5c.dir\\Debug\\cmTC_2cc5c.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
-          Touching "cmTC_2cc5c.dir\\Debug\\cmTC_2cc5c.tlog\\unsuccessfulbuild".
+          Creating "cmTC_00bcc.dir\\Debug\\cmTC_00bcc.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Touching "cmTC_00bcc.dir\\Debug\\cmTC_00bcc.tlog\\unsuccessfulbuild".
         ClCompile:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2cc5c.dir\\Debug\\\\" /Fd"cmTC_2cc5c.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\CheckFunctionExists.c"
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\CL.exe /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_00bcc.dir\\Debug\\\\" /Fd"cmTC_00bcc.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\CheckFunctionExists.c"
           Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35213 for x64
           Copyright (C) Microsoft Corporation.  All rights reserved.
-          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_2cc5c.dir\\Debug\\\\" /Fd"cmTC_2cc5c.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\CheckFunctionExists.c"
+          cl /c /Zi /W3 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=pthread_create /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_00bcc.dir\\Debug\\\\" /Fd"cmTC_00bcc.dir\\Debug\\vc143.pdb" /external:W3 /Gd /TC /errorReport:queue "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\CheckFunctionExists.c"
           CheckFunctionExists.c
         Link:
-          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\Debug\\cmTC_2cc5c.exe" /INCREMENTAL /ILK:"cmTC_2cc5c.dir\\Debug\\cmTC_2cc5c.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-on4wj0/Debug/cmTC_2cc5c.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-on4wj0/Debug/cmTC_2cc5c.lib" /MACHINE:X64  /machine:x64 cmTC_2cc5c.dir\\Debug\\CheckFunctionExists.obj
-        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\cmTC_2cc5c.vcxproj]
-        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\cmTC_2cc5c.vcxproj" (default targets) -- FAILED.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.44.35207\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\Debug\\cmTC_00bcc.exe" /INCREMENTAL /ILK:"cmTC_00bcc.dir\\Debug\\cmTC_00bcc.ilk" /NOLOGO pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-gd1q8b/Debug/cmTC_00bcc.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/dev/Mann_NeuralNetwork/build/CMakeFiles/CMakeScratch/TryCompile-gd1q8b/Debug/cmTC_00bcc.lib" /MACHINE:X64  /machine:x64 cmTC_00bcc.dir\\Debug\\CheckFunctionExists.obj
+        LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\cmTC_00bcc.vcxproj]
+        Done Building Project "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\cmTC_00bcc.vcxproj" (default targets) -- FAILED.
         
         Build FAILED.
         
-        "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\cmTC_2cc5c.vcxproj" (default target) (1) ->
+        "C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\cmTC_00bcc.vcxproj" (default target) (1) ->
         (Link target) -> 
-          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-on4wj0\\cmTC_2cc5c.vcxproj]
+          LINK : fatal error LNK1104: cannot open file 'pthread.lib' [C:\\dev\\Mann_NeuralNetwork\\build\\CMakeFiles\\CMakeScratch\\TryCompile-gd1q8b\\cmTC_00bcc.vcxproj]
         
             0 Warning(s)
             1 Error(s)
         
-        Time Elapsed 00:00:00.55
+        Time Elapsed 00:00:00.56
         
       exitCode: 1
 ...

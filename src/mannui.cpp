@@ -123,21 +123,27 @@ void MannUI::Render()
     std::string line;
     while (std::getline(tempStream, line)) {
         if (line.empty()) continue;
-        // Parse log level from the line (e.g., "[DEBUG]", "[INFO]", etc.)
-        std::string levelStr = line.substr(line.find("[") + 1, line.find("]") - 1);
-        ImVec4 color = IMGUI_COLOR_INFO;  // Default to INFO color
-        if (levelStr == "DEBUG") color = IMGUI_COLOR_DEBUG;
-        else if (levelStr == "INFO") color = IMGUI_COLOR_INFO;
-        else if (levelStr == "WARN") color = IMGUI_COLOR_WARN;
-        else if (levelStr == "ERROR") color = IMGUI_COLOR_ERROR;
+        // Find the second occurrence of "[" to get the log level (e.g., [DEBUG], [INFO])
+        size_t firstBracket = line.find("[");
+        size_t secondBracket = line.find("[", firstBracket + 1);
+        size_t thirdBracket = line.find("[", secondBracket + 1);
+        size_t thirdBracketEnd = line.find("]", thirdBracket + 1);
+        if (thirdBracket != std::string::npos && thirdBracketEnd != std::string::npos) {
+            std::string levelStr = line.substr(thirdBracket + 1, thirdBracketEnd - thirdBracket - 1);
+            ImVec4 color = IMGUI_COLOR_INFO;  // Default to INFO color
+            if (levelStr == "DEBUG") color = IMGUI_COLOR_DEBUG;
+            else if (levelStr == "INFO") color = IMGUI_COLOR_INFO;
+            else if (levelStr == "WARN") color = IMGUI_COLOR_WARN;
+            else if (levelStr == "ERROR") color = IMGUI_COLOR_ERROR;
 
-        ImGui::PushStyleColor(ImGuiCol_Text, color);
-        ImGui::TextWrapped("%s", line.c_str());
-        ImGui::PopStyleColor();
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
+            ImGui::TextWrapped("%s", line.c_str());
+            ImGui::PopStyleColor();
+        } else ImGui::TextWrapped("%s", line.c_str());
     }
-    ImGui::TextWrapped("%s", outputText.str().c_str());
     if (ImGui::Button("Clear Output"))
     {
+        outputText.str("");
         outputText.clear();
     }
     ImGui::End();
@@ -235,12 +241,10 @@ void ShowAvalModels(std::stringstream &outputText)
             else
             {
                 if (modelName.empty()) modelName = getRandomModelName();
-                // outputText << "Creating Model: " << modelName << " with layers [";
                 std::stringstream layersStr;
                 for (size_t i = 0; i < hidden_layers.size(); ++i)
                 {
                     layersStr << hidden_layers[i];
-                    if (i < hidden_layers.size() - 1) outputText << ", ";
                 }
                 MannLogger::info(outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
                 // Create the network

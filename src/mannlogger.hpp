@@ -93,12 +93,10 @@ public:
                 imguiColor = IMGUI_COLOR_ERROR;
                 break;
         }
-        std::string logMsg = "[" + getTimestamp() + "] " + color + "[" + levelStr + "] " + COLOR_RESET + ss.str() + "\n";
-        std::cout << logMsg;  // Console output with ANSI colors
-        // For GUI, store the color information (we'll handle rendering in ImGui)
-        guiOutput << "[" << getTimestamp() << "] [" << levelStr << "] " << ss.str() << "\n";  // Plain text for GUI
-        // Note: ImGui will apply color in the rendering step using PushStyleColor
-        ss.str("");  // Clear the stringstream for the next log
+        std::string logMsg = "[CONSOLE] [" + getTimestamp() + "] " + color + "[" + levelStr + "] " + COLOR_RESET + ss.str() + "\n";
+        std::cout << logMsg;  // Console output with marker
+        guiOutput << "[GUI] [" << getTimestamp() << "] [" << levelStr << "] " << ss.str() << "\n";  // GUI output with marker
+        ss.str("");  // Clear the stringstream
     }
 };
 
