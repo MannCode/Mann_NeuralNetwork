@@ -27,6 +27,7 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <array>
 #include <random>
 #include <stdexcept>
@@ -164,6 +165,12 @@ inline std::string getRandomModelName()
     return lines[dis(gen)];
 }
 
+// Extern declarations for global variables
+extern std::vector<std::string> filenames;
+extern char csv_buffer[256];
+extern MNNetwork::Networks networks;
+extern std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
+
 /**
  * @class MannUI
  * @brief A class for managing the graphical user interface for the neural network.
@@ -182,7 +189,7 @@ public:
      * @param iterations_rate The number of iterations for training.
      * @param batch_size The batch size for training.
      */
-    MannUI(GLFWwindow* window, float learning_rate, size_t iterations_rate, size_t batch_size);
+    MannUI(GLFWwindow* window, std::vector<std::vector<double>> mnist_images_data, std::vector<std::vector<double>> mnist_labels_data);
     
     /**
      * @brief Destructor for the MannUI class.
@@ -199,9 +206,6 @@ public:
 private:
     GLFWwindow* window;              ///< The GLFW window for rendering the UI.
     std::stringstream outputText;    ///< Stream for capturing UI output text.
-    float learning_rate;             ///< Learning rate for neural network training.
-    size_t iterations_rate;          ///< Number of iterations for training.
-    size_t batch_size;               ///< Batch size for training.
 };
 
 #endif // MANN_UI_H

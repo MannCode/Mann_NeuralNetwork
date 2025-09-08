@@ -1,5 +1,3 @@
-#include "mann.h"
-#include "MNNetwork.h"
 #include "mnist.h"
 #include "mannui.hpp"
 
@@ -54,7 +52,7 @@ int main()
     glfwSwapInterval(1); // Enable vsync
 
     // Initialize MannUI
-    MannUI ui(window, learning_rate, iterations, batch_size);
+    MannUI ui(window, mnist_images_data, mnist_labels_data);
 
    while (!glfwWindowShouldClose(window))
     {

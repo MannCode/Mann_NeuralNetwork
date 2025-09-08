@@ -17,6 +17,13 @@
  * @brief Global vector of model filenames retrieved from the models directory.
  */
 std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
+char csv_buffer[256] = "";       // Buffer for csv input.
+
+/**
+ * @brief Global network to store models data.
+ */
+MNNetwork::Networks networks;
+std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
 
 /**
  * @brief Constructs a MannUI object and initializes ImGui with GLFW and OpenGL.
@@ -25,9 +32,8 @@ std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
  * @param iterations_rate The number of iterations for training.
  * @param batch_size The batch size for training.
  */
-MannUI::MannUI(GLFWwindow *window, float learning_rate, size_t iterations_rate, size_t batch_size)
-    : window(window), learning_rate(learning_rate), iterations_rate(iterations_rate),
-      batch_size(batch_size)
+MannUI::MannUI(GLFWwindow *window, std::vector<std::vector<double>> mnist_images_data, std::vector<std::vector<double>> mnist_labels_data)
+    : window(window)
 {
     // Init ImGui context
     IMGUI_CHECKVERSION();
@@ -38,6 +44,8 @@ MannUI::MannUI(GLFWwindow *window, float learning_rate, size_t iterations_rate, 
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
+    ::mnist_images_data = mnist_images_data;
+    ::mnist_labels_data = mnist_labels_data;
 }
 
 /**
@@ -56,6 +64,8 @@ inline MannUI::~MannUI()
 
 // PROTOTYPES
 void ShowAvalModels(std::stringstream &outputText);
+
+void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size);
 
 /**
  * @brief Renders the ImGui-based user interface.
@@ -125,6 +135,38 @@ void MannUI::Render()
 }
 
 /**
+ * @brief Parses a CSV string into a std::vector<size_t> with exactly three values.
+ * @param input The input CSV string.
+ * @param output The vector to store parsed integers.
+ * @return True if exactly three valid non-negative integers were parsed, false otherwise.
+ */
+bool ParseCSVToHiddenLayers(const std::string& input, std::vector<size_t>& output)
+{
+    output.clear();
+    std::stringstream ss(input);
+    std::string token;
+
+    while (std::getline(ss, token, ','))
+    {
+        token.erase(0, token.find_first_not_of(" \t"));
+        token.erase(token.find_last_not_of(" \t") + 1);
+
+        try
+        {
+            size_t value = std::stoul(token);
+            output.push_back((value > 699) ? 699 : value);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+            return false;
+        }
+    }
+    return !output.empty();
+}
+
+
+/**
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
  */
@@ -132,9 +174,14 @@ void ShowAvalModels(std::stringstream &outputText)
 {
     for (const std::string& name : filenames)
     {
+        MNNetwork network(name + ".mms");
+        networks.modelName.push_back(name);
+        networks.network.push_back(network);
+
         if (ImGui::Button(name.c_str()))
         {
-            outputText << name << std::endl;
+            float accuracy = network.testNetwork(mnist_images_data, mnist_labels_data);
+            outputText << name << " --- Accuracy: " << accuracy << "%" << std::endl;
         }
     }
 
@@ -148,40 +195,128 @@ void ShowAvalModels(std::stringstream &outputText)
         ImGui::Text("Enter new model details here.");
 
         static std::string modelName = "";
-        
-        std::vector<char> buffer(modelName.begin(), modelName.end());
-        buffer.resize(256);
-        buffer.push_back('\0');
-        
-        if (ImGui::InputText("Model Name", buffer.data(), buffer.size()))
+        static std::vector<size_t> hidden_layers{50, 10};
+        static float learning_rate = 0.01f;
+        static size_t batch_size = 32;
+
+        // Buffer for model name input
+        static char modelNameBuffer[256] = "";
+        if (ImGui::InputText("Model Name", modelNameBuffer, sizeof(modelNameBuffer)))
         {
-            modelName = buffer.data();
+            modelName = modelNameBuffer;
         }
+
+        NetworkConfigUI(hidden_layers, learning_rate, batch_size);
 
         if (ImGui::Button("Create"))
         {
-            if (modelName.empty()) modelName = getRandomModelName();
-            outputText << "Creating Model: " << modelName << std::endl;
-            filenames.push_back(modelName);
-            MNNetwork network(modelName, std::vector<size_t>{100, 20}); // Example hidden layers
-            MNNetwork::Networks networks;
-            networks.modelName.push_back(modelName);
-            networks.network.push_back(network);
+            if (hidden_layers.empty())
+            {
+                outputText << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
+            }
+            else
+            {
+                if (modelName.empty()) modelName = getRandomModelName();
+                outputText << "Creating Model: " << modelName << " with layers [";
+                for (size_t i = 0; i < hidden_layers.size(); ++i)
+                {
+                    outputText << hidden_layers[i];
+                    if (i < hidden_layers.size() - 1) outputText << ", ";
+                }
+                outputText << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
 
-            // network.CreateNewModel(modelName);
-            ImGui::CloseCurrentPopup();
+                // Create the network
+                MNNetwork network(modelName, hidden_layers, learning_rate, batch_size);
+                networks.modelName.push_back(modelName);
+                networks.network.push_back(network);
 
-            modelName[0] = '\0';
+                filenames.push_back(modelName);
+
+                // Reset inputs
+                modelName.clear();
+                hidden_layers.clear();
+                learning_rate = 0.01f;
+                batch_size = 32;
+                modelNameBuffer[0] = '\0';
+                csv_buffer[0] = '\0';
+
+                ImGui::CloseCurrentPopup();
+            }
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button("Cancel"))
         {
+            // Reset inputs
+            modelName.clear();
+            hidden_layers.clear();
+            learning_rate = 0.01f;
+            batch_size = 32;
+            modelNameBuffer[0] = '\0';
+            csv_buffer[0] = '\0';
             ImGui::CloseCurrentPopup();
         }
 
         ImGui::EndPopup();
+    }
+}
+
+/**
+ * @brief Renders UI for configuring neural network parameters.
+ * @param hidden_layers Vector to store hidden layer sizes.
+ * @param learning_rate Learning rate for the network.
+ * @param batch_size Batch size for training.
+ */
+void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size)
+{
+    ImGui::Text("Hidden Layers");
+    ImGui::Separator();
+
+    ImGui::InputText("Layers", csv_buffer, sizeof(csv_buffer), ImGuiInputTextFlags_CharsNoBlank);
+
+    if (ImGui::Button("Add Layers"))
+    {
+        std::string input(csv_buffer);
+        std::vector<size_t> new_layers;
+        if (ParseCSVToHiddenLayers(input, new_layers))
+        {
+            hidden_layers.insert(hidden_layers.end(), new_layers.begin(), new_layers.end());
+            csv_buffer[0] = '\0';
+        }
+    }
+
+    // Display current hidden_layers with Remove buttons
+    ImGui::Text("Current Layers:");
+    for (size_t i = 0; i < hidden_layers.size(); ++i)
+    {
+        ImGui::PushID(i);
+        ImGui::Text("Layer %zu: %zu", i + 1, hidden_layers[i]);
+        ImGui::SameLine();
+        if (ImGui::Button("Remove"))
+        {
+            hidden_layers.erase(hidden_layers.begin() + i);
+            ImGui::PopID();
+            continue;
+        }
+        ImGui::PopID();
+    }
+
+    ImGui::Text("Learning Rate");
+    ImGui::Separator();
+    if (ImGui::InputFloat("Learning Rate", &learning_rate, 0.001f, 0.1f, "%.4f", ImGuiInputTextFlags_CharsDecimal))
+    {
+        if (learning_rate < 0.0f) learning_rate = 0.0f;
+        if (learning_rate > 1.0f) learning_rate = 1.0f;
+    }
+
+    ImGui::Text("Batch Size");
+    ImGui::Separator();
+    int batch_size_int = static_cast<int>(batch_size);
+    if (ImGui::InputInt("Batch Size", &batch_size_int, 0, 0, ImGuiInputTextFlags_CharsNoBlank))
+    {
+        if (batch_size_int > 0)
+            batch_size = static_cast<size_t>((batch_size_int > 200) ? 200 : batch_size_int);
     }
 }
 

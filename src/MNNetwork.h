@@ -34,9 +34,11 @@ public:
      * @brief Constructs a neural network with specified hidden layer sizes.
      * @param filename The name of the file to save/load the network configuration.
      * @param hidden_layers_size A vector specifying the number of neurons in each hidden layer.
+     * @param learning_rate The learning rate for weight updates during training.
+     * @param batch_size The size of each training batch.
      */
-    MNNetwork(std::string filename, std::vector<size_t> hidden_layers_size);
-    
+    MNNetwork(std::string filename, std::vector<size_t> hidden_layers_size, float learning_rate, size_t batch_size);
+
     /**
      * @brief Destructor for the MNNetwork class.
      *
@@ -71,13 +73,9 @@ public:
 
     /**
      * @brief Tests the neural network using the provided dataset.
-     * @param images_data A vector of input image data for testing.
-     * @param labels_data A vector of corresponding label data for testing.
-     * @param filename The file containing the network configuration.
      */
-    void testNetwork(std::vector<std::vector<double>> &images_data, 
-                     std::vector<std::vector<double>> &labels_data, 
-                     const std::string &filename);
+    float testNetwork(std::vector<std::vector<double>> &images_data, 
+                     std::vector<std::vector<double>> &labels_data);
 
     /**
      * @brief Initializes the neural network with the specified layer sizes.
@@ -140,6 +138,8 @@ public:
      * @param filename The file to save the network configuration.
      */
     void saveNetwork(const std::vector<size_t>& layers_size, 
+                     float learning_rate,
+                     size_t batch_size,
                      const std::vector<Mann::Matrix> &weights, 
                      const std::vector<Mann::Matrix> &biases, 
                      const std::string &filename);
@@ -152,11 +152,7 @@ public:
      * @param biases A vector of matrices to store the biases for each layer.
      * @param filename The file containing the network configuration.
      */
-    void loadNetwork(std::vector<size_t> &layers_size, 
-                     std::vector<Mann::Matrix> &nodes, 
-                     std::vector<Mann::Matrix> &weights, 
-                     std::vector<Mann::Matrix> &biases, 
-                     const std::string &filename);
+    void loadNetwork(const std::string &filename);
 
     /**
      * @brief Saves image and label data to a file.
@@ -184,6 +180,8 @@ public:
      * @param modelName The name of the neural network model.
      */
     void CreateNetwork(std::vector<size_t> &layers_size, 
+                       float learning_rate,
+                       size_t batch_size,
                        std::vector<Mann::Matrix> &nodes, 
                        std::vector<Mann::Matrix> &weights, 
                        std::vector<Mann::Matrix> &biases, 
@@ -200,6 +198,12 @@ public:
         std::vector<std::string> modelName; ///< Names of the neural network models.
         std::vector<MNNetwork> network;     ///< Collection of neural network instances.
     };
+
+    std::string m_filename;
+    float m_learning_rate;
+    size_t m_batch_size;
+    float m_accuracy;
+    float m_total_training_time;
 
 private:
     std::vector<size_t> MNN_Layers_size;      ///< Sizes of the layers in the neural network.
