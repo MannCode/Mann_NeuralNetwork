@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\tests\events.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\deps\getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\deps\glad_gl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\deps\getopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\deps\glad\gl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{FF39D74C-1577-3548-8C36-67437A20A496}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{88343D2E-DB45-3582-B04C-D7BFE544075C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

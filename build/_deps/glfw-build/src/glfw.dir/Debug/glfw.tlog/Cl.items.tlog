@@ -1,0 +1,15 @@
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\context.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\context.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\init.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\init.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\input.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\input.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\monitor.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\monitor.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\vulkan.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\vulkan.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\window.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\window.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\win32_init.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\win32_init.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\win32_joystick.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\win32_joystick.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\win32_monitor.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\win32_monitor.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\win32_time.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\win32_time.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\win32_thread.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\win32_thread.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\win32_window.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\win32_window.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\wgl_context.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\wgl_context.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\egl_context.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\egl_context.obj
+C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\osmesa_context.c;C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\glfw.dir\Debug\osmesa_context.obj

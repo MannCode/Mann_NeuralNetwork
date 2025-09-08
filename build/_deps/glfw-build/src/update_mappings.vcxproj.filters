@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\CMakeFiles\3715f749b2765e8730ddad29d72d4ace\update_mappings.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\src\mappings.h.in">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-src\CMake\GenerateMappings.cmake" />
+    <None Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-build\src\CMakeFiles\update_mappings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{C57CBE3B-BA49-38E4-8249-2991A0DA4167}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{FF39D74C-1577-3548-8C36-67437A20A496}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

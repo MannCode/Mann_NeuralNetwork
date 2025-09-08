@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\8b8811a68200fea25d7924530accefae\glfw-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\56c49c1a1842fb95c0a01d63894dcc1d\glfw-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\f4a3fca394097edb5564a35cea938d8c\glfw-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\dev\Mann_NeuralNetwork\build\_deps\glfw-subbuild\CMakeFiles\glfw-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{AF4F33BC-8D7F-3A4A-AEC2-108ED69B6609}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

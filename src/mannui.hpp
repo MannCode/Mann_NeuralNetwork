@@ -76,7 +76,7 @@ inline std::vector<std::string> getTxtFileNamesWithoutExtension() {
     std::vector<std::string> filenames;
 
 #ifdef _WIN32
-    const char* cmd = "dir /b ..\\models\\*.mms";
+    const char* cmd = "dir /b ..\\..\\models\\*.mms";
 #else
     const char* cmd = "ls ../models/*.mms 2> /dev/null";
 #endif
@@ -135,7 +135,11 @@ inline std::string trim(const std::string& s)
  */
 inline std::string getRandomModelName()
 {
+#ifdef _WIN32
+    std::ifstream file("../../src/modelnames.txt");
+#else
     std::ifstream file("../src/modelnames.txt");
+#endif
 
     if (!file.is_open())
     {
