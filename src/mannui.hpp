@@ -16,6 +16,7 @@
 #include "utils.h"
 #include "MNNetwork.h"
 #include "mann.h"
+#include "mannlogger.hpp"
 
 #include "../dependencies/includes/imgui/imgui_internal.h"
 

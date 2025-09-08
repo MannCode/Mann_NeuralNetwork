@@ -118,6 +118,23 @@ void MannUI::Render()
 
     // Output Window
     ImGui::Begin("Output");
+    std::stringstream tempStream;
+    tempStream << outputText.str();  // Copy current content
+    std::string line;
+    while (std::getline(tempStream, line)) {
+        if (line.empty()) continue;
+        // Parse log level from the line (e.g., "[DEBUG]", "[INFO]", etc.)
+        std::string levelStr = line.substr(line.find("[") + 1, line.find("]") - 1);
+        ImVec4 color = IMGUI_COLOR_INFO;  // Default to INFO color
+        if (levelStr == "DEBUG") color = IMGUI_COLOR_DEBUG;
+        else if (levelStr == "INFO") color = IMGUI_COLOR_INFO;
+        else if (levelStr == "WARN") color = IMGUI_COLOR_WARN;
+        else if (levelStr == "ERROR") color = IMGUI_COLOR_ERROR;
+
+        ImGui::PushStyleColor(ImGuiCol_Text, color);
+        ImGui::TextWrapped("%s", line.c_str());
+        ImGui::PopStyleColor();
+    }
     ImGui::TextWrapped("%s", outputText.str().c_str());
     if (ImGui::Button("Clear Output"))
     {
@@ -181,7 +198,7 @@ void ShowAvalModels(std::stringstream &outputText)
         if (ImGui::Button(name.c_str()))
         {
             float accuracy = network.testNetwork(mnist_images_data, mnist_labels_data);
-            outputText << name << " --- Accuracy: " << accuracy << "%" << std::endl;
+            MannLogger::info(outputText) << name << " --- Accuracy: " << accuracy << "%" << std::endl;
         }
     }
 
@@ -212,19 +229,20 @@ void ShowAvalModels(std::stringstream &outputText)
         {
             if (hidden_layers.empty())
             {
-                outputText << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
+                // outputText << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
+                MannLogger::error(outputText) << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
             }
             else
             {
                 if (modelName.empty()) modelName = getRandomModelName();
-                outputText << "Creating Model: " << modelName << " with layers [";
+                // outputText << "Creating Model: " << modelName << " with layers [";
+                std::stringstream layersStr;
                 for (size_t i = 0; i < hidden_layers.size(); ++i)
                 {
-                    outputText << hidden_layers[i];
+                    layersStr << hidden_layers[i];
                     if (i < hidden_layers.size() - 1) outputText << ", ";
                 }
-                outputText << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
-
+                MannLogger::info(outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
                 // Create the network
                 MNNetwork network(modelName, hidden_layers, learning_rate, batch_size);
                 networks.modelName.push_back(modelName);
