@@ -364,7 +364,7 @@ void MNNetwork::saveNetwork(const std::vector<size_t> &layers_size,
                            const std::vector<Mann::Matrix> &biases, 
                            const std::string &filename)
 {
-    std::ofstream file(filename);
+    std::ofstream file("../models/" + filename);
     if (!file.is_open()) {
         std::cerr << "Error opening file for saving network: " << filename << std::endl;
         return;

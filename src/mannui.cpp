@@ -203,7 +203,10 @@ void ShowAvalModels(std::stringstream &outputText)
 
         if (ImGui::Button(name.c_str()))
         {
-            float accuracy = network.testNetwork(mnist_images_data, mnist_labels_data);
+            // float accuracy = network.testNetwork(mnist_images_data, mnist_labels_data);
+            std::future<float> future_accuracy = std::async(std::launch::async, &MNNetwork::testNetwork, &network,
+                                                std::ref(mnist_images_data), std::ref(mnist_labels_data));
+            float accuracy = future_accuracy.get();
             MannLogger::info(outputText) << name << " --- Accuracy: " << accuracy << "%" << std::endl;
         }
     }
