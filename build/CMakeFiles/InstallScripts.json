@@ -1,11 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"C:/dev/Mann_NeuralNetwork/build/cmake_install.cmake",
-		"C:/dev/Mann_NeuralNetwork/build/_deps/glfw-build/cmake_install.cmake",
-		"C:/dev/Mann_NeuralNetwork/build/_deps/glfw-build/src/cmake_install.cmake",
-		"C:/dev/Mann_NeuralNetwork/build/_deps/glfw-build/examples/cmake_install.cmake",
-		"C:/dev/Mann_NeuralNetwork/build/_deps/glfw-build/tests/cmake_install.cmake"
+		"/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

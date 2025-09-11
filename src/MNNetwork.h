@@ -193,11 +193,6 @@ public:
      * @struct Networks
      * @brief A structure to store multiple neural network models and their names.
      */
-    struct Networks
-    {
-        std::vector<std::string> modelName; ///< Names of the neural network models.
-        std::vector<MNNetwork> network;     ///< Collection of neural network instances.
-    };
 
     std::string m_filename;
     float m_learning_rate;
@@ -205,7 +200,7 @@ public:
     float m_accuracy;
     float m_total_training_time;
 
-private:
+// private:
     std::vector<size_t> MNN_Layers_size;      ///< Sizes of the layers in the neural network.
     std::vector<Mann::Matrix> MNN_Nodes;      ///< Nodes (activations) for each layer.
     std::vector<Mann::Matrix> MNN_Weights;    ///< Weights between layers.

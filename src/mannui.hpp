@@ -174,8 +174,15 @@ inline std::string getRandomModelName()
 // Extern declarations for global variables
 extern std::vector<std::string> filenames;
 extern char csv_buffer[256];
-extern MNNetwork::Networks networks;
 extern std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
+
+struct NetworkEntry
+{
+    std::string modelName; ///< Name of the neural network model.
+    MNNetwork* network;    ///< Pointer to neural network instance.
+};
+
+extern std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
 
 /**
  * @class MannUI

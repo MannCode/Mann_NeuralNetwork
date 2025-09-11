@@ -1,4 +1,5 @@
 #include "MNNetwork.h"
+#include <cassert>
 
 /**
  * @brief Constructs a neural network by loading from a file.
@@ -179,7 +180,7 @@ void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data,
 float MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data, 
                           std::vector<std::vector<double>> &mnist_labels_data)
 {
-    std::cout << "Testing the network..." << std::endl;
+    // std::cout << "Testing the network..." << std::endl;
     
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
@@ -187,10 +188,15 @@ float MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data
 
     float avg_cost_bulk = 0;
 
+    // MNN_Nodes[0][783][0] = mnist_images_data[0][783];
+
     for (int i = 0; i < mnist_images_data.size(); i++) {
+
         // load image data in network
+        // std::cout << MNN_Nodes[0].cols() << std::endl;
         for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-            MNN_Nodes[0][j][0] = mnist_images_data[i][j];
+            // MNN_Nodes[0][783][0] = mnist_images_data[0][783];
+            std::cout << "hello";
         }
         for (int j = 0; j < MNN_y.rows(); j++) { 
             MNN_y[j][0] = mnist_labels_data[i][j];
@@ -207,7 +213,7 @@ float MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data
 
         avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
     }
-    std::cout << std::endl;
+    // std::cout << std::endl;
     // std::cout << "Accuracy: " << (10 - avg_cost_bulk) * 10 << "%" << std::endl << std::endl << std::endl;
     return (10 - avg_cost_bulk) * 10;
 }

@@ -22,8 +22,10 @@ char csv_buffer[256] = "";       // Buffer for csv input.
 /**
  * @brief Global network to store models data.
  */
-MNNetwork::Networks networks;
 std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
+std::mutex resultsMutex; ///< Mutex for synchronizing output in threaded operations.
+
+std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
 
 /**
  * @brief Constructs a MannUI object and initializes ImGui with GLFW and OpenGL.
@@ -112,6 +114,20 @@ void MannUI::Render()
         ImGui::DockBuilderDockWindow("Output", dock_id_right);
         // Finish dock builder
         ImGui::DockBuilderFinish(dockspace_id);
+
+        // load the networks
+        for (const std::string& name : filenames)
+        {
+            Networks.push_back({name, new MNNetwork(name + ".mms")});
+
+            // Test the model also in a new thread
+            // std::thread test_thread([name](MNNetwork* net) {
+            //     float accuracy = net->testNetwork(::mnist_images_data, ::mnist_labels_data);
+            //     std::lock_guard<std::mutex> lock(resultsMutex);
+            //     MannLogger::info() << name << " --- Accuracy: " << accuracy << "%" << std::endl;
+            // }, Networks.back().network);
+            // test_thread.detach();
+        }
     }
 
     ImGui::End();
@@ -195,19 +211,19 @@ bool ParseCSVToHiddenLayers(const std::string& input, std::vector<size_t>& outpu
  */
 void ShowAvalModels(std::stringstream &outputText)
 {
-    for (const std::string& name : filenames)
+    // MannLogger::info(outputText) << "Available Models:" << std::endl;
+    for (const auto& entry : Networks)
     {
-        MNNetwork network(name + ".mms");
-        networks.modelName.push_back(name);
-        networks.network.push_back(network);
-
-        if (ImGui::Button(name.c_str()))
+        if (ImGui::Button(entry.modelName.c_str()))
         {
-            // float accuracy = network.testNetwork(mnist_images_data, mnist_labels_data);
-            std::future<float> future_accuracy = std::async(std::launch::async, &MNNetwork::testNetwork, &network,
-                                                std::ref(mnist_images_data), std::ref(mnist_labels_data));
-            float accuracy = future_accuracy.get();
-            MannLogger::info(outputText) << name << " --- Accuracy: " << accuracy << "%" << std::endl;
+            // Launch testing in a separate thread
+            std::thread test_thread([&entry, &outputText]() {
+                float accuracy = entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
+                // std::lock_guard<std::mutex> lock(resultsMutex);
+                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << accuracy << "%" << std::endl;
+            });
+            test_thread.detach();
+            // std::cout << "Testing the network in a separate thread..." << std::endl;
         }
     }
 
@@ -252,8 +268,7 @@ void ShowAvalModels(std::stringstream &outputText)
                 MannLogger::info(outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
                 // Create the network
                 MNNetwork network(modelName, hidden_layers, learning_rate, batch_size);
-                networks.modelName.push_back(modelName);
-                networks.network.push_back(network);
+                Networks.push_back({modelName, new MNNetwork(modelName + ".mms")});
 
                 filenames.push_back(modelName);
 
