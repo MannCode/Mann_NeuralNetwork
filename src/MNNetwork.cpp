@@ -195,8 +195,8 @@ float MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data
         // load image data in network
         // std::cout << MNN_Nodes[0].cols() << std::endl;
         for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-            // MNN_Nodes[0][783][0] = mnist_images_data[0][783];
-            std::cout << "hello";
+            MNN_Nodes[0][j][0] = mnist_images_data[i][j];
+            // std::cout << "hello";
         }
         for (int j = 0; j < MNN_y.rows(); j++) { 
             MNN_y[j][0] = mnist_labels_data[i][j];

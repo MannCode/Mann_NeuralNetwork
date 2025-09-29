@@ -6,7 +6,7 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src -I/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/GLFW -I/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui -I/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/. -iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -isystem /opt/homebrew/include
 
-CXX_FLAGSarm64 = -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+CXX_FLAGSarm64 = -std=gnu++17 -arch arm64
 
-CXX_FLAGS = -std=gnu++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+CXX_FLAGS = -std=gnu++17 -arch arm64
 

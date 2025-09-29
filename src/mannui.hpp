@@ -180,6 +180,21 @@ struct NetworkEntry
 {
     std::string modelName; ///< Name of the neural network model.
     MNNetwork* network;    ///< Pointer to neural network instance.
+
+    NetworkEntry(const std::string& name, MNNetwork* net) : modelName(name), network(net) {}
+
+    NetworkEntry(const NetworkEntry&) = delete;
+    NetworkEntry(NetworkEntry&&) noexcept = default;
+    NetworkEntry& operator=(const NetworkEntry&) = default;
+    NetworkEntry& operator=(NetworkEntry&&) noexcept = default;
+
+    ~NetworkEntry() = default;
+
+    bool calculatingAccuracy = false;
+    bool accuracyAvailable = false;
+    float accuracy = 0.0f;
+
+    std::future<float> accuracyFuture;
 };
 
 extern std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
@@ -212,12 +227,15 @@ public:
     virtual ~MannUI();
 
     /**
-     * @brief Renders the UI using ImGui and GLFW.
+     * @brief Renders the UI using ImGui and GLFW. 
+     * @param outputText A stringstream to append output messages for display in the UI.
      */
-    void Render();
+    void Render(std::stringstream &outputText);
 
 private:
     GLFWwindow* window;              ///< The GLFW window for rendering the UI.
+
+public:
     std::stringstream outputText;    ///< Stream for capturing UI output text.
 };
 

@@ -17,13 +17,13 @@
  * @brief Global vector of model filenames retrieved from the models directory.
  */
 std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
-char csv_buffer[256] = "";       // Buffer for csv input.
+char csv_buffer[256] = ""; // Buffer for csv input.
 
 /**
  * @brief Global network to store models data.
  */
 std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
-std::mutex resultsMutex; ///< Mutex for synchronizing output in threaded operations.
+std::mutex resultsMutex;                                               ///< Mutex for synchronizing output in threaded operations.
 
 std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
 
@@ -75,7 +75,7 @@ void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, s
  * Sets up a new ImGui frame, renders the output window and control panel,
  * and handles docking and rendering of draw data.
  */
-void MannUI::Render()
+void MannUI::Render(std::stringstream &outputText)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -83,7 +83,7 @@ void MannUI::Render()
 
     // ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGuiViewport *viewport = ImGui::GetMainViewport();
     ImGui::SetNextWindowPos(viewport->Pos);
     ImGui::SetNextWindowSize(viewport->Size);
     ImGui::SetNextWindowViewport(viewport->ID);
@@ -116,17 +116,26 @@ void MannUI::Render()
         ImGui::DockBuilderFinish(dockspace_id);
 
         // load the networks
-        for (const std::string& name : filenames)
+        for (const std::string &name : filenames)
         {
-            Networks.push_back({name, new MNNetwork(name + ".mms")});
+            Networks.emplace_back(name, new MNNetwork(name + ".mms"));
+        }
 
-            // Test the model also in a new thread
-            // std::thread test_thread([name](MNNetwork* net) {
-            //     float accuracy = net->testNetwork(::mnist_images_data, ::mnist_labels_data);
-            //     std::lock_guard<std::mutex> lock(resultsMutex);
-            //     MannLogger::info() << name << " --- Accuracy: " << accuracy << "%" << std::endl;
-            // }, Networks.back().network);
-            // test_thread.detach();
+        MannLogger::info(outputText) << "Calculating model accuracy:" << std::endl;
+        for (auto &entry : Networks)
+        {
+            std::thread test_thread([&entry, &outputText]()
+            {
+                entry.calculatingAccuracy = true;
+                float accuracy = entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
+                entry.accuracy = accuracy;
+
+                entry.accuracyAvailable = true;
+
+                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << accuracy << "%" << std::endl;
+                // std::lock_guard<std::mutex> lock(resultsMutex);
+            });
+            test_thread.detach();
         }
     }
 
@@ -135,27 +144,36 @@ void MannUI::Render()
     // Output Window
     ImGui::Begin("Output");
     std::stringstream tempStream;
-    tempStream << outputText.str();  // Copy current content
+    tempStream << outputText.str(); // Copy current content
     std::string line;
-    while (std::getline(tempStream, line)) {
-        if (line.empty()) continue;
+    while (std::getline(tempStream, line))
+    {
+        if (line.empty())
+            continue;
         // Find the second occurrence of "[" to get the log level (e.g., [DEBUG], [INFO])
         size_t firstBracket = line.find("[");
         size_t secondBracket = line.find("[", firstBracket + 1);
         size_t thirdBracket = line.find("[", secondBracket + 1);
         size_t thirdBracketEnd = line.find("]", thirdBracket + 1);
-        if (thirdBracket != std::string::npos && thirdBracketEnd != std::string::npos) {
+        if (thirdBracket != std::string::npos && thirdBracketEnd != std::string::npos)
+        {
             std::string levelStr = line.substr(thirdBracket + 1, thirdBracketEnd - thirdBracket - 1);
-            ImVec4 color = IMGUI_COLOR_INFO;  // Default to INFO color
-            if (levelStr == "DEBUG") color = IMGUI_COLOR_DEBUG;
-            else if (levelStr == "INFO") color = IMGUI_COLOR_INFO;
-            else if (levelStr == "WARN") color = IMGUI_COLOR_WARN;
-            else if (levelStr == "ERROR") color = IMGUI_COLOR_ERROR;
+            ImVec4 color = IMGUI_COLOR_INFO; // Default to INFO color
+            if (levelStr == "DEBUG")
+                color = IMGUI_COLOR_DEBUG;
+            else if (levelStr == "INFO")
+                color = IMGUI_COLOR_INFO;
+            else if (levelStr == "WARN")
+                color = IMGUI_COLOR_WARN;
+            else if (levelStr == "ERROR")
+                color = IMGUI_COLOR_ERROR;
 
             ImGui::PushStyleColor(ImGuiCol_Text, color);
             ImGui::TextWrapped("%s", line.c_str());
             ImGui::PopStyleColor();
-        } else ImGui::TextWrapped("%s", line.c_str());
+        }
+        else
+            ImGui::TextWrapped("%s", line.c_str());
     }
     if (ImGui::Button("Clear Output"))
     {
@@ -168,7 +186,7 @@ void MannUI::Render()
     ImGui::Begin("Models");
     ShowAvalModels(outputText);
     ImGui::End();
-    
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -179,7 +197,7 @@ void MannUI::Render()
  * @param output The vector to store parsed integers.
  * @return True if exactly three valid non-negative integers were parsed, false otherwise.
  */
-bool ParseCSVToHiddenLayers(const std::string& input, std::vector<size_t>& output)
+bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &output)
 {
     output.clear();
     std::stringstream ss(input);
@@ -195,7 +213,7 @@ bool ParseCSVToHiddenLayers(const std::string& input, std::vector<size_t>& outpu
             size_t value = std::stoul(token);
             output.push_back((value > 699) ? 699 : value);
         }
-        catch(const std::exception& e)
+        catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
             return false;
@@ -204,7 +222,6 @@ bool ParseCSVToHiddenLayers(const std::string& input, std::vector<size_t>& outpu
     return !output.empty();
 }
 
-
 /**
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
@@ -212,19 +229,49 @@ bool ParseCSVToHiddenLayers(const std::string& input, std::vector<size_t>& outpu
 void ShowAvalModels(std::stringstream &outputText)
 {
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
-    for (const auto& entry : Networks)
+    for (auto &entry : Networks)
     {
+        ImGui::PushID(entry.modelName.c_str());
+        
         if (ImGui::Button(entry.modelName.c_str()))
         {
-            // Launch testing in a separate thread
-            std::thread test_thread([&entry, &outputText]() {
-                float accuracy = entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
-                // std::lock_guard<std::mutex> lock(resultsMutex);
-                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << accuracy << "%" << std::endl;
-            });
-            test_thread.detach();
-            // std::cout << "Testing the network in a separate thread..." << std::endl;
+            // ... show the details of the model in a popup
         }
+        
+        ImGui::SameLine();
+
+        if (entry.calculatingAccuracy)
+        {
+            if (entry.accuracyAvailable)
+            {
+                ImGui::Text("%.2f%%", entry.accuracy);
+            }
+            else
+            {
+                static const char *spinnerFrames[] = {".", "..", "..."};
+                static int spinnerIndex = 0;
+                static float lastTime = 0.0f;
+
+                float currentTime = ImGui::GetTime();
+
+                if (currentTime - lastTime > 0.4f)
+                {
+                    spinnerIndex = (spinnerIndex + 1) % 3;
+                    lastTime = currentTime;
+                }
+
+                ImGui::Text("%s", spinnerFrames[spinnerIndex]);
+            }
+        }
+        else if(entry.accuracyAvailable)
+        {
+            ImGui::Text("Accuracy: %.2f%%", entry.accuracy);
+        }
+        else{
+            MannLogger::error(outputText) << "FUCKING FUCK ERROR!";
+        }
+
+        ImGui::PopID();
     }
 
     if (ImGui::Button("Create New Model"))
@@ -259,7 +306,8 @@ void ShowAvalModels(std::stringstream &outputText)
             }
             else
             {
-                if (modelName.empty()) modelName = getRandomModelName();
+                if (modelName.empty())
+                    modelName = getRandomModelName();
                 std::stringstream layersStr;
                 for (size_t i = 0; i < hidden_layers.size(); ++i)
                 {
@@ -346,8 +394,10 @@ void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, s
     ImGui::Separator();
     if (ImGui::InputFloat("Learning Rate", &learning_rate, 0.001f, 0.1f, "%.4f", ImGuiInputTextFlags_CharsDecimal))
     {
-        if (learning_rate < 0.0f) learning_rate = 0.0f;
-        if (learning_rate > 1.0f) learning_rate = 1.0f;
+        if (learning_rate < 0.0f)
+            learning_rate = 0.0f;
+        if (learning_rate > 1.0f)
+            learning_rate = 1.0f;
     }
 
     ImGui::Text("Batch Size");
