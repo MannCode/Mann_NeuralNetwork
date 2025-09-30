@@ -236,6 +236,7 @@ void ShowAvalModels(std::stringstream &outputText)
         if (ImGui::Button(entry.modelName.c_str()))
         {
             // ... show the details of the model in a popup
+            ImGui::OpenPopup((entry.modelName + "Details").c_str());
         }
         
         ImGui::SameLine();
@@ -269,6 +270,25 @@ void ShowAvalModels(std::stringstream &outputText)
         }
         else{
             MannLogger::error(outputText) << "FUCKING FUCK ERROR!";
+        }
+
+
+        // popup for model details
+        if (ImGui::BeginPopupModal((entry.modelName + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            // Show model details here
+            ImGui::Text("Model Name: %s", entry.modelName.c_str());
+            ImGui::NewLine();
+            ImGui::Text("Accuracy: %.2f%%", entry.accuracy);
+            ImGui::Text("Learning Rate: %.6f", entry.network->m_learning_rate);
+            ImGui::Text("Batch Size: %zu", entry.network->m_batch_size);
+            ImGui::Text("Total Time Trained: %.2f", entry.network->m_total_training_time);
+
+            if (ImGui::Button("Close"))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::EndPopup();
         }
 
         ImGui::PopID();
