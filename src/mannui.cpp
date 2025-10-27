@@ -65,7 +65,7 @@ inline MannUI::~MannUI()
 }
 
 // PROTOTYPES
-void ShowAvalModels(std::stringstream &outputText);
+void ShowAvalModels(std::stringstream &outputText, bool &show_training_window);
 
 void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size);
 
@@ -108,9 +108,10 @@ void MannUI::Render(std::stringstream &outputText)
         ImGuiID dock_main_id = dockspace_id;
         ImGuiID dock_id_left;
         ImGuiID dock_id_right;
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.3f, &dock_id_left, &dock_id_right);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.7f, &dock_id_left, &dock_id_right);
         // Dock your windows into the nodes
         ImGui::DockBuilderDockWindow("Models", dock_id_left);
+        ImGui::DockBuilderDockWindow("Train Model", dock_id_left);
         ImGui::DockBuilderDockWindow("Output", dock_id_right);
         // Finish dock builder
         ImGui::DockBuilderFinish(dockspace_id);
@@ -184,8 +185,20 @@ void MannUI::Render(std::stringstream &outputText)
 
     // Control Panel
     ImGui::Begin("Models");
-    ShowAvalModels(outputText);
+    ShowAvalModels(outputText, show_training_window);
     ImGui::End();
+
+    if(show_training_window)
+    {
+        ImGui::Begin("Train Model");
+        ImGui::Text("Training in progress...");
+        // Add training progress UI elements here
+        if (ImGui::Button("Close"))
+        {
+            show_training_window = false;
+        }
+        ImGui::End();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -226,7 +239,7 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
  */
-void ShowAvalModels(std::stringstream &outputText)
+void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
 {
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
@@ -279,11 +292,41 @@ void ShowAvalModels(std::stringstream &outputText)
             // Show model details here
             ImGui::Text("Model Name: %s", entry.modelName.c_str());
             ImGui::NewLine();
+            // show layers size
+            ImGui::Text("Layers: ");
+            ImGui::SameLine();
+            for (const auto& layer : entry.network->MNN_Layers_size) {
+                ImGui::Text("%zu,", layer);
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
             ImGui::Text("Accuracy: %.2f%%", entry.accuracy);
             ImGui::Text("Learning Rate: %.6f", entry.network->m_learning_rate);
             ImGui::Text("Batch Size: %zu", entry.network->m_batch_size);
             ImGui::Text("Total Time Trained: %.2f", entry.network->m_total_training_time);
 
+            ImGui::NewLine();
+            //buttons (train, test network on data, test network by canvas)
+            if (ImGui::Button("Train"))
+            {
+                // Train the network
+                show_training_window = true;
+                ImGui::CloseCurrentPopup();
+                // open a new window where we can monitor training progress
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Test on Data"))
+            {
+                // Test the network on data
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Test by Canvas"))
+            {
+                // Test the network by canvas
+                ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
             if (ImGui::Button("Close"))
             {
                 ImGui::CloseCurrentPopup();

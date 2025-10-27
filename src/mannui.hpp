@@ -234,6 +234,7 @@ public:
 
 private:
     GLFWwindow* window;              ///< The GLFW window for rendering the UI.
+    bool show_training_window = false;  ///< Flag to show/hide the training window.    
 
 public:
     std::stringstream outputText;    ///< Stream for capturing UI output text.
