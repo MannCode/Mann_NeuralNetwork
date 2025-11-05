@@ -192,9 +192,6 @@ struct NetworkEntry
 
     bool calculatingAccuracy = false;
     bool accuracyAvailable = false;
-    float accuracy = 0.0f;
-
-    std::future<float> accuracyFuture;
 };
 
 extern std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
@@ -234,10 +231,17 @@ public:
 
 private:
     GLFWwindow* window;              ///< The GLFW window for rendering the UI.
-    bool show_training_window = false;  ///< Flag to show/hide the training window.    
+    // bool show_models_window = true;    ///< Flag to show/hide the models window.
+    // bool show_training_window = false;  ///< Flag to show/hide the training window.
+    NetworkEntry* selected_model = nullptr;       ///< Pointer to the selected neural network model.
 
 public:
     std::stringstream outputText;    ///< Stream for capturing UI output text.
+    struct Shown_Windows
+    {
+        bool models_window = true;
+        bool training_window = false;
+    } shown_windows;                ///< Struct to manage visibility of different UI windows.
 };
 
 #endif // MANN_UI_H

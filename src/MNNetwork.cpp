@@ -43,12 +43,9 @@ MNNetwork::~MNNetwork() {};
  * @param filename The file to save the trained network.
  * @param learning_rate The learning rate for weight updates during training.
  */
-void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size, 
-                            std::vector<std::vector<double>> &images_data, 
-                            std::vector<std::vector<double>> &labels_data, 
-                            const std::string &filename, float learning_rate)
+void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<double>> &images_data, 
+                            std::vector<std::vector<double>> &labels_data)
 {
-    std::cout << "Training the network..." << std::endl;
     
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
@@ -57,14 +54,14 @@ void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size,
 
     for(int n = 0; n < iterations; n++) {
         float avg_cost_bulk = 0;
-        saveNetwork(MNN_Layers_size, learning_rate, batch_size,MNN_Weights, MNN_Bias, filename);
-        for(int batch = 0; batch < images_data.size()/batch_size; batch++) {
+        saveNetwork();
+        for(int batch = 0; batch < images_data.size()/m_batch_size; batch++) {
             for (int j = 0; j < MNN_d_weights.size(); j++) {
                 MNN_d_weights[j].nullMatrix();
                 MNN_d_biases[j].nullMatrix();
             }
 
-            for (int i = batch * batch_size; i < (batch + 1) * batch_size; i++) {
+            for (int i = batch * m_batch_size; i < (batch + 1) * m_batch_size; i++) {
                 // load image data in network
                 for (int j =0; j < MNN_Nodes[0].rows(); j++) {
                     MNN_Nodes[0][j][0] = images_data[i][j];
@@ -92,12 +89,13 @@ void MNNetwork::trainNetwork(const size_t iterations, const size_t batch_size,
             
             // time to update the weights and biases
             for (int j = 0; j < MNN_Weights.size(); j++) {
-                MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * learning_rate);
-                MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * learning_rate);
+                MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * m_learning_rate);
+                MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
             }
+
+            m_accuracy = (10 - avg_cost_bulk) * 10;
         }
         float accuracy = (10 - avg_cost_bulk) * 10;
-        std::cout << "Iteration: " << n+1 << ", Average Cost: " << avg_cost_bulk << ", Accuracy: " << accuracy << std::endl;
     }
 }
 
@@ -177,10 +175,9 @@ void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data,
 /**
  * @brief Tests the neural network using the provided dataset.
  */
-float MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data, 
+void MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data, 
                           std::vector<std::vector<double>> &mnist_labels_data)
 {
-    // std::cout << "Testing the network..." << std::endl;
     
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
@@ -215,7 +212,8 @@ float MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data
     }
     // std::cout << std::endl;
     // std::cout << "Accuracy: " << (10 - avg_cost_bulk) * 10 << "%" << std::endl << std::endl << std::endl;
-    return (10 - avg_cost_bulk) * 10;
+    // return (10 - avg_cost_bulk) * 10;
+    m_accuracy = (10 - avg_cost_bulk) * 10;
 }
 
 /**
@@ -356,43 +354,32 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
 
 /**
  * @brief Saves the neural network configuration and weights to a file.
- * @param layers_size A vector specifying the size of each layer.
- * @param learning_rate The learning rate for weight updates during training.
- * @param batch_size The size of each training batch.
- * @param weights A vector of matrices representing the weights between layers.
- * @param biases A vector of matrices representing the biases for each layer.
- * @param filename The file to save the network configuration.
  */
-void MNNetwork::saveNetwork(const std::vector<size_t> &layers_size, 
-                            float learning_rate,
-                            size_t batch_size,
-                           const std::vector<Mann::Matrix> &weights, 
-                           const std::vector<Mann::Matrix> &biases, 
-                           const std::string &filename)
+void MNNetwork::saveNetwork()
 {
-    std::ofstream file("../models/" + filename);
+    std::ofstream file("../models/" + m_filename);
     if (!file.is_open()) {
-        std::cerr << "Error opening file for saving network: " << filename << std::endl;
+        std::cerr << "Error opening file for saving network: " << m_filename << std::endl;
         return;
     }
     // Save layers_size
-    for (size_t i = 0; i < layers_size.size(); ++i) {
-        file << layers_size[i] << (i + 1 < layers_size.size() ? " " : "\n");
+    for (size_t i = 0; i < MNN_Layers_size.size(); ++i) {
+        file << MNN_Layers_size[i] << (i + 1 < MNN_Layers_size.size() ? " " : "\n");
     }
     // Save Learning Rate
-    file << learning_rate << "\n";
+    file << m_learning_rate << "\n";
     // Save Batch Size
-    file << batch_size << "\n";
+    file << m_batch_size << "\n";
     // Save Accuracy
-    file << NULL << "\n";
+    file << m_accuracy << "\n";
     // Save Total Training Time
-    file << NULL << "\n";
+    file << m_total_training_time << "\n";
     // Save weights
-    for (Mann::Matrix weight : weights) {
+    for (Mann::Matrix weight : MNN_Weights) {
         file << weight;
     }
     // Save biases
-    for (Mann::Matrix bias : biases) {
+    for (Mann::Matrix bias : MNN_Bias) {
         file << bias;
     }
 }
@@ -493,7 +480,7 @@ void MNNetwork::CreateNetwork(std::vector<size_t> &layers_size,
     layers_size.push_back(10);  // output layer
 
     initializeNetwork(layers_size, nodes, weights, biases);
-    saveNetwork(layers_size, learning_rate, batch_size, weights, biases, path);
+    saveNetwork();
 
     outfile.close();
     std::cout << "File created successfully!" << std::endl; 

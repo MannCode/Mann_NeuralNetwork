@@ -49,16 +49,11 @@ public:
     /**
      * @brief Trains the neural network using the provided dataset.
      * @param iterations The number of training iterations.
-     * @param batch_size The size of each training batch.
      * @param images_data A vector of input image data for training.
      * @param labels_data A vector of corresponding label data for training.
-     * @param filename The file to save the trained network.
-     * @param learning_rate The learning rate for weight updates during training.
      */
-    void trainNetwork(const size_t iterations, const size_t batch_size, 
-                     std::vector<std::vector<double>> &images_data, 
-                     std::vector<std::vector<double>> &labels_data, 
-                     const std::string &filename, float learning_rate);
+    void trainNetwork(const size_t iterations, std::vector<std::vector<double>> &images_data, 
+                     std::vector<std::vector<double>> &labels_data);
 
 
     /**
@@ -74,7 +69,7 @@ public:
     /**
      * @brief Tests the neural network using the provided dataset.
      */
-    float testNetwork(std::vector<std::vector<double>> &images_data, 
+    void testNetwork(std::vector<std::vector<double>> &images_data, 
                      std::vector<std::vector<double>> &labels_data);
 
     /**
@@ -132,17 +127,8 @@ public:
 
     /**
      * @brief Saves the neural network configuration and weights to a file.
-     * @param layers_size A vector specifying the size of each layer.
-     * @param weights A vector of matrices representing the weights between layers.
-     * @param biases A vector of matrices representing the biases for each layer.
-     * @param filename The file to save the network configuration.
      */
-    void saveNetwork(const std::vector<size_t>& layers_size, 
-                     float learning_rate,
-                     size_t batch_size,
-                     const std::vector<Mann::Matrix> &weights, 
-                     const std::vector<Mann::Matrix> &biases, 
-                     const std::string &filename);
+    void saveNetwork();
 
     /**
      * @brief Loads the neural network configuration and weights from a file.
@@ -199,6 +185,7 @@ public:
     size_t m_batch_size;
     float m_accuracy;
     float m_total_training_time;
+
 
 // private:
     std::vector<size_t> MNN_Layers_size;      ///< Sizes of the layers in the neural network.

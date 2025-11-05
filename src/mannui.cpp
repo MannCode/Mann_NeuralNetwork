@@ -65,8 +65,8 @@ inline MannUI::~MannUI()
 }
 
 // PROTOTYPES
-void ShowAvalModels(std::stringstream &outputText, bool &show_training_window);
-
+void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model);
+void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model);
 void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size);
 
 /**
@@ -128,12 +128,10 @@ void MannUI::Render(std::stringstream &outputText)
             std::thread test_thread([&entry, &outputText]()
             {
                 entry.calculatingAccuracy = true;
-                float accuracy = entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
-                entry.accuracy = accuracy;
-
+                entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
                 entry.accuracyAvailable = true;
 
-                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << accuracy << "%" << std::endl;
+                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy << "%" << std::endl;
                 // std::lock_guard<std::mutex> lock(resultsMutex);
             });
             test_thread.detach();
@@ -184,19 +182,17 @@ void MannUI::Render(std::stringstream &outputText)
     ImGui::End();
 
     // Control Panel
-    ImGui::Begin("Models");
-    ShowAvalModels(outputText, show_training_window);
-    ImGui::End();
+    if(shown_windows.models_window)
+    {
+        ImGui::Begin("Models");
+        ShowAvalModels(outputText, shown_windows, selected_model);
+        ImGui::End();
+    }
 
-    if(show_training_window)
+    if(shown_windows.training_window)
     {
         ImGui::Begin("Train Model");
-        ImGui::Text("Training in progress...");
-        // Add training progress UI elements here
-        if (ImGui::Button("Close"))
-        {
-            show_training_window = false;
-        }
+        TrainingWindow(outputText, shown_windows, selected_model);
         ImGui::End();
     }
 
@@ -239,7 +235,7 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
  */
-void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
+void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model)
 {
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
@@ -258,7 +254,7 @@ void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
         {
             if (entry.accuracyAvailable)
             {
-                ImGui::Text("%.2f%%", entry.accuracy);
+                ImGui::Text("%.2f%%", entry.network->m_accuracy);
             }
             else
             {
@@ -279,7 +275,7 @@ void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
         }
         else if(entry.accuracyAvailable)
         {
-            ImGui::Text("Accuracy: %.2f%%", entry.accuracy);
+            ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy);
         }
         else{
             MannLogger::error(outputText) << "FUCKING FUCK ERROR!";
@@ -289,6 +285,9 @@ void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
         // popup for model details
         if (ImGui::BeginPopupModal((entry.modelName + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
+            // Non Graphical things
+            selected_model = &entry;
+
             // Show model details here
             ImGui::Text("Model Name: %s", entry.modelName.c_str());
             ImGui::NewLine();
@@ -300,7 +299,7 @@ void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
                 ImGui::SameLine();
             }
             ImGui::NewLine();
-            ImGui::Text("Accuracy: %.2f%%", entry.accuracy);
+            ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy);
             ImGui::Text("Learning Rate: %.6f", entry.network->m_learning_rate);
             ImGui::Text("Batch Size: %zu", entry.network->m_batch_size);
             ImGui::Text("Total Time Trained: %.2f", entry.network->m_total_training_time);
@@ -310,7 +309,8 @@ void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
             if (ImGui::Button("Train"))
             {
                 // Train the network
-                show_training_window = true;
+                shown_windows.training_window = true;
+                shown_windows.models_window = false;
                 ImGui::CloseCurrentPopup();
                 // open a new window where we can monitor training progress
             }
@@ -411,6 +411,44 @@ void ShowAvalModels(std::stringstream &outputText, bool &show_training_window)
 
         ImGui::EndPopup();
     }
+}
+
+void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model) {
+    ImGui::Text("Training Window - Under Construction");
+    ImGui::Separator();
+
+    if (selected_model)
+    {
+        ImGui::Text("Model: %s", selected_model->modelName.c_str());
+        ImGui::Text("Cuurrent Accuracy: %.2f%%", selected_model->network->m_accuracy);
+
+        // Add training controls and progress here
+        if (ImGui::Button("Start Training"))
+        {
+            // Start training logic
+            MannLogger::info(outputText) << "Starting training for model: " << selected_model->modelName << std::endl;
+
+            // Simulate training process (different thread)
+            std::thread training_thread([selected_model, &outputText]()
+            {
+                selected_model->network->trainNetwork(1000, 
+                    ::mnist_images_data, ::mnist_labels_data);
+            });
+            training_thread.detach();
+        }
+
+    }
+    else
+    {
+        ImGui::Text("No Model Selected");
+    }
+
+    if (ImGui::Button("Close"))
+    {
+        shown_windows.training_window = false;
+        shown_windows.models_window = true;
+    }
+
 }
 
 /**
