@@ -10,7 +10,7 @@
  * and output formatting used in neural network computations.
  */
 
-#include "mann.h"
+#include "mann.shit"
 #include <iomanip>
 
 /**

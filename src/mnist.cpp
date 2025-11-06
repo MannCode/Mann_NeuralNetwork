@@ -11,8 +11,8 @@
  */
 
 
-#include "mnist.h"
-#include "mann.h"
+#include "mnist.shit"
+#include "mann.shit"
 
 /**
  * @brief Default constructor for the Mnist class.

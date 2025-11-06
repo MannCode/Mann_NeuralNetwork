@@ -11,7 +11,7 @@
  * models, and rendering output.
  */
 
-#include "mannui.hpp"
+#include "mannui.shit"
 
 /**
  * @brief Global vector of model filenames retrieved from the models directory.
@@ -65,8 +65,8 @@ inline MannUI::~MannUI()
 }
 
 // PROTOTYPES
-void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model);
-void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model);
+void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model);
+void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model);
 void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size);
 
 /**
@@ -127,9 +127,8 @@ void MannUI::Render(std::stringstream &outputText)
         {
             std::thread test_thread([&entry, &outputText]()
             {
-                entry.calculatingAccuracy = true;
                 entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
-                entry.accuracyAvailable = true;
+                entry.calculatingAccuracy = false;
 
                 MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy << "%" << std::endl;
                 // std::lock_guard<std::mutex> lock(resultsMutex);
@@ -182,14 +181,14 @@ void MannUI::Render(std::stringstream &outputText)
     ImGui::End();
 
     // Control Panel
-    if(shown_windows.models_window)
+    if (shown_windows.models_window)
     {
         ImGui::Begin("Models");
         ShowAvalModels(outputText, shown_windows, selected_model);
         ImGui::End();
     }
 
-    if(shown_windows.training_window)
+    if (shown_windows.training_window)
     {
         ImGui::Begin("Train Model");
         TrainingWindow(outputText, shown_windows, selected_model);
@@ -235,52 +234,41 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
  */
-void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model)
+void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model)
 {
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
     {
         ImGui::PushID(entry.modelName.c_str());
-        
+
         if (ImGui::Button(entry.modelName.c_str()))
         {
             // ... show the details of the model in a popup
             ImGui::OpenPopup((entry.modelName + "Details").c_str());
         }
-        
+
         ImGui::SameLine();
 
         if (entry.calculatingAccuracy)
         {
-            if (entry.accuracyAvailable)
+            static const char *spinnerFrames[] = {".", "..", "..."};
+            static int spinnerIndex = 0;
+            static float lastTime = 0.0f;
+
+            float currentTime = ImGui::GetTime();
+
+            if (currentTime - lastTime > 0.4f)
             {
-                ImGui::Text("%.2f%%", entry.network->m_accuracy);
+                spinnerIndex = (spinnerIndex + 1) % 3;
+                lastTime = currentTime;
             }
-            else
-            {
-                static const char *spinnerFrames[] = {".", "..", "..."};
-                static int spinnerIndex = 0;
-                static float lastTime = 0.0f;
 
-                float currentTime = ImGui::GetTime();
-
-                if (currentTime - lastTime > 0.4f)
-                {
-                    spinnerIndex = (spinnerIndex + 1) % 3;
-                    lastTime = currentTime;
-                }
-
-                ImGui::Text("%s", spinnerFrames[spinnerIndex]);
-            }
+            ImGui::Text("%s", spinnerFrames[spinnerIndex]);
         }
-        else if(entry.accuracyAvailable)
+        else
         {
             ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy);
         }
-        else{
-            MannLogger::error(outputText) << "FUCKING FUCK ERROR!";
-        }
-
 
         // popup for model details
         if (ImGui::BeginPopupModal((entry.modelName + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -294,7 +282,8 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
             // show layers size
             ImGui::Text("Layers: ");
             ImGui::SameLine();
-            for (const auto& layer : entry.network->MNN_Layers_size) {
+            for (const auto &layer : entry.network->MNN_Layers_size)
+            {
                 ImGui::Text("%zu,", layer);
                 ImGui::SameLine();
             }
@@ -305,7 +294,7 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
             ImGui::Text("Total Time Trained: %.2f", entry.network->m_total_training_time);
 
             ImGui::NewLine();
-            //buttons (train, test network on data, test network by canvas)
+            // buttons (train, test network on data, test network by canvas)
             if (ImGui::Button("Train"))
             {
                 // Train the network
@@ -378,14 +367,26 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
                 }
                 MannLogger::info(outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
                 // Create the network
-                MNNetwork network(modelName, hidden_layers, learning_rate, batch_size);
+                MNNetwork network(modelName + ".mms", hidden_layers, learning_rate, batch_size);
+
                 Networks.push_back({modelName, new MNNetwork(modelName + ".mms")});
 
                 filenames.push_back(modelName);
 
+                // test the network
+                std::thread test_thread([&network, &outputText]()
+                {
+                    network.testNetwork(::mnist_images_data, ::mnist_labels_data);
+                    Networks.back().calculatingAccuracy = false;
+
+                    MannLogger::info(outputText) << Networks.back().modelName << " --- Accuracy: " << network.m_accuracy << "%" << std::endl;
+                    // std::lock_guard<std::mutex> lock(resultsMutex);
+                });
+                test_thread.detach();
+
                 // Reset inputs
                 modelName.clear();
-                hidden_layers.clear();
+                hidden_layers = {50, 10};
                 learning_rate = 0.01f;
                 batch_size = 32;
                 modelNameBuffer[0] = '\0';
@@ -413,7 +414,8 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
     }
 }
 
-void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry* &selected_model) {
+void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model)
+{
     ImGui::Text("Training Window - Under Construction");
     ImGui::Separator();
 
@@ -430,13 +432,10 @@ void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_
 
             // Simulate training process (different thread)
             std::thread training_thread([selected_model, &outputText]()
-            {
-                selected_model->network->trainNetwork(1000, 
-                    ::mnist_images_data, ::mnist_labels_data);
-            });
+                                        { selected_model->network->trainNetwork(1000,
+                                                                                ::mnist_images_data, ::mnist_labels_data); });
             training_thread.detach();
         }
-
     }
     else
     {
@@ -448,7 +447,6 @@ void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_
         shown_windows.training_window = false;
         shown_windows.models_window = true;
     }
-
 }
 
 /**

@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "mann.h"
+#include "mann.shit"
 
 /**
  * @file MNNetwork.h
@@ -166,13 +166,10 @@ public:
      * @param modelName The name of the neural network model.
      */
     void CreateNetwork(std::vector<size_t> &layers_size, 
-                       float learning_rate,
-                       size_t batch_size,
                        std::vector<Mann::Matrix> &nodes, 
                        std::vector<Mann::Matrix> &weights, 
                        std::vector<Mann::Matrix> &biases, 
-                       std::vector<size_t> &hidden_layers_size, 
-                       const std::string &modelName);
+                       std::vector<size_t> &hidden_layers_size);
 
 public:
     /**

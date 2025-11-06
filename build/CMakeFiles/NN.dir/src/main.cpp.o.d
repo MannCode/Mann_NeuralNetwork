@@ -1,7 +1,7 @@
 CMakeFiles/NN.dir/src/main.cpp.o: \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/main.cpp \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.shit \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.shit \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/fstream \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/max.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__algorithm/comp.h \
@@ -881,7 +881,7 @@ CMakeFiles/NN.dir/src/main.cpp.o: \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/forward_list \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/future \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/iostream \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.hpp \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.shit \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/utils.h \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imgui.h \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imconfig.h \
@@ -900,6 +900,6 @@ CMakeFiles/NN.dir/src/main.cpp.o: \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/dependencies/includes/imgui/imgui.h \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/backends/imgui_impl_opengl3.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h \
-  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.h \
+  /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/MNNetwork.shit \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannlogger.hpp \
   /Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/../dependencies/includes/imgui/imgui_internal.h

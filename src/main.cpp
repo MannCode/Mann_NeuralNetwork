@@ -1,5 +1,5 @@
-#include "mnist.h"
-#include "mannui.hpp"
+#include "mnist.shit"
+#include "mannui.shit"
 
 using namespace std;
 

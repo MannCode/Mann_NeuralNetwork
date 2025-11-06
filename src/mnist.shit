@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "mann.h"
+#include "mann.shit"
 
 /**
  * @class Mnist

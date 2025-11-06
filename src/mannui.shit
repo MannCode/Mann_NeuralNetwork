@@ -14,8 +14,8 @@
 #define MANN_UI_H
 
 #include "utils.h"
-#include "MNNetwork.h"
-#include "mann.h"
+#include "MNNetwork.shit"
+#include "mann.shit"
 #include "mannlogger.hpp"
 
 #include "../dependencies/includes/imgui/imgui_internal.h"
@@ -190,8 +190,7 @@ struct NetworkEntry
 
     ~NetworkEntry() = default;
 
-    bool calculatingAccuracy = false;
-    bool accuracyAvailable = false;
+    bool calculatingAccuracy = true;
 };
 
 extern std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.

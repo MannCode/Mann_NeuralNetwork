@@ -1,4 +1,4 @@
-#include "MNNetwork.h"
+#include "MNNetwork.shit"
 #include <cassert>
 
 /**
@@ -8,7 +8,10 @@
 MNNetwork::MNNetwork(std::string filename)
         : m_filename(filename)
 {
-    loadNetwork(filename);
+    m_accuracy = 0.0f;
+    m_total_training_time = 0.0f;
+
+    loadNetwork(m_filename);
 }
 
 /**
@@ -22,9 +25,12 @@ MNNetwork::MNNetwork(std::string filename)
 MNNetwork::MNNetwork(std::string filename, std::vector<size_t> hidden_layers_size, float learning_rate, size_t batch_size)
                     : m_learning_rate(learning_rate), m_batch_size(batch_size), m_filename(filename)
 {
-    std::ifstream file("../models/" + filename + ".mms");
-    file.good() ?  loadNetwork(filename) 
-    : CreateNetwork(MNN_Layers_size, learning_rate, batch_size, MNN_Nodes, MNN_Weights, MNN_Bias, hidden_layers_size, filename);
+    m_accuracy = 0.0f;
+    m_total_training_time = 0.0f;
+
+    std::ifstream file("../models/" + m_filename);
+    file.good() ?  loadNetwork(m_filename) 
+    : CreateNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, hidden_layers_size);
 };
 
 /**
@@ -92,10 +98,8 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
                 MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * m_learning_rate);
                 MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
             }
-
-            m_accuracy = (10 - avg_cost_bulk) * 10;
         }
-        float accuracy = (10 - avg_cost_bulk) * 10;
+        m_accuracy = (10 - avg_cost_bulk) * 10;
     }
 }
 
@@ -455,15 +459,12 @@ void MNNetwork::loadNetwork(const std::string &filename)
  * @param modelName The name of the neural network model.
  */
 void MNNetwork::CreateNetwork(std::vector<size_t> &layers_size,
-                             float learning_rate,
-                             size_t batch_size,
                              std::vector<Mann::Matrix> &nodes, 
                              std::vector<Mann::Matrix> &weights, 
                              std::vector<Mann::Matrix> &biases, 
-                             std::vector<size_t> &hidden_layers_size, 
-                             const std::string &modelName)
+                             std::vector<size_t> &hidden_layers_size)
 {
-    std::string path = "../models/" + modelName + ".mms";
+    std::string path = "../models/" + m_filename;
     std::ofstream outfile(path); // mandeep model storage
  
     if (!outfile)
