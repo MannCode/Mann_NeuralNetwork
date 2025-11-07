@@ -50,7 +50,7 @@ MNNetwork::~MNNetwork() {};
  * @param learning_rate The learning rate for weight updates during training.
  */
 void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<double>> &images_data, 
-                            std::vector<std::vector<double>> &labels_data)
+                            std::vector<std::vector<double>> &labels_data, bool *is_training)
 {
     
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
@@ -60,8 +60,9 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
 
     for(int n = 0; n < iterations; n++) {
         float avg_cost_bulk = 0;
-        saveNetwork();
         for(int batch = 0; batch < images_data.size()/m_batch_size; batch++) {
+            float avg_cost_bulk_batch = 0;
+            current_batch = batch;
             for (int j = 0; j < MNN_d_weights.size(); j++) {
                 MNN_d_weights[j].nullMatrix();
                 MNN_d_biases[j].nullMatrix();
@@ -84,7 +85,10 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
                 for (int j = 0; j < MNN_cost.rows(); j++) {
                     avg_cost += MNN_cost[j][0];
                 }
+                m_accuracy_crr_image = (10 - avg_cost) * 10;
+                m_accuracy_crr_image_history.push_back(m_accuracy_crr_image);
                 avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
+                avg_cost_bulk_batch = (avg_cost_bulk_batch + avg_cost) / 2;
 
                 std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
                 for(int j = 0; j < MNN_d_weights.size(); j++) {
@@ -92,14 +96,23 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
                     MNN_d_biases[j] = (MNN_d_biases[j] + MNN_d_weights_biases[1][j])/2;
                 }
             }
+
+            m_accuracy_crr_batch = (10 - avg_cost_bulk_batch) * 10;
+            m_accuracy_crr_batch_history.push_back(m_accuracy_crr_batch);
             
             // time to update the weights and biases
             for (int j = 0; j < MNN_Weights.size(); j++) {
                 MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * m_learning_rate);
                 MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
             }
+            
+            if(is_training && !(*is_training)) {
+                return;
+            }
         }
+        saveNetwork();
         m_accuracy = (10 - avg_cost_bulk) * 10;
+        m_accuracy_history.push_back(m_accuracy);
     }
 }
 

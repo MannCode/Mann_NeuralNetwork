@@ -241,6 +241,12 @@ public:
         bool models_window = true;
         bool training_window = false;
     } shown_windows;                ///< Struct to manage visibility of different UI windows.
+
+    //models_window specific variables
+
+    //training window specific variables
+    bool is_training = false;
+    std::thread training_thread;
 };
 
 #endif // MANN_UI_H

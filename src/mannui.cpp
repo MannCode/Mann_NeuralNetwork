@@ -66,7 +66,7 @@ inline MannUI::~MannUI()
 
 // PROTOTYPES
 void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model);
-void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model);
+void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model, bool &is_training, std::thread &training_thread);
 void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size);
 
 /**
@@ -191,7 +191,7 @@ void MannUI::Render(std::stringstream &outputText)
     if (shown_windows.training_window)
     {
         ImGui::Begin("Train Model");
-        TrainingWindow(outputText, shown_windows, selected_model);
+        TrainingWindow(outputText, shown_windows, selected_model, is_training, training_thread);
         ImGui::End();
     }
 
@@ -367,22 +367,24 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
                 }
                 MannLogger::info(outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
                 // Create the network
-                MNNetwork network(modelName + ".mms", hidden_layers, learning_rate, batch_size);
+                // MNNetwork network(modelName + ".mms", hidden_layers, learning_rate, batch_size);
 
-                Networks.push_back({modelName, new MNNetwork(modelName + ".mms")});
+                Networks.push_back({modelName, new MNNetwork(modelName + ".mms", hidden_layers, learning_rate, batch_size)});
 
-                filenames.push_back(modelName);
+                auto &newEntry = Networks.back();
 
                 // test the network
-                std::thread test_thread([&network, &outputText]()
+                std::thread test_thread([&newEntry, &outputText]()
                 {
-                    network.testNetwork(::mnist_images_data, ::mnist_labels_data);
-                    Networks.back().calculatingAccuracy = false;
+                    // dont fucking touch this code at all costs, pata nhi kese chala h ye, bus chal rha h.
+                    newEntry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
+                    newEntry.calculatingAccuracy = false;
 
-                    MannLogger::info(outputText) << Networks.back().modelName << " --- Accuracy: " << network.m_accuracy << "%" << std::endl;
-                    // std::lock_guard<std::mutex> lock(resultsMutex);
+                    MannLogger::info(outputText) << Networks.back().modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
                 });
                 test_thread.detach();
+
+                filenames.push_back(modelName);
 
                 // Reset inputs
                 modelName.clear();
@@ -411,41 +413,6 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
         }
 
         ImGui::EndPopup();
-    }
-}
-
-void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model)
-{
-    ImGui::Text("Training Window - Under Construction");
-    ImGui::Separator();
-
-    if (selected_model)
-    {
-        ImGui::Text("Model: %s", selected_model->modelName.c_str());
-        ImGui::Text("Cuurrent Accuracy: %.2f%%", selected_model->network->m_accuracy);
-
-        // Add training controls and progress here
-        if (ImGui::Button("Start Training"))
-        {
-            // Start training logic
-            MannLogger::info(outputText) << "Starting training for model: " << selected_model->modelName << std::endl;
-
-            // Simulate training process (different thread)
-            std::thread training_thread([selected_model, &outputText]()
-                                        { selected_model->network->trainNetwork(1000,
-                                                                                ::mnist_images_data, ::mnist_labels_data); });
-            training_thread.detach();
-        }
-    }
-    else
-    {
-        ImGui::Text("No Model Selected");
-    }
-
-    if (ImGui::Button("Close"))
-    {
-        shown_windows.training_window = false;
-        shown_windows.models_window = true;
     }
 }
 
@@ -506,6 +473,86 @@ void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, s
     {
         if (batch_size_int > 0)
             batch_size = static_cast<size_t>((batch_size_int > 200) ? 200 : batch_size_int);
+    }
+}
+
+
+void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model, bool &is_training, std::thread &training_thread)
+{
+    ImGui::Text("Training Window - Under Construction");
+    ImGui::Separator();
+
+    if (selected_model)
+    {
+        ImGui::Text("Model: %s", selected_model->modelName.c_str());
+        ImGui::Text("Current Accuracy: %.2f%%", selected_model->network->m_accuracy);
+        ImGui::Text("Batch Size: %zu", selected_model->network->m_batch_size);
+        ImGui::Text("Current Batch: %d/%d", selected_model->network->current_batch, (mnist_images_data.size() / selected_model->network->m_batch_size));
+
+        ImGui::Separator();
+        ImGui::NewLine();
+
+        ImGui::PlotLines("Accuracy Over Whole data", [](void* data, int idx) {
+            std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
+            return (*accuracies)[idx];
+        }, static_cast<void*>(&(selected_model->network->m_accuracy_history)), selected_model->network->m_accuracy_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 300));
+
+        ImGui::PlotLines("Current Batch Accuracy", [](void* data, int idx) {
+            std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
+            return (*accuracies)[idx];
+        }, static_cast<void*>(&(selected_model->network->m_accuracy_crr_batch_history)), selected_model->network->m_accuracy_crr_batch_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
+
+        ImGui::PlotLines("Current Image Accuracy", [](void* data, int idx) {
+            std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
+            return (*accuracies)[idx];
+        }, static_cast<void*>(&(selected_model->network->m_accuracy_crr_image_history)), selected_model->network->m_accuracy_crr_image_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
+
+        ImGui::NewLine();
+        ImGui::Separator();
+
+        // Add training controls and progress here
+        if (!is_training) {
+            if (ImGui::Button("Start Training"))
+            {
+                if(training_thread.joinable())
+                    training_thread.join();
+
+                // Start training logic
+                MannLogger::info(outputText) << "Starting training for model: " << selected_model->modelName << std::endl;
+
+                // Simulate training process (different thread)
+                training_thread = std::thread([selected_model, &outputText, &is_training]()
+                                            { selected_model->network->trainNetwork(1000, ::mnist_images_data, ::mnist_labels_data, &is_training); });
+                // training_thread.detach();
+
+                is_training = true;
+            }
+        }
+        else {
+            ImGui::Text("Model is training...");
+
+            if(ImGui::Button("Stop Training"))
+            {
+                // Stop training logic
+                is_training = false;
+
+                if(training_thread.joinable())
+                    training_thread.join();
+
+                MannLogger::info(outputText) << "Training stopped for model: " << selected_model->modelName << std::endl;
+            }
+            // Here you can add a progress bar or other indicators
+        }
+    }
+    else
+        ImGui::Text("No Model Selected");
+
+    if(!is_training) {
+    if (ImGui::Button("Close"))
+        {
+            shown_windows.training_window = false;
+            shown_windows.models_window = true;
+        }
     }
 }
 
