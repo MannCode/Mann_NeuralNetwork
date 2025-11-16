@@ -9,6 +9,7 @@ fn platform_dependent_execution() {
             'cmake ..',
             'cmake --build .',
             './NN',
+        ]
     } else if os.user_os() == 'windows' {
         commands = [
             'for /d %i in (*) do if not "%i"=="_deps" rmdir /s /q "%i" & for %i in (*) do if not "%i"=="run.v" del /q "%i"',
