@@ -93,12 +93,8 @@ namespace MannLogger {
     inline std::string getTimestamp() {
         auto now = std::chrono::system_clock::now();
         auto time = std::chrono::system_clock::to_time_t(now);
-        std::tm tm_struct;
         std::stringstream ss;
-
-        errno_t result = localtime_s(&tm_struct, &time);
-        (result == 0) ? ss << std::put_time(&tm_struct, "%Y-%m-%d %H:%M:%S")
-                      : ss << "Error: Failed to get local time";
+        ss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S");
         return ss.str();
     }
 

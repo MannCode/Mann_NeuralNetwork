@@ -417,6 +417,30 @@ src/mnist.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NN.dir/build.make CMakeFiles/NN.dir/src/mnist.cpp.s
 .PHONY : src/mnist.cpp.s
 
+src/windowManager.o: src/windowManager.cpp.o
+.PHONY : src/windowManager.o
+
+# target to build an object file
+src/windowManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NN.dir/build.make CMakeFiles/NN.dir/src/windowManager.cpp.o
+.PHONY : src/windowManager.cpp.o
+
+src/windowManager.i: src/windowManager.cpp.i
+.PHONY : src/windowManager.i
+
+# target to preprocess a source file
+src/windowManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NN.dir/build.make CMakeFiles/NN.dir/src/windowManager.cpp.i
+.PHONY : src/windowManager.cpp.i
+
+src/windowManager.s: src/windowManager.cpp.s
+.PHONY : src/windowManager.s
+
+# target to generate assembly for a file
+src/windowManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NN.dir/build.make CMakeFiles/NN.dir/src/windowManager.cpp.s
+.PHONY : src/windowManager.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -462,6 +486,9 @@ help:
 	@echo "... src/mnist.o"
 	@echo "... src/mnist.i"
 	@echo "... src/mnist.s"
+	@echo "... src/windowManager.o"
+	@echo "... src/windowManager.i"
+	@echo "... src/windowManager.s"
 .PHONY : help
 
 

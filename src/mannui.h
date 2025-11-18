@@ -250,7 +250,7 @@ public:
 struct UIContext {
   std::stringstream &outputText;
   MannUI::Shown_Windows &shown_windows;
-  NetworkEntry* selected_model;
+  NetworkEntry* &selected_model;
 };
 
 

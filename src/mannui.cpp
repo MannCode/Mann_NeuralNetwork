@@ -14,6 +14,8 @@
 #include "mannui.h"
 #include "MNNetwork.h"
 
+#include <assert.h>
+
 /**
  * @brief Global vector of model filenames retrieved from the models directory.
  */
@@ -183,7 +185,7 @@ void MannUI::Render(std::stringstream &outputText)
     ImGui::End();
 
     UIContext* ui_context = new UIContext{outputText, shown_windows, selected_model};
-
+    
     // Control Panel
     if (shown_windows.models_window)
     {
@@ -386,21 +388,21 @@ void ShowAvalModels(UIContext* ui_context)
                     mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
                     newEntry.network->testNetwork(mnist_data);
                     newEntry.calculatingAccuracy = false;
-
-                    MannLogger::info(ui_context->outputText) << Networks.back().modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
+                    MannLogger::info(ui_context->outputText) << newEntry.modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
                 });
                 test_thread.detach();
-
-                filenames.push_back(modelName);
-
+                
+                filenames.push_back(modelName);                
                 // Reset inputs
                 modelName.clear();
-                hidden_layers = {50, 10};
-                learning_rate = 0.01f;
-                batch_size = 32;
-                modelNameBuffer[0] = '\0';
-                csv_buffer[0] = '\0';
-
+                // hidden_layers = {50, 10};
+                // learning_rate = 0.01f;
+                // batch_size = 32;
+                // modelNameBuffer[0] = '\0';
+                // csv_buffer[0] = '\0';
+                
+                // NetworkConfiguration* network_configuration = new NetworkConfiguration{hidden_layers, learning_rate, batch_size};
+                
                 ImGui::CloseCurrentPopup();
             }
         }
@@ -488,7 +490,6 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
 {
     ImGui::Text("Training Window - Under Construction");
     ImGui::Separator();
-
     if (ui_context->selected_model)
     {
         ImGui::Text("Model: %s", ui_context->selected_model->modelName.c_str());

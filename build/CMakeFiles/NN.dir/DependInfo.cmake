@@ -20,6 +20,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mann.cpp" "CMakeFiles/NN.dir/src/mann.cpp.o" "gcc" "CMakeFiles/NN.dir/src/mann.cpp.o.d"
   "/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mannui.cpp" "CMakeFiles/NN.dir/src/mannui.cpp.o" "gcc" "CMakeFiles/NN.dir/src/mannui.cpp.o.d"
   "/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/mnist.cpp" "CMakeFiles/NN.dir/src/mnist.cpp.o" "gcc" "CMakeFiles/NN.dir/src/mnist.cpp.o.d"
+  "/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/src/windowManager.cpp" "CMakeFiles/NN.dir/src/windowManager.cpp.o" "gcc" "CMakeFiles/NN.dir/src/windowManager.cpp.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

@@ -23,6 +23,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/NN.dir/src/mannui.cpp.o.d"
   "CMakeFiles/NN.dir/src/mnist.cpp.o"
   "CMakeFiles/NN.dir/src/mnist.cpp.o.d"
+  "CMakeFiles/NN.dir/src/windowManager.cpp.o"
+  "CMakeFiles/NN.dir/src/windowManager.cpp.o.d"
   "NN"
   "NN.pdb"
 )
