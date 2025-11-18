@@ -11,7 +11,8 @@
  * models, and rendering output.
  */
 
-#include "mannui.shit"
+#include "mannui.h"
+#include "MNNetwork.h"
 
 /**
  * @brief Global vector of model filenames retrieved from the models directory.
@@ -34,7 +35,7 @@ std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network
  * @param iterations_rate The number of iterations for training.
  * @param batch_size The batch size for training.
  */
-MannUI::MannUI(GLFWwindow *window, std::vector<std::vector<double>> mnist_images_data, std::vector<std::vector<double>> mnist_labels_data)
+MannUI::MannUI(GLFWwindow *window, mnistData* mnist_data)
     : window(window)
 {
     // Init ImGui context
@@ -46,8 +47,8 @@ MannUI::MannUI(GLFWwindow *window, std::vector<std::vector<double>> mnist_images
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
-    ::mnist_images_data = mnist_images_data;
-    ::mnist_labels_data = mnist_labels_data;
+    ::mnist_images_data = mnist_data->mnist_images_data;
+    ::mnist_labels_data = mnist_data->mnist_labels_data;
 }
 
 /**
@@ -65,9 +66,9 @@ inline MannUI::~MannUI()
 }
 
 // PROTOTYPES
-void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model);
-void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model, bool &is_training, std::thread &training_thread);
-void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size);
+void ShowAvalModels(UIContext* ui_context);
+void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread);
+void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
  * @brief Renders the ImGui-based user interface.
@@ -127,7 +128,8 @@ void MannUI::Render(std::stringstream &outputText)
         {
             std::thread test_thread([&entry, &outputText]()
             {
-                entry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
+                mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
+                entry.network->testNetwork(mnist_data);
                 entry.calculatingAccuracy = false;
 
                 MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy << "%" << std::endl;
@@ -180,18 +182,20 @@ void MannUI::Render(std::stringstream &outputText)
     }
     ImGui::End();
 
+    UIContext* ui_context = new UIContext{outputText, shown_windows, selected_model};
+
     // Control Panel
     if (shown_windows.models_window)
     {
         ImGui::Begin("Models");
-        ShowAvalModels(outputText, shown_windows, selected_model);
+        ShowAvalModels(ui_context);
         ImGui::End();
     }
 
     if (shown_windows.training_window)
     {
         ImGui::Begin("Train Model");
-        TrainingWindow(outputText, shown_windows, selected_model, is_training, training_thread);
+        TrainingWindow(ui_context, is_training, training_thread);
         ImGui::End();
     }
 
@@ -234,7 +238,7 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
  */
-void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model)
+void ShowAvalModels(UIContext* ui_context)
 {
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
@@ -274,7 +278,7 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
         if (ImGui::BeginPopupModal((entry.modelName + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             // Non Graphical things
-            selected_model = &entry;
+            ui_context->selected_model = &entry;
 
             // Show model details here
             ImGui::Text("Model Name: %s", entry.modelName.c_str());
@@ -282,7 +286,7 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
             // show layers size
             ImGui::Text("Layers: ");
             ImGui::SameLine();
-            for (const auto &layer : entry.network->MNN_Layers_size)
+            for (const size_t &layer : entry.network->MNN_Layers_size)
             {
                 ImGui::Text("%zu,", layer);
                 ImGui::SameLine();
@@ -298,8 +302,8 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
             if (ImGui::Button("Train"))
             {
                 // Train the network
-                shown_windows.training_window = true;
-                shown_windows.models_window = false;
+                ui_context->shown_windows.training_window = true;
+                ui_context->shown_windows.models_window = false;
                 ImGui::CloseCurrentPopup();
                 // open a new window where we can monitor training progress
             }
@@ -347,14 +351,15 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
             modelName = modelNameBuffer;
         }
 
-        NetworkConfigUI(hidden_layers, learning_rate, batch_size);
+        NetworkConfiguration* network_configuration = new NetworkConfiguration{hidden_layers, learning_rate, batch_size};
+        NetworkConfigUI(network_configuration);
 
         if (ImGui::Button("Create"))
         {
             if (hidden_layers.empty())
             {
                 // outputText << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
-                MannLogger::error(outputText) << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
+                MannLogger::error(ui_context->outputText) << "Error: No layers added. Please add layers using the Add Layer button." << std::endl;
             }
             else
             {
@@ -365,22 +370,24 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
                 {
                     layersStr << hidden_layers[i];
                 }
-                MannLogger::info(outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
+                MannLogger::info(ui_context->outputText) << "Creating Model: " << modelName << " with layers [" << layersStr.str() << "], learning rate: " << learning_rate << ", batch size: " << batch_size << std::endl;
                 // Create the network
                 // MNNetwork network(modelName + ".mms", hidden_layers, learning_rate, batch_size);
 
-                Networks.push_back({modelName, new MNNetwork(modelName + ".mms", hidden_layers, learning_rate, batch_size)});
+                NetworkConfiguration* network_configuration = new NetworkConfiguration{hidden_layers, learning_rate, batch_size};
+                Networks.push_back({modelName, new MNNetwork(modelName + ".mms", network_configuration)});
 
                 auto &newEntry = Networks.back();
 
                 // test the network
-                std::thread test_thread([&newEntry, &outputText]()
+                std::thread test_thread([&newEntry, &ui_context]()
                 {
                     // dont fucking touch this code at all costs, pata nhi kese chala h ye, bus chal rha h.
-                    newEntry.network->testNetwork(::mnist_images_data, ::mnist_labels_data);
+                    mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
+                    newEntry.network->testNetwork(mnist_data);
                     newEntry.calculatingAccuracy = false;
 
-                    MannLogger::info(outputText) << Networks.back().modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
+                    MannLogger::info(ui_context->outputText) << Networks.back().modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
                 });
                 test_thread.detach();
 
@@ -422,7 +429,7 @@ void ShowAvalModels(std::stringstream &outputText, MannUI::Shown_Windows &shown_
  * @param learning_rate Learning rate for the network.
  * @param batch_size Batch size for training.
  */
-void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, size_t &batch_size)
+void NetworkConfigUI(NetworkConfiguration* network_configuration)
 {
     ImGui::Text("Hidden Layers");
     ImGui::Separator();
@@ -435,21 +442,21 @@ void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, s
         std::vector<size_t> new_layers;
         if (ParseCSVToHiddenLayers(input, new_layers))
         {
-            hidden_layers.insert(hidden_layers.end(), new_layers.begin(), new_layers.end());
+            network_configuration->hidden_layers.insert(network_configuration->hidden_layers.end(), new_layers.begin(), new_layers.end());
             csv_buffer[0] = '\0';
         }
     }
 
     // Display current hidden_layers with Remove buttons
     ImGui::Text("Current Layers:");
-    for (size_t i = 0; i < hidden_layers.size(); ++i)
+    for (size_t i = 0; i < network_configuration->hidden_layers.size(); ++i)
     {
         ImGui::PushID(i);
-        ImGui::Text("Layer %zu: %zu", i + 1, hidden_layers[i]);
+        ImGui::Text("Layer %zu: %zu", i + 1, network_configuration->hidden_layers[i]);
         ImGui::SameLine();
         if (ImGui::Button("Remove"))
         {
-            hidden_layers.erase(hidden_layers.begin() + i);
+            network_configuration->hidden_layers.erase(network_configuration->hidden_layers.begin() + i);
             ImGui::PopID();
             continue;
         }
@@ -458,36 +465,36 @@ void NetworkConfigUI(std::vector<size_t> &hidden_layers, float &learning_rate, s
 
     ImGui::Text("Learning Rate");
     ImGui::Separator();
-    if (ImGui::InputFloat("Learning Rate", &learning_rate, 0.001f, 0.1f, "%.4f", ImGuiInputTextFlags_CharsDecimal))
+    if (ImGui::InputFloat("Learning Rate", &network_configuration->learning_rate, 0.001f, 0.1f, "%.4f", ImGuiInputTextFlags_CharsDecimal))
     {
-        if (learning_rate < 0.0f)
-            learning_rate = 0.0f;
-        if (learning_rate > 1.0f)
-            learning_rate = 1.0f;
+        if (network_configuration->learning_rate < 0.0f)
+            network_configuration->learning_rate = 0.0f;
+        if (network_configuration->learning_rate > 1.0f)
+            network_configuration->learning_rate = 1.0f;
     }
 
     ImGui::Text("Batch Size");
     ImGui::Separator();
-    int batch_size_int = static_cast<int>(batch_size);
+    int batch_size_int = static_cast<int>(network_configuration->batch_size);
     if (ImGui::InputInt("Batch Size", &batch_size_int, 0, 0, ImGuiInputTextFlags_CharsNoBlank))
     {
         if (batch_size_int > 0)
-            batch_size = static_cast<size_t>((batch_size_int > 200) ? 200 : batch_size_int);
+            network_configuration->batch_size = static_cast<size_t>((batch_size_int > 200) ? 200 : batch_size_int);
     }
 }
 
 
-void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_windows, NetworkEntry *&selected_model, bool &is_training, std::thread &training_thread)
+void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread)
 {
     ImGui::Text("Training Window - Under Construction");
     ImGui::Separator();
 
-    if (selected_model)
+    if (ui_context->selected_model)
     {
-        ImGui::Text("Model: %s", selected_model->modelName.c_str());
-        ImGui::Text("Current Accuracy: %.2f%%", selected_model->network->m_accuracy);
-        ImGui::Text("Batch Size: %zu", selected_model->network->m_batch_size);
-        ImGui::Text("Current Batch: %d/%d", selected_model->network->current_batch, (mnist_images_data.size() / selected_model->network->m_batch_size));
+        ImGui::Text("Model: %s", ui_context->selected_model->modelName.c_str());
+        ImGui::Text("Current Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+        ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
+        ImGui::Text("Current Batch: %d/%zu", ui_context->selected_model->network->current_batch, (mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
 
         ImGui::Separator();
         ImGui::NewLine();
@@ -495,17 +502,17 @@ void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_
         ImGui::PlotLines("Accuracy Over Whole data", [](void* data, int idx) {
             std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
             return (*accuracies)[idx];
-        }, static_cast<void*>(&(selected_model->network->m_accuracy_history)), selected_model->network->m_accuracy_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 300));
+        }, static_cast<void*>(&(ui_context->selected_model->network->m_accuracy_history)), ui_context->selected_model->network->m_accuracy_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 300));
 
         ImGui::PlotLines("Current Batch Accuracy", [](void* data, int idx) {
             std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
             return (*accuracies)[idx];
-        }, static_cast<void*>(&(selected_model->network->m_accuracy_crr_batch_history)), selected_model->network->m_accuracy_crr_batch_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
+        }, static_cast<void*>(&(ui_context->selected_model->network->m_accuracy_crr_batch_history)), ui_context->selected_model->network->m_accuracy_crr_batch_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
 
         ImGui::PlotLines("Current Image Accuracy", [](void* data, int idx) {
             std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
             return (*accuracies)[idx];
-        }, static_cast<void*>(&(selected_model->network->m_accuracy_crr_image_history)), selected_model->network->m_accuracy_crr_image_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
+        }, static_cast<void*>(&(ui_context->selected_model->network->m_accuracy_crr_image_history)), ui_context->selected_model->network->m_accuracy_crr_image_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
 
         ImGui::NewLine();
         ImGui::Separator();
@@ -518,11 +525,25 @@ void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_
                     training_thread.join();
 
                 // Start training logic
-                MannLogger::info(outputText) << "Starting training for model: " << selected_model->modelName << std::endl;
+                MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->modelName << std::endl;
 
+                // FIX: GAY FIX
                 // Simulate training process (different thread)
-                training_thread = std::thread([selected_model, &outputText, &is_training]()
-                                            { selected_model->network->trainNetwork(1000, ::mnist_images_data, ::mnist_labels_data, &is_training); });
+                // training_thread = std::thread([selected_model, &outputText, &is_training]()
+                //                             { selected_model->network->trainNetwork(1000, ::mnist_images_data, ::mnist_labels_data, &is_training); });
+                training_thread = std::thread([ui_context, &is_training]() {
+                    // Access selected_model via ui_context
+                    if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
+                        mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
+                        ui_context->selected_model->network->trainNetwork(1000, mnist_data, &is_training);
+                    } else {
+                        // Handle error: e.g., log to outputText if available
+                        if (ui_context && ui_context->outputText) {
+                            ui_context->outputText << "Error: Invalid ui_context or selected_model for training." << std::endl;
+                        }
+                    }
+                });
+
                 // training_thread.detach();
 
                 is_training = true;
@@ -539,7 +560,7 @@ void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_
                 if(training_thread.joinable())
                     training_thread.join();
 
-                MannLogger::info(outputText) << "Training stopped for model: " << selected_model->modelName << std::endl;
+                MannLogger::info(ui_context->outputText) << "Training stopped for model: " << ui_context->selected_model->modelName << std::endl;
             }
             // Here you can add a progress bar or other indicators
         }
@@ -550,8 +571,8 @@ void TrainingWindow(std::stringstream &outputText, MannUI::Shown_Windows &shown_
     if(!is_training) {
     if (ImGui::Button("Close"))
         {
-            shown_windows.training_window = false;
-            shown_windows.models_window = true;
+            ui_context->shown_windows.training_window = false;
+            ui_context->shown_windows.models_window = true;
         }
     }
 }

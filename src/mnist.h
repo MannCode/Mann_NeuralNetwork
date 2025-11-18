@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "mann.shit"
+#include "mann.h"
 
 /**
  * @class Mnist
@@ -52,7 +52,7 @@ public:
      * @param arr A vector of vectors to store the image data as doubles.
      */
     void ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<std::vector<double>> &arr);
-    
+
     /**
      * @brief Reads MNIST label data from a file into a vector.
      * @param NumberOfImages The number of images (labels) to read.

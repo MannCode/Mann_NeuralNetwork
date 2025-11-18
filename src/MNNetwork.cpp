@@ -1,4 +1,4 @@
-#include "MNNetwork.shit"
+#include "MNNetwork.h"
 #include <cassert>
 
 /**
@@ -22,15 +22,17 @@ MNNetwork::MNNetwork(std::string filename)
  * @param batch_size The size of each training batch.
 
  */
-MNNetwork::MNNetwork(std::string filename, std::vector<size_t> hidden_layers_size, float learning_rate, size_t batch_size)
-                    : m_learning_rate(learning_rate), m_batch_size(batch_size), m_filename(filename)
+MNNetwork::MNNetwork(std::string filename, NetworkConfiguration* network_configuration)
+                    : m_learning_rate(network_configuration->learning_rate), m_batch_size(network_configuration->batch_size), m_filename(filename)
 {
     m_accuracy = 0.0f;
     m_total_training_time = 0.0f;
+    NetworkInitialization* network_initalization = new NetworkInitialization{MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias};
+    NetworkArchitecture* network_arch = new NetworkArchitecture{network_initalization, network_configuration->hidden_layers};
 
     std::ifstream file("../models/" + m_filename);
-    file.good() ?  loadNetwork(m_filename) 
-    : CreateNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, hidden_layers_size);
+    file.good() ?  loadNetwork(m_filename)
+    : CreateNetwork(network_arch);
 };
 
 /**
@@ -49,10 +51,9 @@ MNNetwork::~MNNetwork() {};
  * @param filename The file to save the trained network.
  * @param learning_rate The learning rate for weight updates during training.
  */
-void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<double>> &images_data, 
-                            std::vector<std::vector<double>> &labels_data, bool *is_training)
+void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, bool *is_training)
 {
-    
+
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
     std::vector<Mann::Matrix> MNN_d_weights = MNN_Weights;
@@ -60,7 +61,7 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
 
     for(int n = 0; n < iterations; n++) {
         float avg_cost_bulk = 0;
-        for(int batch = 0; batch < images_data.size()/m_batch_size; batch++) {
+        for(int batch = 0; batch < image_data->mnist_images_data.size()/m_batch_size; batch++) {
             float avg_cost_bulk_batch = 0;
             current_batch = batch;
             for (int j = 0; j < MNN_d_weights.size(); j++) {
@@ -71,10 +72,10 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
             for (int i = batch * m_batch_size; i < (batch + 1) * m_batch_size; i++) {
                 // load image data in network
                 for (int j =0; j < MNN_Nodes[0].rows(); j++) {
-                    MNN_Nodes[0][j][0] = images_data[i][j];
+                    MNN_Nodes[0][j][0] = image_data->mnist_images_data[i][j];
                 }
                 for (int j = 0; j < MNN_y.rows(); j++) {
-                    MNN_y[j][0] = labels_data[i][j];
+                    MNN_y[j][0] = image_data->mnist_labels_data[i][j];
                 }
 
                 feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
@@ -99,13 +100,13 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
 
             m_accuracy_crr_batch = (10 - avg_cost_bulk_batch) * 10;
             m_accuracy_crr_batch_history.push_back(m_accuracy_crr_batch);
-            
+
             // time to update the weights and biases
             for (int j = 0; j < MNN_Weights.size(); j++) {
                 MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * m_learning_rate);
                 MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
             }
-            
+
             if(is_training && !(*is_training)) {
                 return;
             }
@@ -122,11 +123,10 @@ void MNNetwork::trainNetwork(const size_t iterations, std::vector<std::vector<do
  * @param labels_data A vector of corresponding label data for testing.
  * @param filename The file containing the network configuration.
  */
-void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data, 
-                                 std::vector<std::vector<double>> &labels_data, 
+void MNNetwork::testNetworkByUser(mnistData* image_data,
                                  const std::string &filename)
 {
-    
+
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
@@ -136,18 +136,18 @@ void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data,
         int index = 0;
         std::cout << "Enter the index of the image to test (0 - 9999): ";
         std::cin >> index;
-        if (index < 0 || index >= images_data.size()) {
+        if (index < 0 || index >= image_data->mnist_images_data.size()) {
             std::cout << "Invalid index. Exiting." << std::endl;
         }
         else {
             // load image data in network
             for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-                MNN_Nodes[0][j][0] = images_data[index][j];
+                MNN_Nodes[0][j][0] = image_data->mnist_images_data[index][j];
             }
-            for (int j = 0; j < MNN_y.rows(); j++) { 
-                MNN_y[j][0] = labels_data[index][j];
+            for (int j = 0; j < MNN_y.rows(); j++) {
+                MNN_y[j][0] = image_data->mnist_labels_data[index][j];
             }
-            
+
             feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
 
             Mann::Matrix MNN_cost = (MNN_Nodes[MNN_Nodes.size() - 1] - MNN_y);
@@ -183,8 +183,9 @@ void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data,
             std::cout << std::endl;
             std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
 
+            mnistData* mnist_data = new mnistData{{image_data->mnist_images_data[index]}, {image_data->mnist_labels_data[index]}};
             // print the image
-            saveImageDataToFile(images_data[index], labels_data[index], "test_image.mms");
+            saveImageDataToFile(mnist_data, "test_image.mms");
         }
     }
 }
@@ -192,10 +193,9 @@ void MNNetwork::testNetworkByUser(std::vector<std::vector<double>> &images_data,
 /**
  * @brief Tests the neural network using the provided dataset.
  */
-void MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data, 
-                          std::vector<std::vector<double>> &mnist_labels_data)
+void MNNetwork::testNetwork(mnistData* image_data)
 {
-    
+
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
@@ -204,18 +204,18 @@ void MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data,
 
     // MNN_Nodes[0][783][0] = mnist_images_data[0][783];
 
-    for (int i = 0; i < mnist_images_data.size(); i++) {
+    for (int i = 0; i < image_data->mnist_images_data.size(); i++) {
 
         // load image data in network
         // std::cout << MNN_Nodes[0].cols() << std::endl;
         for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-            MNN_Nodes[0][j][0] = mnist_images_data[i][j];
+            MNN_Nodes[0][j][0] = image_data->mnist_images_data[i][j];
             // std::cout << "hello";
         }
-        for (int j = 0; j < MNN_y.rows(); j++) { 
-            MNN_y[j][0] = mnist_labels_data[i][j];
+        for (int j = 0; j < MNN_y.rows(); j++) {
+            MNN_y[j][0] = image_data->mnist_labels_data[i][j];
         }
-        
+
         feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
 
         Mann::Matrix MNN_cost = (MNN_Nodes[MNN_Nodes.size() - 1] - MNN_y);
@@ -240,23 +240,20 @@ void MNNetwork::testNetwork(std::vector<std::vector<double>> &mnist_images_data,
  * @param weights A vector of matrices to store the weights between layers.
  * @param biases A vector of matrices to store the biases for each layer.
  */
-void MNNetwork::initializeNetwork(std::vector<size_t> layers_size, 
-                                 std::vector<Mann::Matrix> &nodes, 
-                                 std::vector<Mann::Matrix> &weights, 
-                                 std::vector<Mann::Matrix> &biases)
+void MNNetwork::initializeNetwork(NetworkInitialization* network_initialization)
 {
-    for(int i=0; i < layers_size.size(); i++)
+    for(int i=0; i < network_initialization->layers_size.size(); i++)
     {
-        nodes.emplace_back(Mann::Matrix(layers_size[i], 1));
+        network_initialization->nodes.emplace_back(Mann::Matrix(network_initialization->layers_size[i], 1));
     }
 
-    for(int i=0; i < layers_size.size() - 1; i++)
+    for(int i=0; i < network_initialization->layers_size.size() - 1; i++)
     {
-        weights.emplace_back(Mann::Matrix(layers_size[i + 1], layers_size[i]));
-        biases.emplace_back(Mann::Matrix(layers_size[i + 1], 1));
+        network_initialization->weights.emplace_back(Mann::Matrix(network_initialization->layers_size[i + 1], network_initialization->layers_size[i]));
+        network_initialization->biases.emplace_back(Mann::Matrix(network_initialization->layers_size[i + 1], 1));
 
-        weights[i].randomize();
-        biases[i].randomize();
+        network_initialization->weights[i].randomize();
+        network_initialization->biases[i].randomize();
     }
 }
 
@@ -267,9 +264,9 @@ void MNNetwork::initializeNetwork(std::vector<size_t> layers_size,
  * @param weights A vector of matrices representing the weights between layers.
  * @param biases A vector of matrices representing the biases for each layer.
  */
-void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes, 
-                           std::vector<Mann::Matrix> &weighted_sum, 
-                           std::vector<Mann::Matrix> &weights, 
+void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes,
+                           std::vector<Mann::Matrix> &weighted_sum,
+                           std::vector<Mann::Matrix> &weights,
                            std::vector<Mann::Matrix> &biases)
 {
     for (size_t i = 0; i < nodes.size() - 1; ++i)
@@ -314,10 +311,10 @@ void MNNetwork::der_activationFunction(Mann::Matrix &matrix, const Mann::Matrix 
  * @param target The target output matrix for the current input.
  * @return A vector of vectors of matrices containing gradients for weights and biases.
  */
-std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Mann::Matrix> &nodes, 
-                                                                std::vector<Mann::Matrix> &weighted_sum, 
-                                                                std::vector<Mann::Matrix> &weights, 
-                                                                std::vector<Mann::Matrix> &biases, 
+std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Mann::Matrix> &nodes,
+                                                                std::vector<Mann::Matrix> &weighted_sum,
+                                                                std::vector<Mann::Matrix> &weights,
+                                                                std::vector<Mann::Matrix> &biases,
                                                                 const Mann::Matrix &target)
 {
     // Differentiation variables for backpropagation
@@ -328,7 +325,8 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
 
     std::vector<size_t> layers_size;
     for (size_t i = 0; i < nodes.size(); ++i) { layers_size.push_back(nodes[i].rows()); }
-    initializeNetwork(layers_size, d_nodes, d_weights, d_biases);
+    NetworkInitialization* network_initialization = new NetworkInitialization{layers_size, d_nodes, d_weights, d_biases};
+    initializeNetwork(network_initialization);
     d_a_weighted_sum = d_biases;
 
 
@@ -363,7 +361,7 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
 
 
         d_biases[i] = d_a_weighted_sum[i] ^ d_nodes[i + 1];
-        
+
     }
 
     return {d_weights, d_biases};
@@ -425,7 +423,7 @@ void MNNetwork::loadNetwork(const std::string &filename)
 
     // Get second line (learning rate)
     file >> m_learning_rate;
-    
+
     // Get third line (batch size)
     file >> m_batch_size;
 
@@ -471,15 +469,11 @@ void MNNetwork::loadNetwork(const std::string &filename)
  * @param hidden_layers_size A vector specifying the number of neurons in each hidden layer.
  * @param modelName The name of the neural network model.
  */
-void MNNetwork::CreateNetwork(std::vector<size_t> &layers_size,
-                             std::vector<Mann::Matrix> &nodes, 
-                             std::vector<Mann::Matrix> &weights, 
-                             std::vector<Mann::Matrix> &biases, 
-                             std::vector<size_t> &hidden_layers_size)
+void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
 {
     std::string path = "../models/" + m_filename;
     std::ofstream outfile(path); // mandeep model storage
- 
+
     if (!outfile)
     {
         std::cerr << "Error creating new file!" << std::endl;
@@ -487,17 +481,19 @@ void MNNetwork::CreateNetwork(std::vector<size_t> &layers_size,
     }
 
     // [783, hidden, 10]
-    layers_size.push_back(784); // input layer
-    for (size_t i = 0; i < hidden_layers_size.size(); i++) {
-        layers_size.push_back(hidden_layers_size[i]); // hidden layers
+    network_arch->network_initialization->layers_size.push_back(784); // input layer
+    for (size_t i = 0; i < network_arch->hidden_layers_size.size(); i++) {
+        network_arch->network_initialization->layers_size.push_back(network_arch->hidden_layers_size[i]); // hidden layers
     }
-    layers_size.push_back(10);  // output layer
+    network_arch->network_initialization->layers_size.push_back(10);  // output layer
 
-    initializeNetwork(layers_size, nodes, weights, biases);
+    NetworkInitialization* network_initialization = new NetworkInitialization{network_arch->network_initialization->layers_size,
+                    network_arch->network_initialization->nodes, network_arch->network_initialization->weights, network_arch->network_initialization->biases};
+    initializeNetwork(network_initialization);
     saveNetwork();
 
     outfile.close();
-    std::cout << "File created successfully!" << std::endl; 
+    std::cout << "File created successfully!" << std::endl;
 }
 
 /**
@@ -506,8 +502,7 @@ void MNNetwork::CreateNetwork(std::vector<size_t> &layers_size,
  * @param label_data A vector containing the corresponding label data.
  * @param filename The file to save the image and label data.
  */
-void MNNetwork::saveImageDataToFile(const std::vector<double>& image_data, 
-                                   const std::vector<double>& lable_data,
+void MNNetwork::saveImageDataToFile(mnistData* image_data,
                                    const std::string& filename)
 {
     std::ofstream file(filename);
@@ -518,24 +513,24 @@ void MNNetwork::saveImageDataToFile(const std::vector<double>& image_data,
             for (int j = 0; j < 28; j++)
             {
                 // only 2 decimal points
-                if (image_data[i * 28 + j] < 0.1)
+                if (*image_data->mnist_images_data[i * 28 + j].data() < 0.1)
                 {
                     file << ".....";
                 }
                 else
                 {
-                    file << std::fixed << std::setprecision(2) << image_data[i * 28 + j] << " ";
+                    file << std::fixed << std::setprecision(2) << image_data->mnist_images_data[i * 28 + j].data() << " ";
                 }
-                
+
                 // file << image_data[i * 28 + j] << " ";
             }
             file << std::endl << std::endl;
-            
+
         }
         file << "Label: ";
         for (int i = 0; i < 10; i++)
         {
-            file << lable_data[i] << " ";
+            file << image_data->mnist_labels_data[i].data() << " ";
         }
         file << std::endl;
         file.close();

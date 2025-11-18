@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-#include "mann.shit"
+#include "structs.hpp"
 
 /**
  * @file MNNetwork.h
@@ -37,7 +37,7 @@ public:
      * @param learning_rate The learning rate for weight updates during training.
      * @param batch_size The size of each training batch.
      */
-    MNNetwork(std::string filename, std::vector<size_t> hidden_layers_size, float learning_rate, size_t batch_size);
+    MNNetwork(std::string filename, NetworkConfiguration* network_configuration);
 
     /**
      * @brief Destructor for the MNNetwork class.
@@ -52,8 +52,7 @@ public:
      * @param images_data A vector of input image data for training.
      * @param labels_data A vector of corresponding label data for training.
      */
-    void trainNetwork(const size_t iterations, std::vector<std::vector<double>> &images_data, 
-                     std::vector<std::vector<double>> &labels_data, bool *is_training);
+    void trainNetwork(const size_t iterations, mnistData* image_data, bool *is_training);
 
 
     /**
@@ -62,15 +61,13 @@ public:
      * @param labels_data A vector of corresponding label data for testing.
      * @param filename The file containing the network configuration.
      */
-    void testNetworkByUser(std::vector<std::vector<double>> &images_data, 
-                          std::vector<std::vector<double>> &labels_data, 
+    void testNetworkByUser(mnistData* image_data,
                           const std::string &filename);
 
     /**
      * @brief Tests the neural network using the provided dataset.
      */
-    void testNetwork(std::vector<std::vector<double>> &images_data, 
-                     std::vector<std::vector<double>> &labels_data);
+    void testNetwork(mnistData* image_data);
 
     /**
      * @brief Initializes the neural network with the specified layer sizes.
@@ -79,10 +76,7 @@ public:
      * @param weights A vector of matrices representing the weights between layers.
      * @param biases A vector of matrices representing the biases for each layer.
      */
-    void initializeNetwork(std::vector<size_t> layers_size, 
-                          std::vector<Mann::Matrix> &layers, 
-                          std::vector<Mann::Matrix> &weights, 
-                          std::vector<Mann::Matrix> &biases);
+    void initializeNetwork(NetworkInitialization* network_initialization);
 
     /**
      * @brief Performs the feedforward operation on the neural network.
@@ -91,9 +85,9 @@ public:
      * @param weights A vector of matrices representing the weights between layers.
      * @param biases A vector of matrices representing the biases for each layer.
      */
-    void feedForward(std::vector<Mann::Matrix> &nodes, 
-                     std::vector<Mann::Matrix> &weighted_sum, 
-                     std::vector<Mann::Matrix> &weights, 
+    void feedForward(std::vector<Mann::Matrix> &nodes,
+                     std::vector<Mann::Matrix> &weighted_sum,
+                     std::vector<Mann::Matrix> &weights,
                      std::vector<Mann::Matrix> &biases);
 
     /**
@@ -105,10 +99,10 @@ public:
      * @param target The target output matrix for the current input.
      * @return A vector of vectors of matrices containing gradients for weights and biases.
      */
-    std::vector<std::vector<Mann::Matrix>> backPropagation(std::vector<Mann::Matrix> &nodes, 
-                                                          std::vector<Mann::Matrix> &weighted_sum, 
-                                                          std::vector<Mann::Matrix> &weights, 
-                                                          std::vector<Mann::Matrix> &biases, 
+    std::vector<std::vector<Mann::Matrix>> backPropagation(std::vector<Mann::Matrix> &nodes,
+                                                          std::vector<Mann::Matrix> &weighted_sum,
+                                                          std::vector<Mann::Matrix> &weights,
+                                                          std::vector<Mann::Matrix> &biases,
                                                           const Mann::Matrix &target);
 
     /**
@@ -146,8 +140,7 @@ public:
      * @param label_data A vector containing the corresponding label data.
      * @param filename The file to save the image and label data.
      */
-    void saveImageDataToFile(const std::vector<double>& image_data, 
-                             const std::vector<double>& label_data, 
+    void saveImageDataToFile(mnistData* image_data,
                              const std::string& filename);
 
     /**
@@ -165,11 +158,7 @@ public:
      * @param hidden_layers_size A vector specifying the number of neurons in each hidden layer.
      * @param modelName The name of the neural network model.
      */
-    void CreateNetwork(std::vector<size_t> &layers_size, 
-                       std::vector<Mann::Matrix> &nodes, 
-                       std::vector<Mann::Matrix> &weights, 
-                       std::vector<Mann::Matrix> &biases, 
-                       std::vector<size_t> &hidden_layers_size);
+    void CreateNetwork(NetworkArchitecture* network_arch);
 
 public:
     /**

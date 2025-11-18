@@ -18,7 +18,8 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
-#include <utility>
+#include <ctime>
+#include "utils.h"
 
 /**
  * @brief ANSI color code to reset console text formatting.
@@ -92,8 +93,12 @@ namespace MannLogger {
     inline std::string getTimestamp() {
         auto now = std::chrono::system_clock::now();
         auto time = std::chrono::system_clock::to_time_t(now);
+        std::tm tm_struct;
         std::stringstream ss;
-        ss << std::put_time(std::localtime(&time), "%Y-%m-%d %H:%M:%S");
+
+        errno_t result = localtime_s(&tm_struct, &time);
+        (result == 0) ? ss << std::put_time(&tm_struct, "%Y-%m-%d %H:%M:%S")
+                      : ss << "Error: Failed to get local time";
         return ss.str();
     }
 
@@ -216,8 +221,8 @@ namespace MannLogger {
     inline LogStream operator<<(std::stringstream& guiOutput, LogLevel level) {
         switch (level) {
             case LogLevel::DEBUG: return debug(guiOutput);
-            case LogLevel::INFO: return info(guiOutput);
-            case LogLevel::WARN: return warn(guiOutput);
+            case LogLevel::INFO:  return info(guiOutput);
+            case LogLevel::WARN:  return warn(guiOutput);
             case LogLevel::ERROR: return error(guiOutput);
         }
         return info(guiOutput);  // Default fallback

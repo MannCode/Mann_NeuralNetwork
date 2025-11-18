@@ -10,7 +10,7 @@
  * and output formatting used in neural network computations.
  */
 
-#include "mann.shit"
+#include "mann.h"
 #include <iomanip>
 
 /**
@@ -365,7 +365,7 @@ namespace Mann
         }
         return *this;
     }
-    
+
     /**
      * @brief Randomizes the matrix elements within a specified range.
      * @param min The minimum value for randomization.
