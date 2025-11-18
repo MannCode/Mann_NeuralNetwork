@@ -14,15 +14,13 @@
 #define MANN_UI_H
 
 #include "utils.h"
-#include "MNNetwork.shit"
-#include "mann.shit"
+#include "MNNetwork.h"
+#include "mann.h"
 #include "mannlogger.hpp"
 
 #include "../dependencies/includes/imgui/imgui_internal.h"
 
 #include <iostream>
-#include <vector>
-#include <string>
 #include <memory>
 #include <future>
 #include <stdexcept>
@@ -98,7 +96,7 @@ inline std::vector<std::string> getTxtFileNamesWithoutExtension() {
         }
 
 #ifdef _WIN32
-        
+
 #else
         size_t pos = line.find_last_of('/');
         if (pos != std::string::npos) {
@@ -213,8 +211,8 @@ public:
      * @param iterations_rate The number of iterations for training.
      * @param batch_size The batch size for training.
      */
-    MannUI(GLFWwindow* window, std::vector<std::vector<double>> mnist_images_data, std::vector<std::vector<double>> mnist_labels_data);
-    
+    MannUI(GLFWwindow* window, mnistData* mnist_data);
+
     /**
      * @brief Destructor for the MannUI class.
      *
@@ -223,7 +221,7 @@ public:
     virtual ~MannUI();
 
     /**
-     * @brief Renders the UI using ImGui and GLFW. 
+     * @brief Renders the UI using ImGui and GLFW.
      * @param outputText A stringstream to append output messages for display in the UI.
      */
     void Render(std::stringstream &outputText);
@@ -249,5 +247,12 @@ public:
     bool is_training = false;
     std::thread training_thread;
 };
+
+struct UIContext {
+  std::stringstream &outputText;
+  MannUI::Shown_Windows &shown_windows;
+  NetworkEntry* &selected_model;
+};
+
 
 #endif // MANN_UI_H

@@ -11,8 +11,7 @@
  */
 
 
-#include "mnist.shit"
-#include "mann.shit"
+#include "mnist.h"
 
 /**
  * @brief Default constructor for the Mnist class.
@@ -55,7 +54,7 @@ void Mnist::ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<s
     std::ifstream file ("dependencies/includes/t10k-images-idx3-ubyte", std::ios::binary);
     if (file.is_open())
     {
-        
+
         int magic_number=0;
         int number_of_images=0;
         int n_rows=0;

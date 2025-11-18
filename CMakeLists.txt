@@ -62,6 +62,7 @@ set(SOURCES
     src/mann.cpp
     src/mnist.cpp
     src/MNNetwork.cpp
+    src/windowManager.cpp
 )
 
 set(IMGUI_SOURCES

@@ -18,7 +18,8 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
-#include <utility>
+#include <ctime>
+#include "utils.h"
 
 /**
  * @brief ANSI color code to reset console text formatting.
@@ -216,8 +217,8 @@ namespace MannLogger {
     inline LogStream operator<<(std::stringstream& guiOutput, LogLevel level) {
         switch (level) {
             case LogLevel::DEBUG: return debug(guiOutput);
-            case LogLevel::INFO: return info(guiOutput);
-            case LogLevel::WARN: return warn(guiOutput);
+            case LogLevel::INFO:  return info(guiOutput);
+            case LogLevel::WARN:  return warn(guiOutput);
             case LogLevel::ERROR: return error(guiOutput);
         }
         return info(guiOutput);  // Default fallback
