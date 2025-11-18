@@ -271,7 +271,7 @@ NN: CMakeFiles/NN.dir/dependencies/includes/imgui/imgui_widgets.cpp.o
 NN: CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_glfw.cpp.o
 NN: CMakeFiles/NN.dir/dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp.o
 NN: CMakeFiles/NN.dir/build.make
-NN: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
+NN: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/OpenGL.framework
 NN: /opt/homebrew/lib/libglfw.3.4.dylib
 NN: CMakeFiles/NN.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/mandeepsingh/myStuff/programming/Mann_NeuralNetwork/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable NN"

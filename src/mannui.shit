@@ -227,6 +227,7 @@ public:
      * @param outputText A stringstream to append output messages for display in the UI.
      */
     void Render(std::stringstream &outputText);
+    void SetModernDarkTheme();
 
 private:
     GLFWwindow* window;              ///< The GLFW window for rendering the UI.
