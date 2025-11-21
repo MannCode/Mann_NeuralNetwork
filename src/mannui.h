@@ -18,8 +18,6 @@
 #include "mann.h"
 #include "mannlogger.hpp"
 
-#include "../dependencies/includes/imgui/imgui_internal.h"
-
 #include <iostream>
 #include <memory>
 #include <future>

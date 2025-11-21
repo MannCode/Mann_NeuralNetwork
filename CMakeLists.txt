@@ -75,6 +75,11 @@ set(IMGUI_SOURCES
     dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
 )
 
+set(IMPLOT
+    dependencies/includes/implot/implot.cpp
+    dependencies/includes/implot/implot_items.cpp
+)
+
 # Find required packages
 find_package(OpenGL REQUIRED)
 
@@ -102,7 +107,7 @@ else()
 endif()
 
 # Add executable
-add_executable(NN ${SOURCES} ${IMGUI_SOURCES})
+add_executable(NN ${SOURCES} ${IMGUI_SOURCES} ${IMPLOT})
 
 # Link libraries
 target_link_libraries(NN PRIVATE OpenGL::GL)

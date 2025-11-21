@@ -1,6 +1,7 @@
 #include "MNNetwork.h"
 #include <cassert>
 
+
 /**
  * @brief Constructs a neural network by loading from a file.
  * @param filename The name of the file containing the network configuration and weights.
@@ -53,6 +54,7 @@ MNNetwork::~MNNetwork() {};
  */
 void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, bool *is_training)
 {
+    float start_time = static_cast<float>(glfwGetTime());
 
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
@@ -107,11 +109,16 @@ void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, boo
                 MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
             }
 
+            float end_time = static_cast<float>(glfwGetTime());
+            m_total_training_time += (end_time - start_time);
+            start_time = end_time;
+
+            saveNetwork();
+
             if(is_training && !(*is_training)) {
                 return;
             }
         }
-        saveNetwork();
         m_accuracy = (10 - avg_cost_bulk) * 10;
         m_accuracy_history.push_back(m_accuracy);
     }
@@ -227,9 +234,7 @@ void MNNetwork::testNetwork(mnistData* image_data)
 
         avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
     }
-    // std::cout << std::endl;
-    // std::cout << "Accuracy: " << (10 - avg_cost_bulk) * 10 << "%" << std::endl << std::endl << std::endl;
-    // return (10 - avg_cost_bulk) * 10;
+    
     m_accuracy = (10 - avg_cost_bulk) * 10;
 }
 
