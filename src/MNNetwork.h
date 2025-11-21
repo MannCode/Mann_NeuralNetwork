@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include "structs.hpp"
+#include "mnist.h"
 #include "GLFW/glfw3.h"
 
 /**
@@ -53,7 +54,7 @@ public:
      * @param images_data A vector of input image data for training.
      * @param labels_data A vector of corresponding label data for training.
      */
-    void trainNetwork(const size_t iterations, mnistData* image_data, bool *is_training);
+    void trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_data, bool *is_training);
 
 
     /**
@@ -62,13 +63,13 @@ public:
      * @param labels_data A vector of corresponding label data for testing.
      * @param filename The file containing the network configuration.
      */
-    void testNetworkByUser(mnistData* image_data,
+    void testNetworkByUser(Mnist::Mnist_Data* image_data,
                           const std::string &filename);
 
     /**
      * @brief Tests the neural network using the provided dataset.
      */
-    void testNetwork(mnistData* image_data);
+    void testNetwork(Mnist::Mnist_Data* image_data);
 
     /**
      * @brief Initializes the neural network with the specified layer sizes.
@@ -141,7 +142,7 @@ public:
      * @param label_data A vector containing the corresponding label data.
      * @param filename The file to save the image and label data.
      */
-    void saveImageDataToFile(mnistData* image_data,
+    void saveImageDataToFile(Mnist::Mnist_Data* image_data,
                              const std::string& filename);
 
     /**
@@ -172,14 +173,14 @@ public:
     size_t m_batch_size;
     float m_accuracy;
     float m_total_training_time;
+    int sample_image_label;
 
     //training related
     int current_batch;
-    float m_accuracy_crr_image;
-    std::vector<float> m_accuracy_crr_image_history;
-    float m_accuracy_crr_batch;
-    std::vector<float> m_accuracy_crr_batch_history;
     std::vector<float> m_accuracy_history;
+
+    float m_batch_accuracy;
+    std::vector<float> m_batch_accuracy_history;
 
 
 // private:

@@ -2,12 +2,6 @@
 
 #include "mann.h"
 
-struct mnistData
-{
-    std::vector<std::vector<double>> mnist_images_data;
-    std::vector<std::vector<double>> mnist_labels_data;
-};
-
 struct NetworkConfiguration
 {
   std::vector<size_t> &hidden_layers;

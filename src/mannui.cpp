@@ -21,11 +21,11 @@
  */
 std::vector<std::string> filenames = getTxtFileNamesWithoutExtension();
 char csv_buffer[256] = ""; // Buffer for csv input.
+Mnist* mnist;
 
 /**
  * @brief Global network to store models data.
  */
-std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
 std::mutex resultsMutex;                                               ///< Mutex for synchronizing output in threaded operations.
 
 std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
@@ -37,7 +37,7 @@ std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network
  * @param iterations_rate The number of iterations for training.
  * @param batch_size The batch size for training.
  */
-MannUI::MannUI(GLFWwindow *window, mnistData* mnist_data)
+MannUI::MannUI(GLFWwindow *window, Mnist *mnist)
     : window(window)
 {
     // Init ImGui context
@@ -51,8 +51,7 @@ MannUI::MannUI(GLFWwindow *window, mnistData* mnist_data)
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
-    ::mnist_images_data = mnist_data->mnist_images_data;
-    ::mnist_labels_data = mnist_data->mnist_labels_data;
+    ::mnist = mnist;
 }
 
 /**
@@ -72,7 +71,7 @@ inline MannUI::~MannUI()
 
 // PROTOTYPES
 void ShowAvalModels(UIContext* ui_context);
-void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread);
+void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
@@ -133,8 +132,8 @@ void MannUI::Render(std::stringstream &outputText)
         {
             std::thread test_thread([&entry, &outputText]()
             {
-                mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
-                entry.network->testNetwork(mnist_data);
+
+                entry.network->testNetwork(&mnist->mnist_testData);
                 entry.calculatingAccuracy = false;
 
                 MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy << "%" << std::endl;
@@ -200,7 +199,7 @@ void MannUI::Render(std::stringstream &outputText)
     if (shown_windows.training_window)
     {
         ImGui::Begin("Train Model");
-        TrainingWindow(ui_context, is_training, training_thread);
+        TrainingWindow(ui_context, is_training, training_thread, testing_thread);
         ImGui::End();
     }
 
@@ -388,8 +387,7 @@ void ShowAvalModels(UIContext* ui_context)
                 std::thread test_thread([&newEntry, &ui_context]()
                 {
                     // dont fucking touch this code at all costs, pata nhi kese chala h ye, bus chal rha h.
-                    mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
-                    newEntry.network->testNetwork(mnist_data);
+                    newEntry.network->testNetwork(&mnist->mnist_testData);
                     newEntry.calculatingAccuracy = false;
                     MannLogger::info(ui_context->outputText) << newEntry.modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
                 });
@@ -398,11 +396,6 @@ void ShowAvalModels(UIContext* ui_context)
                 filenames.push_back(modelName);                
                 // Reset inputs
                 modelName.clear();
-                // hidden_layers = {50, 10};
-                // learning_rate = 0.01f;
-                // batch_size = 32;
-                // modelNameBuffer[0] = '\0';
-                // csv_buffer[0] = '\0';
                 
                 // NetworkConfiguration* network_configuration = new NetworkConfiguration{hidden_layers, learning_rate, batch_size};
                 
@@ -489,7 +482,7 @@ void NetworkConfigUI(NetworkConfiguration* network_configuration)
 }
 
 
-void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread)
+void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
 {
     ImGui::Text("Training Window - Under Construction");
     ImGui::Separator();
@@ -509,14 +502,16 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
             ImGui::NewLine();
             ImGui::Text("Learning Rate: %.6f", ui_context->selected_model->network->m_learning_rate);
             ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
+
             ImGui::TreePop();
         }
 
         if (ImGui::TreeNodeEx("Training Details", node_flags))
         {
             ImGui::Text("Current Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            ImGui::Text("Current Batch Accuracy: %.2f%%", ui_context->selected_model->network->m_batch_accuracy);
             // ImGui::Text("Epoch #: %zu", ui_context->selected_model->network->m_current_epoch);
-            ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
+            ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
             // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
 
             // show total time trained in hr:min:sec format
@@ -532,15 +527,31 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
         ImGui::Separator();
         ImGui::NewLine();
 
-        if (ImGui::TreeNodeEx("Training Graphs Per Batch", node_flags))
+        if (ImGui::TreeNodeEx("Training Graphs Per Epoch", node_flags))
         {
-            if(ImPlot::BeginPlot("Graph"))
+            if(ImPlot::BeginPlot("Graph Per Epoch"))
             {
-                ImPlot::SetupAxes("Batches", "Accuracy (%)");
-                ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(100.0, static_cast<double>(ui_context->selected_model->network->m_accuracy_crr_batch_history.size())), ImGuiCond_Always);
+                ImPlot::SetupAxes("Epochs", "Accuracy (%)");
+                ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(20.0, static_cast<double>(ui_context->selected_model->network->m_accuracy_history.size())), ImGuiCond_Always);
                 ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
 
-                ImPlot::PlotLine("Accuracy", ui_context->selected_model->network->m_accuracy_crr_batch_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_crr_batch_history.size()));
+                ImPlot::PlotLine("Accuracy Per Epoch", ui_context->selected_model->network->m_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_history.size()));
+                
+                ImPlot::EndPlot();
+            }
+
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNodeEx("Training Graphs Per Batch", node_flags))
+        {
+            if(ImPlot::BeginPlot("Graph Per Batch"))
+            {
+                ImPlot::SetupAxes("Batches", "Accuracy (%)");
+                ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(100.0, static_cast<double>(ui_context->selected_model->network->m_batch_accuracy_history.size())), ImGuiCond_Always);
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
+
+                ImPlot::PlotLine("Accuracy Per Batch", ui_context->selected_model->network->m_batch_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_batch_accuracy_history.size()));
                 
                 ImPlot::EndPlot();
             }
@@ -558,18 +569,17 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                 if(training_thread.joinable())
                     training_thread.join();
 
+                // if(testing_thread.joinable())
+                //     testing_thread.join();
+
                 // Start training logic
                 MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->modelName << std::endl;
-
-                // FIX: GAY FIX
-                // Simulate training process (different thread)
-                // training_thread = std::thread([selected_model, &outputText, &is_training]()
-                //                             { selected_model->network->trainNetwork(1000, ::mnist_images_data, ::mnist_labels_data, &is_training); });
+                
+                
                 training_thread = std::thread([ui_context, &is_training]() {
                     // Access selected_model via ui_context
                     if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
-                        mnistData* mnist_data = new mnistData{::mnist_images_data, ::mnist_labels_data};
-                        ui_context->selected_model->network->trainNetwork(1000, mnist_data, &is_training);
+                        ui_context->selected_model->network->trainNetwork(1000, &mnist->mnist_trainingData, &is_training);
                     } else {
                         // Handle error: e.g., log to outputText if available
                         if (ui_context && ui_context->outputText) {
@@ -578,9 +588,24 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                     }
                 });
 
-                // training_thread.detach();
-
                 is_training = true;
+
+                testing_thread = std::thread([ui_context, &is_training]() {
+                    // This thread is used to predict accuracy while training for better UI experience
+                    while (is_training)
+                    {
+                        if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
+                            ui_context->selected_model->network->testNetwork(&mnist->mnist_trainingData);
+                            // Update accuracy history for UI graph
+                            // ui_context->selected_model->network->m_batch_accuracy_history.push_back(ui_context->selected_model->network->m_batch_accuracy);
+                        }
+                        // ui_context->selected_model->network->m_accuracy_history.push_back(ui_context->selected_model->network->m_accuracy);
+                        std::this_thread::sleep_for(std::chrono::seconds(5)); // Adjust the sleep duration as needed
+                    }
+                    
+                });
+
+                // training_thread.detach();
             }
         }
         else {
@@ -593,6 +618,9 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
 
                 if(training_thread.joinable())
                     training_thread.join();
+
+                // if(testing_thread.joinable())
+                //     testing_thread.join();
 
                 MannLogger::info(ui_context->outputText) << "Training stopped for model: " << ui_context->selected_model->modelName << std::endl;
             }
