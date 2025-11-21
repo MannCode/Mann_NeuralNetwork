@@ -15,6 +15,10 @@
  * Provides the core functionality for the ImGui immediate-mode GUI library.
  */
 #include "../dependencies/includes/imgui/imgui.h"
+#include "../dependencies/includes/imgui/imgui_internal.h"
+
+#include "../dependencies/includes/implot/implot.h"
+// #include "../dependencies/includes/implot/implot_internal.h"
 
 /**
  * @brief Suppresses OpenGL deprecation warnings.

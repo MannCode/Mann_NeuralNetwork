@@ -43,6 +43,7 @@ MannUI::MannUI(GLFWwindow *window, mnistData* mnist_data)
     // Init ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
     ImGui::StyleColorsDark();
@@ -65,6 +66,7 @@ inline MannUI::~MannUI()
     // Cleanup ImGui
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
 
@@ -493,28 +495,58 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
     ImGui::Separator();
     if (ui_context->selected_model)
     {
-        ImGui::Text("Model: %s", ui_context->selected_model->modelName.c_str());
-        ImGui::Text("Current Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
-        ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
-        ImGui::Text("Current Batch: %d/%zu", ui_context->selected_model->network->current_batch, (mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
+        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
+        if (ImGui::TreeNodeEx("Model Details", node_flags))
+        {
+            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Layers: ");
+            ImGui::SameLine();
+            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+            {
+                ImGui::Text("%zu,", layer);
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+            ImGui::Text("Learning Rate: %.6f", ui_context->selected_model->network->m_learning_rate);
+            ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
+            ImGui::TreePop();
+        }
+
+        if (ImGui::TreeNodeEx("Training Details", node_flags))
+        {
+            ImGui::Text("Current Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            // ImGui::Text("Epoch #: %zu", ui_context->selected_model->network->m_current_epoch);
+            ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
+            // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
+
+            // show total time trained in hr:min:sec format
+            float total_time = ui_context->selected_model->network->m_total_training_time;
+            int hours = static_cast<int>(total_time) / 3600;
+            int minutes = (static_cast<int>(total_time) % 3600) / 60;
+            float seconds = total_time - (hours * 3600) - (minutes * 60);
+            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+            // ImGui::Text("Total Time Trained: %.2f min", ui_context->selected_model->network->m_total_training_time);
+            ImGui::TreePop();
+        }
 
         ImGui::Separator();
         ImGui::NewLine();
 
-        ImGui::PlotLines("Accuracy Over Whole data", [](void* data, int idx) {
-            std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
-            return (*accuracies)[idx];
-        }, static_cast<void*>(&(ui_context->selected_model->network->m_accuracy_history)), ui_context->selected_model->network->m_accuracy_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 300));
+        if (ImGui::TreeNodeEx("Training Graphs Per Batch", node_flags))
+        {
+            if(ImPlot::BeginPlot("Graph"))
+            {
+                ImPlot::SetupAxes("Batches", "Accuracy (%)");
+                ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(100.0, static_cast<double>(ui_context->selected_model->network->m_accuracy_crr_batch_history.size())), ImGuiCond_Always);
+                ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
 
-        ImGui::PlotLines("Current Batch Accuracy", [](void* data, int idx) {
-            std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
-            return (*accuracies)[idx];
-        }, static_cast<void*>(&(ui_context->selected_model->network->m_accuracy_crr_batch_history)), ui_context->selected_model->network->m_accuracy_crr_batch_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
+                ImPlot::PlotLine("Accuracy", ui_context->selected_model->network->m_accuracy_crr_batch_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_crr_batch_history.size()));
+                
+                ImPlot::EndPlot();
+            }
 
-        ImGui::PlotLines("Current Image Accuracy", [](void* data, int idx) {
-            std::vector<float>* accuracies = static_cast<std::vector<float>*>(data);
-            return (*accuracies)[idx];
-        }, static_cast<void*>(&(ui_context->selected_model->network->m_accuracy_crr_image_history)), ui_context->selected_model->network->m_accuracy_crr_image_history.size(), 0, nullptr, 0.0f, 100.0f, ImVec2(0, 150));
+            ImGui::TreePop();
+        }
 
         ImGui::NewLine();
         ImGui::Separator();
