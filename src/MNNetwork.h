@@ -69,7 +69,7 @@ public:
     /**
      * @brief Tests the neural network using the provided dataset.
      */
-    void testNetwork(Mnist::Mnist_Data* image_data);
+    float testNetwork(Mnist::Mnist_Data* image_data);
 
     /**
      * @brief Initializes the neural network with the specified layer sizes.
@@ -172,15 +172,18 @@ public:
     float m_learning_rate;
     size_t m_batch_size;
     float m_accuracy;
+    float m_accuracy_testdata;
     float m_total_training_time;
     int sample_image_label;
+    int m_current_epoch;
 
     //training related
     int current_batch;
     std::vector<float> m_accuracy_history;
-
+    std::vector<float> m_accuracy_testdata_history;
     float m_batch_accuracy;
     std::vector<float> m_batch_accuracy_history;
+    std::mutex training_threads_mutex;
 
 
 // private:

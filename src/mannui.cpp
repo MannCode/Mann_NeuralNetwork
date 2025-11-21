@@ -133,10 +133,16 @@ void MannUI::Render(std::stringstream &outputText)
             std::thread test_thread([&entry, &outputText]()
             {
 
-                entry.network->testNetwork(&mnist->mnist_testData);
+                float accuracy = entry.network->testNetwork(&mnist->mnist_testData);
+                entry.network->m_accuracy_testdata = accuracy;
+                entry.network->m_accuracy_testdata_history.push_back(accuracy);
                 entry.calculatingAccuracy = false;
 
-                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy << "%" << std::endl;
+                accuracy = entry.network->testNetwork(&mnist->mnist_trainingData);
+                entry.network->m_accuracy = accuracy;
+                entry.network->m_accuracy_history.push_back(accuracy);
+
+                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy_testdata << "%" << std::endl;
                 // std::lock_guard<std::mutex> lock(resultsMutex);
             });
             test_thread.detach();
@@ -275,7 +281,7 @@ void ShowAvalModels(UIContext* ui_context)
         }
         else
         {
-            ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy);
+            ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy_testdata);
         }
 
         // popup for model details
@@ -387,9 +393,16 @@ void ShowAvalModels(UIContext* ui_context)
                 std::thread test_thread([&newEntry, &ui_context]()
                 {
                     // dont fucking touch this code at all costs, pata nhi kese chala h ye, bus chal rha h.
-                    newEntry.network->testNetwork(&mnist->mnist_testData);
+                    float accuracy = newEntry.network->testNetwork(&mnist->mnist_testData);
+                    newEntry.network->m_accuracy_testdata = accuracy;
+                    newEntry.network->m_accuracy_testdata_history.push_back(accuracy);
+
                     newEntry.calculatingAccuracy = false;
-                    MannLogger::info(ui_context->outputText) << newEntry.modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
+
+                    accuracy = newEntry.network->testNetwork(&mnist->mnist_trainingData);
+                    newEntry.network->m_accuracy = accuracy;
+                    newEntry.network->m_accuracy_history.push_back(accuracy);
+                    // MannLogger::info(ui_context->outputText) << newEntry.modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
                 });
                 test_thread.detach();
                 
@@ -508,9 +521,9 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
 
         if (ImGui::TreeNodeEx("Training Details", node_flags))
         {
-            ImGui::Text("Current Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
-            ImGui::Text("Current Batch Accuracy: %.2f%%", ui_context->selected_model->network->m_batch_accuracy);
-            // ImGui::Text("Epoch #: %zu", ui_context->selected_model->network->m_current_epoch);
+            ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
+            ImGui::Text("Epoch #: %zu", ui_context->selected_model->network->m_current_epoch);
             ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
             // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
 
@@ -535,7 +548,8 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                 ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(20.0, static_cast<double>(ui_context->selected_model->network->m_accuracy_history.size())), ImGuiCond_Always);
                 ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
 
-                ImPlot::PlotLine("Accuracy Per Epoch", ui_context->selected_model->network->m_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_history.size()));
+                ImPlot::PlotLine("Accuracy On Training Data", ui_context->selected_model->network->m_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_history.size()));
+                ImPlot::PlotLine("Accuracy On Test Data", ui_context->selected_model->network->m_accuracy_testdata_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_testdata_history.size()));
                 
                 ImPlot::EndPlot();
             }
@@ -569,8 +583,8 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                 if(training_thread.joinable())
                     training_thread.join();
 
-                // if(testing_thread.joinable())
-                //     testing_thread.join();
+                if(testing_thread.joinable())
+                    testing_thread.join();
 
                 // Start training logic
                 MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->modelName << std::endl;
@@ -595,17 +609,21 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                     while (is_training)
                     {
                         if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
-                            ui_context->selected_model->network->testNetwork(&mnist->mnist_trainingData);
+                            float accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_trainingData);
+                            ui_context->selected_model->network->m_accuracy = accuracy;
                             // Update accuracy history for UI graph
-                            // ui_context->selected_model->network->m_batch_accuracy_history.push_back(ui_context->selected_model->network->m_batch_accuracy);
+                            ui_context->selected_model->network->m_accuracy_history.push_back(ui_context->selected_model->network->m_accuracy);
+                            MannLogger::info(ui_context->outputText) << "Network Current Accuracy On Training Data: " << ui_context->selected_model->network->m_accuracy << "%" << std::endl;
+
+                            accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_testData);
+                            ui_context->selected_model->network->m_accuracy_testdata = accuracy;
+                            // Update accuracy history for UI graph
+                            ui_context->selected_model->network->m_accuracy_testdata_history.push_back(ui_context->selected_model->network->m_accuracy_testdata);
+                            MannLogger::info(ui_context->outputText) << "Network Current Accuracy On Test Data: " << ui_context->selected_model->network->m_accuracy_testdata << "%" << std::endl;
                         }
-                        // ui_context->selected_model->network->m_accuracy_history.push_back(ui_context->selected_model->network->m_accuracy);
-                        std::this_thread::sleep_for(std::chrono::seconds(5)); // Adjust the sleep duration as needed
                     }
                     
                 });
-
-                // training_thread.detach();
             }
         }
         else {
@@ -616,14 +634,9 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                 // Stop training logic
                 is_training = false;
 
-                if(training_thread.joinable())
-                    training_thread.join();
-
-                // if(testing_thread.joinable())
-                //     testing_thread.join();
-
                 MannLogger::info(ui_context->outputText) << "Training stopped for model: " << ui_context->selected_model->modelName << std::endl;
             }
+
             // Here you can add a progress bar or other indicators
         }
     }

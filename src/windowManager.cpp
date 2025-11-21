@@ -5,6 +5,7 @@
  */
 
 #include "windowManager.h"
+// #include "mannPopup.hpp"
 
 /**
  * @brief Initializes GLFW with specific hints for OpenGL context.
@@ -88,6 +89,7 @@ void WindowManager::mainLoop(GLFWwindow* window, MannUI* ui)
          glClear(GL_COLOR_BUFFER_BIT);
 
          ui->Render(ui->outputText);
+         MannPopups::renderPopups();
 
          glfwSwapBuffers(window);
      }

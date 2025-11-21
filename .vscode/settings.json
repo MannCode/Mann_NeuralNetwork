@@ -91,6 +91,7 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "*.shit": "cpp"
+        "*.shit": "cpp",
+        "__threading_support": "cpp"
     }
 }

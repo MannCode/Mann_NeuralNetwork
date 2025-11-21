@@ -18,6 +18,7 @@
 #include "mann.h"
 #include "mannlogger.hpp"
 #include "mnist.h"
+#include "mannPopup.hpp"
 
 #include <iostream>
 #include <memory>
