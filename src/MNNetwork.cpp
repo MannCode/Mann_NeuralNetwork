@@ -26,7 +26,7 @@ MNNetwork::MNNetwork(std::string filename)
 MNNetwork::MNNetwork(std::string filename, NetworkConfiguration* network_configuration)
                     : m_learning_rate(network_configuration->learning_rate), m_batch_size(network_configuration->batch_size), m_filename(filename)
 {
-    m_accuracy = 0.0f;
+    m_current_epoch = 1;
     m_total_training_time = 0.0f;
     NetworkInitialization* network_initalization = new NetworkInitialization{MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias};
     NetworkArchitecture* network_arch = new NetworkArchitecture{network_initalization, network_configuration->hidden_layers};
@@ -52,7 +52,7 @@ MNNetwork::~MNNetwork() {};
  * @param filename The file to save the trained network.
  * @param learning_rate The learning rate for weight updates during training.
  */
-void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, bool *is_training)
+void MNNetwork::trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_data, bool *is_training)
 {
     float start_time = static_cast<float>(glfwGetTime());
 
@@ -62,16 +62,20 @@ void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, boo
     std::vector<Mann::Matrix> MNN_d_biases = MNN_Bias;
 
     for(int n = 0; n < iterations; n++) {
-        float avg_cost_bulk = 0;
+        // float avg_cost_bulk = 0.0f;
         for(int batch = 0; batch < image_data->mnist_images_data.size()/m_batch_size; batch++) {
-            float avg_cost_bulk_batch = 0;
             current_batch = batch;
+            m_batch_accuracy = 0.0f;
+            
             for (int j = 0; j < MNN_d_weights.size(); j++) {
                 MNN_d_weights[j].nullMatrix();
                 MNN_d_biases[j].nullMatrix();
             }
 
             for (int i = batch * m_batch_size; i < (batch + 1) * m_batch_size; i++) {
+                // if (i == 10)
+                //     sample_image_label = image_data->mnist_labels_data[i][0]; // just a random number to initialize
+
                 // load image data in network
                 for (int j =0; j < MNN_Nodes[0].rows(); j++) {
                     MNN_Nodes[0][j][0] = image_data->mnist_images_data[i][j];
@@ -88,10 +92,9 @@ void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, boo
                 for (int j = 0; j < MNN_cost.rows(); j++) {
                     avg_cost += MNN_cost[j][0];
                 }
-                m_accuracy_crr_image = (10 - avg_cost) * 10;
-                m_accuracy_crr_image_history.push_back(m_accuracy_crr_image);
-                avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
-                avg_cost_bulk_batch = (avg_cost_bulk_batch + avg_cost) / 2;
+
+                // avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
+                m_batch_accuracy += (10 - avg_cost) * 10 / m_batch_size;
 
                 std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
                 for(int j = 0; j < MNN_d_weights.size(); j++) {
@@ -100,18 +103,20 @@ void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, boo
                 }
             }
 
-            m_accuracy_crr_batch = (10 - avg_cost_bulk_batch) * 10;
-            m_accuracy_crr_batch_history.push_back(m_accuracy_crr_batch);
 
             // time to update the weights and biases
+            training_threads_mutex.lock();
             for (int j = 0; j < MNN_Weights.size(); j++) {
                 MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * m_learning_rate);
                 MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
             }
+            training_threads_mutex.unlock();
 
             float end_time = static_cast<float>(glfwGetTime());
             m_total_training_time += (end_time - start_time);
             start_time = end_time;
+
+            m_batch_accuracy_history.push_back(m_batch_accuracy);
 
             saveNetwork();
 
@@ -119,8 +124,8 @@ void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, boo
                 return;
             }
         }
-        m_accuracy = (10 - avg_cost_bulk) * 10;
-        m_accuracy_history.push_back(m_accuracy);
+
+        m_current_epoch += 1;
     }
 }
 
@@ -130,7 +135,7 @@ void MNNetwork::trainNetwork(const size_t iterations, mnistData* image_data, boo
  * @param labels_data A vector of corresponding label data for testing.
  * @param filename The file containing the network configuration.
  */
-void MNNetwork::testNetworkByUser(mnistData* image_data,
+void MNNetwork::testNetworkByUser(Mnist::Mnist_Data* image_data,
                                  const std::string &filename)
 {
 
@@ -190,9 +195,9 @@ void MNNetwork::testNetworkByUser(mnistData* image_data,
             std::cout << std::endl;
             std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
 
-            mnistData* mnist_data = new mnistData{{image_data->mnist_images_data[index]}, {image_data->mnist_labels_data[index]}};
+            // mnistData* mnist_data = new mnistData{{image_data->mnist_images_data[index]}, {image_data->mnist_labels_data[index]}};
             // print the image
-            saveImageDataToFile(mnist_data, "test_image.mms");
+            // saveImageDataToFile(mnist_data, "test_image.mms");
         }
     }
 }
@@ -200,32 +205,36 @@ void MNNetwork::testNetworkByUser(mnistData* image_data,
 /**
  * @brief Tests the neural network using the provided dataset.
  */
-void MNNetwork::testNetwork(mnistData* image_data)
+float MNNetwork::testNetwork(Mnist::Mnist_Data* image_data)
 {
 
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
 
+    training_threads_mutex.lock();
+    std::vector<Mann::Matrix> MNN_NODES_COPY = MNN_Nodes;
+    std::vector<Mann::Matrix> MNN_WEIGHTED_SUM_COPY = MNN_weighted_sum;
+    std::vector<Mann::Matrix> MNN_WEIGHTS_COPY = MNN_Weights;
+    std::vector<Mann::Matrix> MNN_BIAS_COPY = MNN_Bias;
+    training_threads_mutex.unlock();
+
     float avg_cost_bulk = 0;
 
-    // MNN_Nodes[0][783][0] = mnist_images_data[0][783];
 
     for (int i = 0; i < image_data->mnist_images_data.size(); i++) {
 
         // load image data in network
-        // std::cout << MNN_Nodes[0].cols() << std::endl;
-        for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-            MNN_Nodes[0][j][0] = image_data->mnist_images_data[i][j];
-            // std::cout << "hello";
+        for (int j = 0; j < MNN_NODES_COPY[0].rows(); j++) {
+            MNN_NODES_COPY[0][j][0] = image_data->mnist_images_data[i][j];
         }
         for (int j = 0; j < MNN_y.rows(); j++) {
             MNN_y[j][0] = image_data->mnist_labels_data[i][j];
         }
 
-        feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
+        feedForward(MNN_NODES_COPY, MNN_WEIGHTED_SUM_COPY, MNN_WEIGHTS_COPY, MNN_BIAS_COPY);
 
-        Mann::Matrix MNN_cost = (MNN_Nodes[MNN_Nodes.size() - 1] - MNN_y);
+        Mann::Matrix MNN_cost = (MNN_NODES_COPY[MNN_NODES_COPY.size() - 1] - MNN_y);
         MNN_cost = MNN_cost ^ MNN_cost;
         float avg_cost = 0;
         for (int j = 0; j < MNN_cost.rows(); j++) {
@@ -235,7 +244,7 @@ void MNNetwork::testNetwork(mnistData* image_data)
         avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
     }
     
-    m_accuracy = (10 - avg_cost_bulk) * 10;
+    return (10 - avg_cost_bulk) * 10;
 }
 
 /**
@@ -386,6 +395,8 @@ void MNNetwork::saveNetwork()
     for (size_t i = 0; i < MNN_Layers_size.size(); ++i) {
         file << MNN_Layers_size[i] << (i + 1 < MNN_Layers_size.size() ? " " : "\n");
     }
+    // Save Current Epoch
+    file << m_current_epoch << "\n";
     // Save Learning Rate
     file << m_learning_rate << "\n";
     // Save Batch Size
@@ -426,14 +437,20 @@ void MNNetwork::loadNetwork(const std::string &filename)
         MNN_Layers_size.push_back(static_cast<size_t>(layer_size));
     }
 
+
     // Get second line (learning rate)
+    file >> m_current_epoch;
+
+    // Get third line (learning rate)
     file >> m_learning_rate;
 
-    // Get third line (batch size)
+    // Get fourth line (batch size)
     file >> m_batch_size;
 
-    // Get fourth line (accuracy)
+    // Get fifth line (accuracy)
     file >> m_accuracy;
+
+
 
     // Get fifth line (total training time)
     file >> m_total_training_time;
@@ -507,7 +524,7 @@ void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
  * @param label_data A vector containing the corresponding label data.
  * @param filename The file to save the image and label data.
  */
-void MNNetwork::saveImageDataToFile(mnistData* image_data,
+void MNNetwork::saveImageDataToFile(Mnist::Mnist_Data* image_data,
                                    const std::string& filename)
 {
     std::ofstream file(filename);

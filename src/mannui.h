@@ -17,6 +17,8 @@
 #include "MNNetwork.h"
 #include "mann.h"
 #include "mannlogger.hpp"
+#include "mnist.h"
+#include "mannPopup.hpp"
 
 #include <iostream>
 #include <memory>
@@ -170,7 +172,7 @@ inline std::string getRandomModelName()
 // Extern declarations for global variables
 extern std::vector<std::string> filenames;
 extern char csv_buffer[256];
-extern std::vector<std::vector<double>> mnist_images_data, mnist_labels_data; ///< MNIST data for training and testing.
+extern Mnist* mnist;
 
 struct NetworkEntry
 {
@@ -209,7 +211,7 @@ public:
      * @param iterations_rate The number of iterations for training.
      * @param batch_size The batch size for training.
      */
-    MannUI(GLFWwindow* window, mnistData* mnist_data);
+    MannUI(GLFWwindow* window, Mnist* mnist);
 
     /**
      * @brief Destructor for the MannUI class.
@@ -244,6 +246,7 @@ public:
     //training window specific variables
     bool is_training = false;
     std::thread training_thread;
+    std::thread testing_thread;
 };
 
 struct UIContext {

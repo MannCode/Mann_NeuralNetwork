@@ -24,6 +24,27 @@
 class Mnist
 {
 public:
+
+    /** 
+     * @brief Structure to hold MNIST training data.
+     */
+    struct Mnist_Data
+    {
+        std::vector<std::vector<double>> mnist_images_data;
+        std::vector<std::vector<double>> mnist_labels_data;
+    };
+
+    /** 
+     * @brief MNIST training data.
+     */
+
+    Mnist_Data mnist_trainingData;
+
+    /** 
+     * @brief MNIST test data.
+     */
+    Mnist_Data mnist_testData;
+
     /**
      * @brief Default constructor for the Mnist class.
      *
@@ -50,13 +71,15 @@ public:
      * @param NumberOfImages The number of images to read.
      * @param DataOfAnImage The number of pixels per image (e.g., 784 for 28x28 images).
      * @param arr A vector of vectors to store the image data as doubles.
+     * @param isTraining Boolean flag indicating whether to read training or test data.
      */
-    void ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<std::vector<double>> &arr);
+    void ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<std::vector<double>> &arr, bool isTraining);
 
     /**
      * @brief Reads MNIST label data from a file into a vector.
      * @param NumberOfImages The number of images (labels) to read.
      * @param arr A vector of vectors to store the label data as one-hot encoded doubles.
+     * @param isTraining Boolean flag indicating whether to read training or test data.
      */
-    void ReadMNISTlabels(int NumberOfImages, std::vector<std::vector<double>> &arr);
+    void ReadMNISTlabels(int NumberOfImages, std::vector<std::vector<double>> &arr, bool isTraining);
 };

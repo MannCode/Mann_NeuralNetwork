@@ -51,18 +51,14 @@ project(Mann_NeuralNetwork VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_OSX_ARCHITECTURES "arm64")
 
 # Include directories
 include_directories(src dependencies/includes/GLFW dependencies/includes/imgui .)
 
 # Source files
-set(SOURCES
-    src/main.cpp
-    src/mannui.cpp
-    src/mann.cpp
-    src/mnist.cpp
-    src/MNNetwork.cpp
-    src/windowManager.cpp
+file(GLOB_RECURSE SOURCES
+    src/*.cpp
 )
 
 set(IMGUI_SOURCES
@@ -75,7 +71,7 @@ set(IMGUI_SOURCES
     dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
 )
 
-set(IMPLOT
+set(IMPLOT_SOURCES  # Renamed to IMPLOT_SOURCES for clarity (was IMPLOT, which was a variable name)
     dependencies/includes/implot/implot.cpp
     dependencies/includes/implot/implot_items.cpp
 )
@@ -107,7 +103,7 @@ else()
 endif()
 
 # Add executable
-add_executable(NN ${SOURCES} ${IMGUI_SOURCES} ${IMPLOT})
+add_executable(NN ${SOURCES} ${IMGUI_SOURCES} ${IMPLOT_SOURCES})  # Fixed: Used IMPLOT_SOURCES instead of IMPLOT
 
 # Link libraries
 target_link_libraries(NN PRIVATE OpenGL::GL)
