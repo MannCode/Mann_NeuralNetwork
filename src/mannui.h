@@ -235,11 +235,13 @@ private:
 
 public:
     std::stringstream outputText;    ///< Stream for capturing UI output text.
-    struct Shown_Windows
+    enum Shown_Windows
     {
-        bool models_window = true;
-        bool training_window = false;
-    } shown_windows;                ///< Struct to manage visibility of different UI windows.
+        MODELS_WINDOW,
+        TRAINING_WINDOW,
+        TESTING_DATA_WINDOW,
+        TESTING_CANVAS_WINDOW
+    } shown_windows_enum = MODELS_WINDOW;
 
     //models_window specific variables
 
@@ -247,11 +249,12 @@ public:
     bool is_training = false;
     std::thread training_thread;
     std::thread testing_thread;
+
 };
 
 struct UIContext {
   std::stringstream &outputText;
-  MannUI::Shown_Windows &shown_windows;
+  MannUI::Shown_Windows &shown_windows_enum;
   NetworkEntry* &selected_model;
 };
 

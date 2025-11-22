@@ -71,7 +71,12 @@ inline MannUI::~MannUI()
 
 // PROTOTYPES
 void ShowAvalModels(UIContext* ui_context);
-void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
+void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
+void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
+void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int &selected_dataset, int &image_index);
+void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index);
+void TestingWindowCanvas_1(UIContext* ui_context);
+void TestingWindowCanvas_2(UIContext* ui_context);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
@@ -111,13 +116,28 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
         // Split dockspace into two nodes: left and right
         ImGuiID dock_main_id = dockspace_id;
-        ImGuiID dock_id_left;
-        ImGuiID dock_id_right;
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.7f, &dock_id_left, &dock_id_right);
+        ImGuiID dock_id_top;
+        ImGuiID dock_id_bottom;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.85f, &dock_id_top, &dock_id_bottom);
+
         // Dock your windows into the nodes
-        ImGui::DockBuilderDockWindow("Models", dock_id_left);
-        ImGui::DockBuilderDockWindow("Train Model", dock_id_left);
-        ImGui::DockBuilderDockWindow("Output", dock_id_right);
+        ImGui::DockBuilderDockWindow("Models", dock_id_top);
+        ImGui::DockBuilderDockWindow("Output", dock_id_bottom);
+
+        ImGuiID dock_id_top_left;
+        ImGuiID dock_id_top_right;
+        ImGui::DockBuilderSplitNode(dock_id_top, ImGuiDir_Left, 0.2f, &dock_id_top_left, &dock_id_top_right);
+
+
+        ImGui::DockBuilderDockWindow("Training Model Details", dock_id_top_left);
+        ImGui::DockBuilderDockWindow("Training Progress", dock_id_top_right);
+
+        ImGui::DockBuilderDockWindow("Data Testing Details", dock_id_top_left);
+        ImGui::DockBuilderDockWindow("Data Testing Output", dock_id_top_right);
+
+        ImGui::DockBuilderDockWindow("Canvas Testing Details", dock_id_top_left);
+        ImGui::DockBuilderDockWindow("Canvas Testing Output", dock_id_top_right);
+
         // Finish dock builder
         ImGui::DockBuilderFinish(dockspace_id);
 
@@ -136,11 +156,13 @@ void MannUI::Render(std::stringstream &outputText)
                 float accuracy = entry.network->testNetwork(&mnist->mnist_testData);
                 entry.network->m_accuracy_testdata = accuracy;
                 entry.network->m_accuracy_testdata_history.push_back(accuracy);
+                entry.network->m_average_cost_testdata_history.push_back(entry.network->m_average_cost);
                 entry.calculatingAccuracy = false;
 
                 accuracy = entry.network->testNetwork(&mnist->mnist_trainingData);
                 entry.network->m_accuracy = accuracy;
                 entry.network->m_accuracy_history.push_back(accuracy);
+                entry.network->m_average_cost_testdata_history.push_back(entry.network->m_average_cost);
 
                 MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy_testdata << "%" << std::endl;
                 // std::lock_guard<std::mutex> lock(resultsMutex);
@@ -192,21 +214,48 @@ void MannUI::Render(std::stringstream &outputText)
     }
     ImGui::End();
 
-    UIContext* ui_context = new UIContext{outputText, shown_windows, selected_model};
+    UIContext* ui_context = new UIContext{outputText, shown_windows_enum, selected_model};
     
     // Control Panel
-    if (shown_windows.models_window)
+    switch (shown_windows_enum)
     {
+    case MannUI::MODELS_WINDOW:
         ImGui::Begin("Models");
         ShowAvalModels(ui_context);
         ImGui::End();
-    }
-
-    if (shown_windows.training_window)
-    {
-        ImGui::Begin("Train Model");
-        TrainingWindow(ui_context, is_training, training_thread, testing_thread);
+        break;
+    case MannUI::TRAINING_WINDOW:
+        ImGui::Begin("Training Model Details");
+        TrainingWindow_1(ui_context, is_training, training_thread, testing_thread);
         ImGui::End();
+        ImGui::Begin("Training Progress");
+        TrainingWindow_2(ui_context, is_training, training_thread, testing_thread);
+        ImGui::End();
+        break;
+    case MannUI::TESTING_DATA_WINDOW:
+        // Shared Global Static Variables
+        static int selected_dataset = 0;
+        static int image_index = 0;
+
+        static Mann::Matrix output_layer = Mann::Matrix(10, 1);
+    
+        ImGui::Begin("Data Testing Details");
+        TestingWindowData_1(ui_context, output_layer, selected_dataset, image_index);
+        ImGui::End();
+        ImGui::Begin("Data Testing Output");
+        TestingWindowData_2(ui_context, output_layer, selected_dataset, image_index);
+        ImGui::End();
+        break;
+    case MannUI::TESTING_CANVAS_WINDOW:
+        ImGui::Begin("Canvas Testing Details");
+        TestingWindowCanvas_1(ui_context);
+        ImGui::End();
+        ImGui::Begin("Canvas Testing Output");
+        TestingWindowCanvas_2(ui_context);
+        ImGui::End();
+        break;
+    default:
+        break;
     }
 
     ImGui::Render();
@@ -312,21 +361,22 @@ void ShowAvalModels(UIContext* ui_context)
             if (ImGui::Button("Train"))
             {
                 // Train the network
-                ui_context->shown_windows.training_window = true;
-                ui_context->shown_windows.models_window = false;
+                ui_context->shown_windows_enum = MannUI::TRAINING_WINDOW;
                 ImGui::CloseCurrentPopup();
-                // open a new window where we can monitor training progress
             }
             ImGui::SameLine();
             if (ImGui::Button("Test on Data"))
             {
                 // Test the network on data
+                ui_context->shown_windows_enum = MannUI::TESTING_DATA_WINDOW;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
             if (ImGui::Button("Test by Canvas"))
             {
+                
                 // Test the network by canvas
+                ui_context->shown_windows_enum = MannUI::TESTING_CANVAS_WINDOW;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
@@ -396,12 +446,13 @@ void ShowAvalModels(UIContext* ui_context)
                     float accuracy = newEntry.network->testNetwork(&mnist->mnist_testData);
                     newEntry.network->m_accuracy_testdata = accuracy;
                     newEntry.network->m_accuracy_testdata_history.push_back(accuracy);
-
+                    newEntry.network->m_average_cost_testdata_history.push_back(newEntry.network->m_average_cost);
                     newEntry.calculatingAccuracy = false;
 
                     accuracy = newEntry.network->testNetwork(&mnist->mnist_trainingData);
                     newEntry.network->m_accuracy = accuracy;
                     newEntry.network->m_accuracy_history.push_back(accuracy);
+                    newEntry.network->m_average_cost_testdata_history.push_back(newEntry.network->m_average_cost);
                     // MannLogger::info(ui_context->outputText) << newEntry.modelName << " --- Accuracy: " << newEntry.network->m_accuracy << "%" << std::endl;
                 });
                 test_thread.detach();
@@ -495,9 +546,9 @@ void NetworkConfigUI(NetworkConfiguration* network_configuration)
 }
 
 
-void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
+void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
 {
-    ImGui::Text("Training Window - Under Construction");
+    ImGui::Text("Details Panel");
     ImGui::Separator();
     if (ui_context->selected_model)
     {
@@ -518,12 +569,14 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
 
             ImGui::TreePop();
         }
+        ImGui::NewLine();
 
         if (ImGui::TreeNodeEx("Training Details", node_flags))
         {
             ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
-            ImGui::Text("Epoch #: %zu", ui_context->selected_model->network->m_current_epoch);
+            ImGui::Text("Epoch #: %d", ui_context->selected_model->network->m_current_epoch);
+            ImGui::Text("Epoch Completion: %.2f%%", static_cast<float>(ui_context->selected_model->network->current_batch * ui_context->selected_model->network->m_batch_size) / static_cast<float>(mnist->mnist_trainingData.mnist_images_data.size()) * 100.0f);
             ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
             // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
 
@@ -539,42 +592,6 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
 
         ImGui::Separator();
         ImGui::NewLine();
-
-        if (ImGui::TreeNodeEx("Training Graphs Per Epoch", node_flags))
-        {
-            if(ImPlot::BeginPlot("Graph Per Epoch"))
-            {
-                ImPlot::SetupAxes("Epochs", "Accuracy (%)");
-                ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(20.0, static_cast<double>(ui_context->selected_model->network->m_accuracy_history.size())), ImGuiCond_Always);
-                ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
-
-                ImPlot::PlotLine("Accuracy On Training Data", ui_context->selected_model->network->m_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_history.size()));
-                ImPlot::PlotLine("Accuracy On Test Data", ui_context->selected_model->network->m_accuracy_testdata_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_testdata_history.size()));
-                
-                ImPlot::EndPlot();
-            }
-
-            ImGui::TreePop();
-        }
-
-        if (ImGui::TreeNodeEx("Training Graphs Per Batch", node_flags))
-        {
-            if(ImPlot::BeginPlot("Graph Per Batch"))
-            {
-                ImPlot::SetupAxes("Batches", "Accuracy (%)");
-                ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(100.0, static_cast<double>(ui_context->selected_model->network->m_batch_accuracy_history.size())), ImGuiCond_Always);
-                ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 120.0, ImGuiCond_Always);
-
-                ImPlot::PlotLine("Accuracy Per Batch", ui_context->selected_model->network->m_batch_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_batch_accuracy_history.size()));
-                
-                ImPlot::EndPlot();
-            }
-
-            ImGui::TreePop();
-        }
-
-        ImGui::NewLine();
-        ImGui::Separator();
 
         // Add training controls and progress here
         if (!is_training) {
@@ -613,12 +630,18 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
                             ui_context->selected_model->network->m_accuracy = accuracy;
                             // Update accuracy history for UI graph
                             ui_context->selected_model->network->m_accuracy_history.push_back(ui_context->selected_model->network->m_accuracy);
+
+                            ui_context->selected_model->network->m_average_cost_history.push_back(ui_context->selected_model->network->m_average_cost);
+
                             MannLogger::info(ui_context->outputText) << "Network Current Accuracy On Training Data: " << ui_context->selected_model->network->m_accuracy << "%" << std::endl;
 
                             accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_testData);
                             ui_context->selected_model->network->m_accuracy_testdata = accuracy;
                             // Update accuracy history for UI graph
                             ui_context->selected_model->network->m_accuracy_testdata_history.push_back(ui_context->selected_model->network->m_accuracy_testdata);
+
+                            ui_context->selected_model->network->m_average_cost_testdata_history.push_back(ui_context->selected_model->network->m_average_cost);
+
                             MannLogger::info(ui_context->outputText) << "Network Current Accuracy On Test Data: " << ui_context->selected_model->network->m_accuracy_testdata << "%" << std::endl;
                         }
                     }
@@ -644,62 +667,247 @@ void TrainingWindow(UIContext* ui_context, bool &is_training, std::thread &train
         ImGui::Text("No Model Selected");
 
     if(!is_training) {
-    if (ImGui::Button("Close"))
+    if (ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
+    }
+}
+
+void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
+{
+    ImGui::Text("Training Window");
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
+    if (ImGui::TreeNodeEx("Training Graphs Per Epoch", node_flags))
+    {
+        if(ImPlot::BeginPlot("Graph Per Epoch", ImVec2(-1,500)))
         {
-            ui_context->shown_windows.training_window = false;
-            ui_context->shown_windows.models_window = true;
+            ImPlot::SetupAxes("Epochs", "Accuracy (%)");
+            ImPlot::SetupAxisLimits(ImAxis_X1, 0, std::max(20.0, static_cast<double>(ui_context->selected_model->network->m_accuracy_history.size())), ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 110.0, ImGuiCond_Always);
+
+            ImPlot::PlotLine("Accuracy On Training Data", ui_context->selected_model->network->m_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_history.size()));
+            ImPlot::PlotLine("Accuracy On Test Data", ui_context->selected_model->network->m_accuracy_testdata_history.data(), static_cast<int>(ui_context->selected_model->network->m_accuracy_testdata_history.size()));
+            ImPlot::PlotLine("Average Cost On Training Data", ui_context->selected_model->network->m_average_cost_history.data(), static_cast<int>(ui_context->selected_model->network->m_average_cost_history.size()));
+            ImPlot::PlotLine("Average Cost On Test Data", ui_context->selected_model->network->m_average_cost_testdata_history.data(), static_cast<int>(ui_context->selected_model->network->m_average_cost_testdata_history.size()));
+            
+            ImPlot::EndPlot();
+        }
+
+        ImGui::TreePop();
+    }
+
+    if (ImGui::TreeNodeEx("Training Graphs Per Batch", node_flags))
+    {
+        if(ImPlot::BeginPlot("Graph Per Batch"))
+        {
+            ImPlot::SetupAxes("Batches", "Accuracy (%)");
+            ImPlot::SetupAxisLimits(ImAxis_X1, std::max(0.0, static_cast<double>(ui_context->selected_model->network->m_batch_accuracy_history.size())-100), std::max(100.0, static_cast<double>(ui_context->selected_model->network->m_batch_accuracy_history.size())), ImGuiCond_Always);
+            ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 100.0, ImGuiCond_Always);
+
+            ImPlot::PlotLine("Accuracy Per Batch", ui_context->selected_model->network->m_batch_accuracy_history.data(), static_cast<int>(ui_context->selected_model->network->m_batch_accuracy_history.size()));
+            
+            ImPlot::EndPlot();
+        }
+
+        ImGui::TreePop();
+    }
+}
+
+void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int &selected_dataset, int &image_index)
+{
+    ImGui::Text("Details Panel");
+    ImGui::Separator();
+
+    if (ui_context->selected_model)
+    {
+        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
+        if (ImGui::TreeNodeEx("Model Details", node_flags))
+        {
+            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Layers: ");
+            ImGui::SameLine();
+            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+            {
+                ImGui::Text("%zu,", layer);
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+            ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
+            // show total time trained in hr:min:sec format
+            float total_time = ui_context->selected_model->network->m_total_training_time;
+            int hours = static_cast<int>(total_time) / 3600;
+            int minutes = (static_cast<int>(total_time) % 3600) / 60;
+            float seconds = total_time - (hours * 3600) - (minutes * 60);
+            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+
+            ImGui::TreePop();
+        }
+
+        ImGui::NewLine();
+
+        if (ImGui::TreeNodeEx("Testing Controls", node_flags))
+        {
+            //select dataset for testing
+            static const char* datasets[]{"MNIST Test Data", "MNIST Training Data"};
+            ImGui::Combo("Select Dataset", &selected_dataset, datasets, IM_ARRAYSIZE(datasets));
+            ImGui::NewLine();
+
+            //image index slider
+            int dataset_size = (selected_dataset == 0) ? mnist->mnist_testData.mnist_images_data.size() : mnist->mnist_trainingData.mnist_images_data.size();
+            ImGui::Text("Dataset Size: %d", dataset_size);
+            if(ImGui::Button("Random Image"))
+            {
+                image_index = rand() % dataset_size;
+            }
+            ImGui::SliderInt("Input Index", &image_index, 0, dataset_size - 1);
+            ImGui::NewLine();
+
+
+            Mnist::MnistData* data = (selected_dataset == 0) ? &mnist->mnist_testData : &mnist->mnist_trainingData;
+
+            if (ImGui::Button("Find Wrong Prediction"))
+            {
+                int i = 0;
+                while(true) {
+                    image_index = rand() % dataset_size;
+                    output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+                    Mann::Matrix y(10, 1);
+                    for (int i = 0; i < 10; ++i)
+                    {
+                        y[i][0] = data->mnist_labels_data[image_index][i];
+                    }
+                    if(!ui_context->selected_model->network->IsPredictionCorrect(output_layer, y))
+                        break;
+                    i++;
+                    // This will never happen (like its impossible to have 100% accuracy on MNIST) but just in case to avoid infinite loop
+                    if(i > dataset_size) {
+                        MannLogger::info(ui_context->outputText) << "All predictions are correct in the dataset!" << std::endl;
+                        break;
+                    }
+                }
+            }
+            else {
+                output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+            }
+
+            ImGui::TreePop();
+        }
+    }
+
+    ImGui::Separator();
+    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
+}
+
+void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index)
+{
+    ImGui::Text("Testing Output Panel");
+
+    Mnist::MnistData* data = (selected_dataset == 0) ? &mnist->mnist_testData : &mnist->mnist_trainingData;
+
+    ImGui::Separator();
+
+    ImGui::Text("Actual Number: ");
+    ImGui::SameLine();
+    int actual_number = 0;
+    for (int i = 0; i < 10; ++i)
+    {
+        if (data->mnist_labels_data[image_index][i] == 1.0f)
+        {
+            actual_number = i;
+            break;
+        }
+    }
+    ImGui::Text("%d", actual_number);
+
+    Mann::Matrix y(10, 1);
+    for (int i = 0; i < 10; ++i)
+    {
+        y[i][0] = data->mnist_labels_data[image_index][i];
+    }
+
+    Mann::Matrix Cost = (output_layer - y);
+    Cost = Cost ^ Cost;
+    float total_cost = 0.0f;
+    for (size_t i = 0; i < Cost.rows(); ++i)
+    {
+        total_cost += Cost[i][0];
+    }
+
+    ImGui::Text("Predicted Output: ");
+    ImGui::SameLine();
+    int predicted_number = 0;
+    float max_value = output_layer[0][0];
+    for (int i = 1; i < 10; ++i)
+    {
+        if (output_layer[i][0] > max_value)
+        {
+            max_value = output_layer[i][0];
+            predicted_number = i;
+        }
+    }
+    ImGui::Text("%d", predicted_number);
+    ImGui::Text("Cost: %.6f", total_cost);
+
+    ImGui::Separator();
+
+
+    // Display output probabilities are a bar graph
+    if (ImPlot::BeginPlot("Output Probabilities"))
+    {
+        ImPlot::SetupAxes("Numbers", "Probability", ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 1.0, ImGuiCond_Always);
+        float x[10];
+        float y[10];
+        for (int i = 0; i < 10; ++i)
+        {
+            x[i] = static_cast<float>(i);
+            y[i] = output_layer[i][0];
+        }
+        ImPlot::PlotBars("Probabilities", x, y, 10, 0.5f);
+        
+        for (int i = 0; i < 10; ++i)
+        {
+            y[i] = data->mnist_labels_data[image_index][i];
+        }
+        ImPlot::PlotStems("Actual", x, y, 10);
+
+        ImPlot::EndPlot();
+    }
+
+    ImGui::Separator();
+
+    // Display the input image
+    ImGui::Text("Input Image:");
+    auto drawlist = ImGui::GetWindowDrawList();
+    
+    ImVec2 p = ImGui::GetCursorScreenPos();
+
+    // draw 28x28 image scaled by 10
+    float scale = 10.0f;
+    for (int y = 0; y < 28; ++y )
+    {
+        for (int x = 0; x < 28; ++x)
+        {
+            float pixel_value = data->mnist_images_data[image_index][y * 28 + x];
+            ImU32 col = IM_COL32(static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), 255);
+            drawlist->AddRectFilled(ImVec2(p.x + x * scale, p.y + y * scale), ImVec2(p.x + (x + 1) * scale, p.y + (y + 1) * scale), col);
         }
     }
 }
 
-void SetModernDarkTheme() {
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.ChildRounding = 0;
-    style.GrabRounding = 0;
-    style.FrameRounding = 2;
-    style.PopupRounding = 0;
-    style.ScrollbarRounding = 0;
-    style.TabRounding = 2;
-    style.WindowRounding = 0;
-    style.FramePadding = { 4, 4 };
-    style.WindowTitleAlign = { 0.0, 0.5 };
-    style.ColorButtonPosition = ImGuiDir_Left;
+void TestingWindowCanvas_1(UIContext* ui_context)
+{
+    ImGui::Text("Details Panel");
+    ImGui::Separator();
 
-    ImVec4* colors = style.Colors;
-    colors[ImGuiCol_Text] = { 1.0f, 1.0f, 1.0f, 1.00f };
-    colors[ImGuiCol_TextDisabled] = { 0.25f, 0.25f, 0.25f, 1.00f };
-    colors[ImGuiCol_WindowBg] = { 0.09f, 0.09f, 0.09f, 0.94f };
-    colors[ImGuiCol_ChildBg] = { 0.11f, 0.11f, 0.11f, 1.00f };
-    colors[ImGuiCol_PopupBg] = { 0.11f, 0.11f, 0.11f, 0.94f };
-    colors[ImGuiCol_Border] = { 0.07f, 0.08f, 0.08f, 1.00f };
-    colors[ImGuiCol_BorderShadow] = { 0.00f, 0.00f, 0.00f, 0.00f };
-    colors[ImGuiCol_FrameBg] = { 0.35f, 0.35f, 0.35f, 0.54f };
-    colors[ImGuiCol_FrameBgHovered] = { 0.31f, 0.29f, 0.27f, 1.00f };
-    colors[ImGuiCol_FrameBgActive] = { 0.40f, 0.36f, 0.33f, 0.67f };
-    colors[ImGuiCol_TitleBg] = { 0.1f, 0.1f, 0.1f, 1.00f };
-    colors[ImGuiCol_TitleBgActive] = { 0.3f, 0.3f, 0.3f, 1.00f };
-    colors[ImGuiCol_TitleBgCollapsed] = { 0.0f, 0.0f, 0.0f, 0.61f };
-    colors[ImGuiCol_MenuBarBg] = { 0.18f, 0.18f, 0.18f, 0.94f };
-    // ... continue for other ImGuiCol_ enums
+    ImGui::Separator();
+    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
 }
 
-// GLuint LoadTexture(const std::string &filepath)
-// {
-//     int width, height, channels;
-//     unsigned char *data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
-//     if (!data)
-//     {
-//         outputText += "Failed to load image: " + filepath + "\n";
-//         return 0;
-//     }
-
-//     GLuint textureID;
-//     glGenTextures(1, &textureID);
-//     glBindTexture(GL_TEXTURE_2D, textureID);
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-//     stbi_image_free(data);
-//     return textureID;
-// }
+void TestingWindowCanvas_2(UIContext* ui_context)
+{
+    ImGui::Text("Testing Output Panel");
+    ImGui::Separator();
+}
