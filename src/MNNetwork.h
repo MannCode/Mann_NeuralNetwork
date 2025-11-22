@@ -163,6 +163,10 @@ public:
      */
     void CreateNetwork(NetworkArchitecture* network_arch);
 
+    void saveHistoryData();
+
+    void loadHistoryData();
+
 public:
     /**
      * @struct Networks
@@ -183,11 +187,11 @@ public:
     int current_batch;
     std::vector<float> m_accuracy_history;
     std::vector<float> m_accuracy_testdata_history;
-    float m_batch_accuracy;
-    std::vector<float> m_batch_accuracy_history;
-    std::mutex training_threads_mutex;
     std::vector<float> m_average_cost_history;
     std::vector<float> m_average_cost_testdata_history;
+    float m_batch_accuracy;
+    std::queue<float> m_batch_accuracy_history;
+    std::mutex training_threads_mutex;
     
 
 
