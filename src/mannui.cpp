@@ -764,8 +764,33 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
             ImGui::SliderInt("Input Index", &image_index, 0, dataset_size - 1);
             ImGui::NewLine();
 
+
             Mnist::MnistData* data = (selected_dataset == 0) ? &mnist->mnist_testData : &mnist->mnist_trainingData;
-            output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+
+            if (ImGui::Button("Find Wrong Prediction"))
+            {
+                int i = 0;
+                while(true) {
+                    image_index = rand() % dataset_size;
+                    output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+                    Mann::Matrix y(10, 1);
+                    for (int i = 0; i < 10; ++i)
+                    {
+                        y[i][0] = data->mnist_labels_data[image_index][i];
+                    }
+                    if(!ui_context->selected_model->network->IsPredictionCorrect(output_layer, y))
+                        break;
+                    i++;
+                    // This will never happen (like its impossible to have 100% accuracy on MNIST) but just in case to avoid infinite loop
+                    if(i > dataset_size) {
+                        MannLogger::info(ui_context->outputText) << "All predictions are correct in the dataset!" << std::endl;
+                        break;
+                    }
+                }
+            }
+            else {
+                output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+            }
 
             ImGui::TreePop();
         }
@@ -824,7 +849,9 @@ void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int 
     }
     ImGui::Text("%d", predicted_number);
     ImGui::Text("Cost: %.6f", total_cost);
+
     ImGui::Separator();
+
 
     // Display output probabilities are a bar graph
     if (ImPlot::BeginPlot("Output Probabilities"))
@@ -849,19 +876,25 @@ void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int 
         ImPlot::EndPlot();
     }
 
-    // ImGui::Text("Output Probabilities:");
-    // for (int i = 0; i < 10; ++i)
-    // {
-    //     ImGui::Text("Number %d: %.6f", i, output_layer[i][0]);
-    // }
-    // ImGui::Separator();
-    
-
-
-
-    // ImGui::Text("Average Cost: %.6f", avg_cost);
-
     ImGui::Separator();
+
+    // Display the input image
+    ImGui::Text("Input Image:");
+    auto drawlist = ImGui::GetWindowDrawList();
+    
+    ImVec2 p = ImGui::GetCursorScreenPos();
+
+    // draw 28x28 image scaled by 10
+    float scale = 10.0f;
+    for (int y = 0; y < 28; ++y )
+    {
+        for (int x = 0; x < 28; ++x)
+        {
+            float pixel_value = data->mnist_images_data[image_index][y * 28 + x];
+            ImU32 col = IM_COL32(static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), 255);
+            drawlist->AddRectFilled(ImVec2(p.x + x * scale, p.y + y * scale), ImVec2(p.x + (x + 1) * scale, p.y + (y + 1) * scale), col);
+        }
+    }
 }
 
 void TestingWindowCanvas_1(UIContext* ui_context)

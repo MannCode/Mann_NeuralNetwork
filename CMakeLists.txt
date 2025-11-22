@@ -57,9 +57,11 @@ set(CMAKE_OSX_ARCHITECTURES "arm64")
 include_directories(src dependencies/includes/GLFW dependencies/includes/imgui .)
 
 # Source files
+# all .cpp files in src/ except for those starting with test_
 file(GLOB_RECURSE SOURCES
-    src/*.cpp
+    "src/*.cpp"
 )
+list(FILTER SOURCES EXCLUDE REGEX "src/test_.*\\.cpp$")
 
 set(IMGUI_SOURCES
     dependencies/includes/imgui/imgui.cpp
