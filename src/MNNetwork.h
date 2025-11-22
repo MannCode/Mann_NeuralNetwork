@@ -192,6 +192,7 @@ public:
     float m_batch_accuracy;
     std::queue<float> m_batch_accuracy_history;
     std::mutex training_threads_mutex;
+    float m_averageTimePerBatch;
     
 
 

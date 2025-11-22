@@ -584,7 +584,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
             int minutes = (static_cast<int>(total_time) % 3600) / 60;
             float seconds = total_time - (hours * 3600) - (minutes * 60);
             ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
-            // ImGui::Text("Total Time Trained: %.2f min", ui_context->selected_model->network->m_total_training_time);
+            ImGui::Text("Average Time per Batch: %.4f seconds", ui_context->selected_model->network->m_averageTimePerBatch);
             ImGui::TreePop();
         }
 

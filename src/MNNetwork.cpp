@@ -64,6 +64,7 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
     for(int n = 0; n < iterations; n++) {
         // float avg_cost_bulk = 0.0f;
         for(int batch = 0; batch < image_data->mnist_images_data.size()/m_batch_size; batch++) {
+            float batch_start_time = static_cast<float>(glfwGetTime());
             current_batch = batch;
             int correct_pred = 0;
             
@@ -124,6 +125,10 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
             
 
             saveNetwork();
+
+            float batch_end_time = static_cast<float>(glfwGetTime());
+            float difference = m_averageTimePerBatch - (batch_end_time - batch_start_time);
+            m_averageTimePerBatch -= difference * 0.05f; // moving average with weight 0.05
 
             if(is_training && !(*is_training)) {
                 return;
