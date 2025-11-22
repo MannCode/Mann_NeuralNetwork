@@ -10,7 +10,7 @@ int main()
     WindowManager::initalizeGlfwWithHints();
 
     // Create window
-    GLFWwindow* window = WindowManager::createWindow(1280, 720);
+    GLFWwindow* window = WindowManager::createWindow(1920, 1080);
 
     // Initialize MannUI
     MannUI ui(window, &mnist);

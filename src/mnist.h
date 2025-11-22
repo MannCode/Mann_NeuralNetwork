@@ -28,7 +28,7 @@ public:
     /** 
      * @brief Structure to hold MNIST training data.
      */
-    struct Mnist_Data
+    struct MnistData
     {
         std::vector<std::vector<double>> mnist_images_data;
         std::vector<std::vector<double>> mnist_labels_data;
@@ -38,12 +38,12 @@ public:
      * @brief MNIST training data.
      */
 
-    Mnist_Data mnist_trainingData;
+    MnistData mnist_trainingData;
 
     /** 
      * @brief MNIST test data.
      */
-    Mnist_Data mnist_testData;
+    MnistData mnist_testData;
 
     /**
      * @brief Default constructor for the Mnist class.

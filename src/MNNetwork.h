@@ -54,7 +54,7 @@ public:
      * @param images_data A vector of input image data for training.
      * @param labels_data A vector of corresponding label data for training.
      */
-    void trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_data, bool *is_training);
+    void trainNetwork(const size_t iterations, Mnist::MnistData* image_data, bool *is_training);
 
 
     /**
@@ -63,13 +63,13 @@ public:
      * @param labels_data A vector of corresponding label data for testing.
      * @param filename The file containing the network configuration.
      */
-    void testNetworkByUser(Mnist::Mnist_Data* image_data,
-                          const std::string &filename);
+    Mann::Matrix predictSingleImage(Mnist::MnistData* image_data,
+                           int image_index);
 
     /**
      * @brief Tests the neural network using the provided dataset.
      */
-    float testNetwork(Mnist::Mnist_Data* image_data);
+    float testNetwork(Mnist::MnistData* image_data);
 
     /**
      * @brief Initializes the neural network with the specified layer sizes.
@@ -121,6 +121,8 @@ public:
      */
     void der_activationFunction(Mann::Matrix &matrix, const Mann::Matrix &weighted_sum);
 
+    bool IsPredictionCorrect(const Mann::Matrix &output_layer, const Mann::Matrix &target);
+
     /**
      * @brief Saves the neural network configuration and weights to a file.
      */
@@ -142,7 +144,7 @@ public:
      * @param label_data A vector containing the corresponding label data.
      * @param filename The file to save the image and label data.
      */
-    void saveImageDataToFile(Mnist::Mnist_Data* image_data,
+    void saveImageDataToFile(Mnist::MnistData* image_data,
                              const std::string& filename);
 
     /**
@@ -173,6 +175,7 @@ public:
     size_t m_batch_size;
     float m_accuracy;
     float m_accuracy_testdata;
+    float m_average_cost;
     float m_total_training_time;
     int sample_image_label;
     int m_current_epoch;
@@ -184,6 +187,9 @@ public:
     float m_batch_accuracy;
     std::vector<float> m_batch_accuracy_history;
     std::mutex training_threads_mutex;
+    std::vector<float> m_average_cost_history;
+    std::vector<float> m_average_cost_testdata_history;
+    
 
 
 // private:

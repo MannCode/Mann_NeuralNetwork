@@ -52,7 +52,7 @@ MNNetwork::~MNNetwork() {};
  * @param filename The file to save the trained network.
  * @param learning_rate The learning rate for weight updates during training.
  */
-void MNNetwork::trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_data, bool *is_training)
+void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_data, bool *is_training)
 {
     float start_time = static_cast<float>(glfwGetTime());
 
@@ -65,7 +65,7 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_d
         // float avg_cost_bulk = 0.0f;
         for(int batch = 0; batch < image_data->mnist_images_data.size()/m_batch_size; batch++) {
             current_batch = batch;
-            m_batch_accuracy = 0.0f;
+            int correct_pred = 0;
             
             for (int j = 0; j < MNN_d_weights.size(); j++) {
                 MNN_d_weights[j].nullMatrix();
@@ -93,8 +93,7 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_d
                     avg_cost += MNN_cost[j][0];
                 }
 
-                // avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
-                m_batch_accuracy += (10 - avg_cost) * 10 / m_batch_size;
+                if (IsPredictionCorrect(MNN_Nodes[MNN_Nodes.size() - 1], MNN_y)) correct_pred++;
 
                 std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
                 for(int j = 0; j < MNN_d_weights.size(); j++) {
@@ -116,6 +115,7 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_d
             m_total_training_time += (end_time - start_time);
             start_time = end_time;
 
+            m_batch_accuracy = (static_cast<float>(correct_pred) / static_cast<float>(m_batch_size)) * 100.0f;
             m_batch_accuracy_history.push_back(m_batch_accuracy);
 
             saveNetwork();
@@ -135,77 +135,33 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::Mnist_Data* image_d
  * @param labels_data A vector of corresponding label data for testing.
  * @param filename The file containing the network configuration.
  */
-void MNNetwork::testNetworkByUser(Mnist::Mnist_Data* image_data,
-                                 const std::string &filename)
+Mann::Matrix MNNetwork::predictSingleImage(Mnist::MnistData* image_data, int image_index)
 {
 
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
 
-    while (true) {
-        // get index of the image to test by user
-        int index = 0;
-        std::cout << "Enter the index of the image to test (0 - 9999): ";
-        std::cin >> index;
-        if (index < 0 || index >= image_data->mnist_images_data.size()) {
-            std::cout << "Invalid index. Exiting." << std::endl;
-        }
-        else {
-            // load image data in network
-            for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-                MNN_Nodes[0][j][0] = image_data->mnist_images_data[index][j];
-            }
-            for (int j = 0; j < MNN_y.rows(); j++) {
-                MNN_y[j][0] = image_data->mnist_labels_data[index][j];
-            }
-
-            feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
-
-            Mann::Matrix MNN_cost = (MNN_Nodes[MNN_Nodes.size() - 1] - MNN_y);
-            MNN_cost = MNN_cost ^ MNN_cost;
-            float avg_cost = 0;
-            for (int j = 0; j < MNN_cost.rows(); j++) {
-                avg_cost += MNN_cost[j][0];
-            }
-
-            std::cout << "Actural number: ";
-            for (int j = 0; j < MNN_y.rows(); j++) {
-                if(MNN_y[j][0] == 1) {
-                    std::cout << j << std::endl;
-                    break;
-                }
-            }
-            float highest = 0;
-            int num = 0;
-            std::cout << "Predicted number: ";
-            for (int j = 0; j < MNN_Nodes[MNN_Nodes.size() - 1].rows(); j++) {
-                if(MNN_Nodes[MNN_Nodes.size() - 1][j][0] > highest) {
-                    highest = MNN_Nodes[MNN_Nodes.size() - 1][j][0];
-                    num = j;
-                }
-            }
-            std::cout << num << std::endl;
-            std::cout << std::endl;
-            printLables(MNN_Nodes[MNN_Nodes.size() - 1]);
-            // std::cout << "Predicted Labels: ";
-            // for (int j = 0; j < MNN_Nodes[MNN_Nodes.size() - 1].rows(); j++) {
-            //     std::cout << MNN_Nodes[MNN_Nodes.size() - 1][j][0] << " ";
-            // }
-            std::cout << std::endl;
-            std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
-
-            // mnistData* mnist_data = new mnistData{{image_data->mnist_images_data[index]}, {image_data->mnist_labels_data[index]}};
-            // print the image
-            // saveImageDataToFile(mnist_data, "test_image.mms");
-        }
+    // load image data in network
+    for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
+        MNN_Nodes[0][j][0] = image_data->mnist_images_data[image_index][j];
     }
+    for (int j = 0; j < MNN_y.rows(); j++) {
+        MNN_y[j][0] = image_data->mnist_labels_data[image_index][j];
+    }
+
+    feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
+
+
+    return MNN_Nodes[MNN_Nodes.size() - 1];
+
+    // std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
 }
 
 /**
  * @brief Tests the neural network using the provided dataset.
  */
-float MNNetwork::testNetwork(Mnist::Mnist_Data* image_data)
+float MNNetwork::testNetwork(Mnist::MnistData* image_data)
 {
 
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
@@ -220,7 +176,7 @@ float MNNetwork::testNetwork(Mnist::Mnist_Data* image_data)
     training_threads_mutex.unlock();
 
     float avg_cost_bulk = 0;
-
+    int correct_pred = 0;
 
     for (int i = 0; i < image_data->mnist_images_data.size(); i++) {
 
@@ -241,10 +197,13 @@ float MNNetwork::testNetwork(Mnist::Mnist_Data* image_data)
             avg_cost += MNN_cost[j][0];
         }
 
-        avg_cost_bulk = (avg_cost_bulk + avg_cost) / 2;
+        avg_cost_bulk += avg_cost;
+
+        if (IsPredictionCorrect(MNN_NODES_COPY[MNN_NODES_COPY.size() - 1], MNN_y)) correct_pred++;
     }
     
-    return (10 - avg_cost_bulk) * 10;
+    m_average_cost = avg_cost_bulk / static_cast<float>(image_data->mnist_images_data.size()) * 100.0f;
+    return (static_cast<float>(correct_pred) / static_cast<float>(image_data->mnist_images_data.size())) * 100.0f;
 }
 
 /**
@@ -314,6 +273,29 @@ void MNNetwork::activationFunction(Mann::Matrix &matrix, const Mann::Matrix &wei
 void MNNetwork::der_activationFunction(Mann::Matrix &matrix, const Mann::Matrix &nodes)
 {
     matrix = nodes ^ ((nodes * -1) + 1);
+}
+
+bool MNNetwork::IsPredictionCorrect(const Mann::Matrix &output_layer, const Mann::Matrix &target)
+{
+    int predicted_label = 0;
+    float max_value = output_layer[0][0];
+
+    for (int i = 1; i < output_layer.rows(); i++) {
+        if (output_layer[i][0] > max_value) {
+            max_value = output_layer[i][0];
+            predicted_label = i;
+        }
+    }
+
+    int actual_label = 0;
+    for (int i = 0; i < target.rows(); i++) {
+        if (target[i][0] == 1.0f) {
+            actual_label = i;
+            break;
+        }
+    }
+
+    return predicted_label == actual_label;
 }
 
 /**
@@ -438,7 +420,7 @@ void MNNetwork::loadNetwork(const std::string &filename)
     }
 
 
-    // Get second line (learning rate)
+    // Get second line (current epoch)
     file >> m_current_epoch;
 
     // Get third line (learning rate)
@@ -524,7 +506,7 @@ void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
  * @param label_data A vector containing the corresponding label data.
  * @param filename The file to save the image and label data.
  */
-void MNNetwork::saveImageDataToFile(Mnist::Mnist_Data* image_data,
+void MNNetwork::saveImageDataToFile(Mnist::MnistData* image_data,
                                    const std::string& filename)
 {
     std::ofstream file(filename);
