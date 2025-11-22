@@ -75,8 +75,8 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
 void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
 void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int &selected_dataset, int &image_index);
 void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index);
-void TestingWindowCanvas_1(UIContext* ui_context);
-void TestingWindowCanvas_2(UIContext* ui_context);
+void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>> &pixel_data, Mann::Matrix &output_layer);
+void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, int &response_index);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
@@ -134,6 +134,9 @@ void MannUI::Render(std::stringstream &outputText)
 
         ImGui::DockBuilderDockWindow("Data Testing Details", dock_id_top_left);
         ImGui::DockBuilderDockWindow("Data Testing Output", dock_id_top_right);
+
+        // make left 50% for details
+        // ImGui::DockBuilderSplitNode(dock_id_top, ImGuiDir_Left, 0.5f, &dock_id_top_left, &dock_id_top_right);
 
         ImGui::DockBuilderDockWindow("Canvas Testing Details", dock_id_top_left);
         ImGui::DockBuilderDockWindow("Canvas Testing Output", dock_id_top_right);
@@ -247,11 +250,15 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::End();
         break;
     case MannUI::TESTING_CANVAS_WINDOW:
+        static std::vector<std::vector<float>> pixel_data = std::vector<std::vector<float>>(28, std::vector<float>(28, 0.0f)); // 28x28 canvas
+        static Mann::Matrix output_layer_canvas = Mann::Matrix(10, 1);
+        static int response_index = 0;
+
         ImGui::Begin("Canvas Testing Details");
-        TestingWindowCanvas_1(ui_context);
+        TestingWindowCanvas_1(ui_context, pixel_data, output_layer_canvas);
         ImGui::End();
         ImGui::Begin("Canvas Testing Output");
-        TestingWindowCanvas_2(ui_context);
+        TestingWindowCanvas_2(ui_context, output_layer_canvas, response_index);
         ImGui::End();
         break;
     default:
@@ -751,11 +758,14 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
         {
             //select dataset for testing
             static const char* datasets[]{"MNIST Test Data", "MNIST Training Data"};
-            ImGui::Combo("Select Dataset", &selected_dataset, datasets, IM_ARRAYSIZE(datasets));
+            int dataset_size = (selected_dataset == 0) ? mnist->mnist_testData.mnist_images_data.size() : mnist->mnist_trainingData.mnist_images_data.size();
+            if(ImGui::Combo("Select Dataset", &selected_dataset, datasets, IM_ARRAYSIZE(datasets)))
+            {
+                image_index = dataset_size / 4;
+            }
             ImGui::NewLine();
 
             //image index slider
-            int dataset_size = (selected_dataset == 0) ? mnist->mnist_testData.mnist_images_data.size() : mnist->mnist_trainingData.mnist_images_data.size();
             ImGui::Text("Dataset Size: %d", dataset_size);
             if(ImGui::Button("Random Image"))
             {
@@ -766,13 +776,14 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
 
 
             Mnist::MnistData* data = (selected_dataset == 0) ? &mnist->mnist_testData : &mnist->mnist_trainingData;
+            std::vector<double> image_data = data->mnist_images_data[image_index];
 
             if (ImGui::Button("Find Wrong Prediction"))
             {
                 int i = 0;
                 while(true) {
                     image_index = rand() % dataset_size;
-                    output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+                    output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
                     Mann::Matrix y(10, 1);
                     for (int i = 0; i < 10; ++i)
                     {
@@ -789,7 +800,7 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
                 }
             }
             else {
-                output_layer = ui_context->selected_model->network->predictSingleImage(data, image_index);
+                output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
             }
 
             ImGui::TreePop();
@@ -854,7 +865,7 @@ void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int 
 
 
     // Display output probabilities are a bar graph
-    if (ImPlot::BeginPlot("Output Probabilities"))
+    if (ImPlot::BeginPlot("Output Probabilities", ImVec2(1000,400)))
     {
         ImPlot::SetupAxes("Numbers", "Probability", ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
         ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 1.0, ImGuiCond_Always);
@@ -897,17 +908,200 @@ void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int 
     }
 }
 
-void TestingWindowCanvas_1(UIContext* ui_context)
+void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>> &pixel_data, Mann::Matrix &output_layer)
 {
+    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
+    ImGui::Separator();
+
     ImGui::Text("Details Panel");
     ImGui::Separator();
 
-    ImGui::Separator();
-    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
+    if (ui_context->selected_model)
+    {
+        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
+        if (ImGui::TreeNodeEx("Model Details", node_flags))
+        {
+            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Layers: ");
+            ImGui::SameLine();
+            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+            {
+                ImGui::Text("%zu,", layer);
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+            ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
+            // show total time trained in hr:min:sec format
+            float total_time = ui_context->selected_model->network->m_total_training_time;
+            int hours = static_cast<int>(total_time) / 3600;
+            int minutes = (static_cast<int>(total_time) % 3600) / 60;
+            float seconds = total_time - (hours * 3600) - (minutes * 60);
+            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+
+            ImGui::TreePop();
+        }
+
+        ImGui::NewLine();
+
+        if (ImGui::TreeNodeEx("Testing Controls", node_flags))
+        {
+            ImGui::Text("CANVAS INPUT");
+            
+            // Make a canvas window
+            ImGuiIO& io = ImGui::GetIO();
+            ImVec2 mousePos = io.MousePos;
+            float mouseX = mousePos.x;
+            float mouseY = mousePos.y;
+
+            if (ImGui::Button("Clear Canvas"))
+            {
+                for (int y = 0; y < 28; ++y)
+                {
+                    for (int x = 0; x < 28; ++x)
+                    {
+                        pixel_data[y][x] = 0; // set pixel to black
+                    }
+                }
+            }
+
+            // Canvas preview
+            auto drawlist = ImGui::GetWindowDrawList();
+    
+            ImVec2 p = ImGui::GetCursorScreenPos();
+
+            // draw 28x28 image scaled by 10
+            float scale = 10.0f;
+            for (int y = 0; y < 28; ++y )
+            {
+                for (int x = 0; x < 28; ++x)
+                {
+                    float pixel_value = pixel_data[y][x];
+                    ImU32 col = IM_COL32(static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), 255);
+                    drawlist->AddRectFilled(ImVec2(p.x + x * scale, p.y + y * scale), ImVec2(p.x + (x + 1) * scale, p.y + (y + 1) * scale), col);
+                }
+            } 
+
+            // Canvas Input with faded effect
+            ImGui::InvisibleButton("canvas", ImVec2(280, 280));
+            ImVec2 canvasPos = ImGui::GetItemRectMin();
+            if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+            {
+                int x = static_cast<int>((mouseX - canvasPos.x) / 10.0f);
+                int y = static_cast<int>((mouseY - canvasPos.y) / 10.0f);
+                if (x >= 0 && x < 28 && y >= 0 && y < 28)
+                {
+                    pixel_data[y][x] = std::min(1.0f, pixel_data[y][x] + 0.1f); // increase pixel brightness
+                    if (x > 0) pixel_data[y][x - 1] = std::max(pixel_data[y][x - 1], 0.3f); // left pixel
+                    if (x < 27) pixel_data[y][x + 1] = std::max(pixel_data[y][x + 1], 0.3f); // right pixel
+                    if (y > 0) pixel_data[y - 1][x] = std::max(pixel_data[y - 1][x], 0.3f); // top pixel
+                    if (y < 27) pixel_data[y + 1][x] = std::max(pixel_data[y + 1][x], 0.3f); // bottom pixel
+                    //corners
+                    if (x > 0 && y > 0) pixel_data[y - 1][x - 1] = std::max(pixel_data[y - 1][x - 1], 0.1f); // top-left
+                    if (x < 27 && y > 0) pixel_data[y - 1][x + 1] = std::max(pixel_data[y - 1][x + 1], 0.1f); // top-right
+                    if (x > 0 && y < 27) pixel_data[y + 1][x - 1] = std::max(pixel_data[y + 1][ x - 1], 0.1f); // bottom-left
+                    if (x < 27 && y < 27) pixel_data[y + 1][x + 1] = std::max(pixel_data[y + 1][ x + 1], 0.1f); // bottom-right
+                }
+            }
+
+
+
+
+            // ImGui::InvisibleButton("canvas", ImVec2(280, 280));
+            // ImVec2 canvasPos = ImGui::GetItemRectMin();
+
+            // if (ImGui::IsItemActive() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+            // {
+            //     int x = static_cast<int>((mouseX - canvasPos.x) / 10.0f);
+            //     int y = static_cast<int>((mouseY - canvasPos.y) / 10.0f);
+            //     if (x >= 0 && x < 28 && y >= 0 && y < 28)
+            //     {
+            //         pixel_data[y][x] = 1; // set pixel to white
+            //     }
+            // }
+
+
+            ImGui::TreePop();
+        }
+
+        // Test the canvas input
+        
+        std::vector<double> image_data(28 * 28, 0.0);
+        for (int y = 0; y < 28; ++y)
+        {
+            for (int x = 0; x < 28; ++x)
+            {
+                image_data[y * 28 + x] = static_cast<double>(pixel_data[y][x]);
+            }
+        }
+
+        output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
+    }
 }
 
-void TestingWindowCanvas_2(UIContext* ui_context)
+void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, int &response_index)
 {
     ImGui::Text("Testing Output Panel");
     ImGui::Separator();
+
+    // Randomly select an AI response
+    std::vector<std::string> AI_responses = {
+        "Is it a %d?",
+        "Looks like a %d to me.",
+        "I'm pretty sure it's a %d.",
+        "This seems to be a %d.",
+        "I'd say it's a %d."
+    };
+    
+    if(rand() % 600 == 532) // change response every now and then
+        response_index = rand() % AI_responses.size();
+
+    // Calculate predicted number
+    int predicted_number = 0;
+    float max_value = output_layer[0][0];
+    for (int i = 1; i < 10; ++i)
+    {
+        if (output_layer[i][0] > max_value)
+        {
+            max_value = output_layer[i][0];
+            predicted_number = i;
+        }
+    }
+    ImGui::Text(AI_responses[response_index].c_str(), predicted_number);
+
+    ImGui::Separator();
+
+
+    // Display output probabilities are a bar graph
+    if (ImPlot::BeginPlot("Output Probabilities", ImVec2(1000,400)))
+    {
+        ImPlot::SetupAxes("Numbers", "Probability", ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
+        ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 1.0, ImGuiCond_Always);
+        float x[10];
+        float y[10];
+        for (int i = 0; i < 10; ++i)
+        {
+            x[i] = static_cast<float>(i);
+            y[i] = output_layer[i][0];
+        }
+        ImPlot::PlotBars("Probabilities", x, y, 10, 0.5f);
+
+        ImPlot::EndPlot();
+    }
+
+    // Show predictions in decending order
+    ImGui::Separator();
+    ImGui::Text("Predictions in order:");
+    std::vector<std::pair<int, float>> predictions;
+    for (int i = 0; i < 10; ++i)
+    {
+        predictions.push_back({i, output_layer[i][0]});
+    }
+    std::sort(predictions.begin(), predictions.end(), [](const auto &a, const auto &b) {
+        return a.second > b.second;
+    });
+    for (const auto &pred : predictions)
+    {
+        ImGui::Text("%d: %.2f%%", pred.first, pred.second*100.0f);
+    }
 }

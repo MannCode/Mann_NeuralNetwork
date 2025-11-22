@@ -135,27 +135,21 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
  * @param labels_data A vector of corresponding label data for testing.
  * @param filename The file containing the network configuration.
  */
-Mann::Matrix MNNetwork::predictSingleImage(Mnist::MnistData* image_data, int image_index)
+Mann::Matrix MNNetwork::predictSingleImage(std::vector<double> &image_data)
 {
 
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
-    Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
 
     // load image data in network
     for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-        MNN_Nodes[0][j][0] = image_data->mnist_images_data[image_index][j];
-    }
-    for (int j = 0; j < MNN_y.rows(); j++) {
-        MNN_y[j][0] = image_data->mnist_labels_data[image_index][j];
+        MNN_Nodes[0][j][0] = image_data[j];
     }
 
     feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
 
 
     return MNN_Nodes[MNN_Nodes.size() - 1];
-
-    // std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
 }
 
 /**

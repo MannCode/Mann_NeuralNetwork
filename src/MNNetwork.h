@@ -63,8 +63,7 @@ public:
      * @param labels_data A vector of corresponding label data for testing.
      * @param filename The file containing the network configuration.
      */
-    Mann::Matrix predictSingleImage(Mnist::MnistData* image_data,
-                           int image_index);
+    Mann::Matrix predictSingleImage(std::vector<double> &image_data);
 
     /**
      * @brief Tests the neural network using the provided dataset.
