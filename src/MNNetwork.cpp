@@ -116,7 +116,12 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
             start_time = end_time;
 
             m_batch_accuracy = (static_cast<float>(correct_pred) / static_cast<float>(m_batch_size)) * 100.0f;
-            m_batch_accuracy_history.push_back(m_batch_accuracy);
+            m_batch_accuracy_history.push(m_batch_accuracy);
+            if (m_batch_accuracy_history.size() - 1 > 100)
+            {
+                m_batch_accuracy_history.pop();
+            }
+            
 
             saveNetwork();
 
@@ -135,27 +140,21 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
  * @param labels_data A vector of corresponding label data for testing.
  * @param filename The file containing the network configuration.
  */
-Mann::Matrix MNNetwork::predictSingleImage(Mnist::MnistData* image_data, int image_index)
+Mann::Matrix MNNetwork::predictSingleImage(std::vector<double> &image_data)
 {
 
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
-    Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
 
     // load image data in network
     for (int j = 0; j < MNN_Nodes[0].rows(); j++) {
-        MNN_Nodes[0][j][0] = image_data->mnist_images_data[image_index][j];
-    }
-    for (int j = 0; j < MNN_y.rows(); j++) {
-        MNN_y[j][0] = image_data->mnist_labels_data[image_index][j];
+        MNN_Nodes[0][j][0] = image_data[j];
     }
 
     feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
 
 
     return MNN_Nodes[MNN_Nodes.size() - 1];
-
-    // std::cout << "Accuracy: " << (10 - avg_cost) * 10 << "%" << std::endl << std::endl << std::endl;
 }
 
 /**
@@ -202,7 +201,7 @@ float MNNetwork::testNetwork(Mnist::MnistData* image_data)
         if (IsPredictionCorrect(MNN_NODES_COPY[MNN_NODES_COPY.size() - 1], MNN_y)) correct_pred++;
     }
     
-    m_average_cost = avg_cost_bulk / static_cast<float>(image_data->mnist_images_data.size()) * 100.0f;
+    m_average_cost = avg_cost_bulk / static_cast<float>(image_data->mnist_images_data.size());
     return (static_cast<float>(correct_pred) / static_cast<float>(image_data->mnist_images_data.size())) * 100.0f;
 }
 
@@ -460,6 +459,9 @@ void MNNetwork::loadNetwork(const std::string &filename)
     for (size_t i = 0; i < MNN_Layers_size.size(); ++i) {
         MNN_Nodes.emplace_back(Mann::Matrix(MNN_Layers_size[i], 1));
     }
+
+    file.close();
+    loadHistoryData();
 }
 
 /**
@@ -498,6 +500,8 @@ void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
 
     outfile.close();
     std::cout << "File created successfully!" << std::endl;
+
+    saveHistoryData();
 }
 
 /**
@@ -558,5 +562,73 @@ void MNNetwork::printLables(const Mann::Matrix &matrix)
             std::cout << "*";
         }
         std::cout << std::endl;
+    }
+}
+
+void MNNetwork::saveHistoryData()
+{
+    std::ofstream file("../models/modelsLogData/Log_" + m_filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file for saving network: " << m_filename << std::endl;
+        return;
+    }
+    // save m_accuracy_history
+    for (size_t i = 0; i < m_accuracy_history.size(); ++i) {
+        file << m_accuracy_history[i] << " ";
+    }
+    file << "\n";
+    // save m_accuracy_testdata_history
+    for (size_t i = 0; i < m_accuracy_testdata_history.size(); ++i) {
+        file << m_accuracy_testdata_history[i] << " ";
+    }
+    file << "\n";
+    // save m_average_cost_history
+    for (size_t i = 0; i < m_average_cost_history.size(); ++i) {
+        file << m_average_cost_history[i] << " ";
+    }
+    file << "\n";
+    // save m_average_cost_testdata_history
+    for (size_t i = 0; i < m_average_cost_testdata_history.size(); ++i) {
+        file << m_average_cost_testdata_history[i] << " ";
+    }
+    file << "\n";
+}
+
+void MNNetwork::loadHistoryData()
+{
+    float accuracy_value;
+    std::ifstream file(("../models/modelsLogData/Log_" + m_filename));
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening file for loading network: " << m_filename << std::endl;
+        saveHistoryData();
+        std::cout << "Created new log file for network: " << m_filename << std::endl;
+        return;
+    }
+
+    // get first line (m_accuracy_history)
+    std::string line;
+    std::getline(file, line);
+    std::istringstream iss(line);
+    while (iss >> accuracy_value) {
+        m_accuracy_history.push_back(accuracy_value);
+    }
+    // get second line (m_accuracy_testdata_history)
+    std::getline(file, line);
+    std::istringstream iss2(line);
+    while (iss2 >> accuracy_value) {
+        m_accuracy_testdata_history.push_back(accuracy_value);
+    }
+    // get third line (m_average_cost_history)
+    std::getline(file, line);
+    std::istringstream iss3(line);
+    while (iss3 >> accuracy_value) {
+        m_average_cost_history.push_back(accuracy_value);
+    }
+    // get fourth line (m_average_cost_testdata_history)
+    std::getline(file, line);
+    std::istringstream iss4(line);
+    while (iss4 >> accuracy_value) {
+        m_average_cost_testdata_history.push_back(accuracy_value);
     }
 }

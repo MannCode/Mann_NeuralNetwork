@@ -63,8 +63,7 @@ public:
      * @param labels_data A vector of corresponding label data for testing.
      * @param filename The file containing the network configuration.
      */
-    Mann::Matrix predictSingleImage(Mnist::MnistData* image_data,
-                           int image_index);
+    Mann::Matrix predictSingleImage(std::vector<double> &image_data);
 
     /**
      * @brief Tests the neural network using the provided dataset.
@@ -164,6 +163,10 @@ public:
      */
     void CreateNetwork(NetworkArchitecture* network_arch);
 
+    void saveHistoryData();
+
+    void loadHistoryData();
+
 public:
     /**
      * @struct Networks
@@ -184,11 +187,11 @@ public:
     int current_batch;
     std::vector<float> m_accuracy_history;
     std::vector<float> m_accuracy_testdata_history;
-    float m_batch_accuracy;
-    std::vector<float> m_batch_accuracy_history;
-    std::mutex training_threads_mutex;
     std::vector<float> m_average_cost_history;
     std::vector<float> m_average_cost_testdata_history;
+    float m_batch_accuracy;
+    std::queue<float> m_batch_accuracy_history;
+    std::mutex training_threads_mutex;
     
 
 
