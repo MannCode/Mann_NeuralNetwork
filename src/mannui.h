@@ -242,7 +242,7 @@ public:
         TESTING_DATA_WINDOW,
         TESTING_CANVAS_WINDOW,
         NETWORK_VISUALIZER_WINDOW,
-    } shown_windows_enum = NETWORK_VISUALIZER_WINDOW;
+    } shown_windows_enum = MODELS_WINDOW;
 
     //models_window specific variables
 

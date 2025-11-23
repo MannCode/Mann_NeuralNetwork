@@ -1357,7 +1357,7 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
         std::vector<Mann::Matrix>* MNN_BIAS_prt = &ui_context->selected_model->network->MNN_Bias;
         float layer_spacing = canvas_width / static_cast<float>(MNN_NODES_ptr->size() + 1);
 
-        for(int i=1; i < MNN_NODES_ptr->size(); ++i)
+        for(int i=0; i < MNN_NODES_ptr->size(); ++i)
         {
             float nodes_spacing = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
             float radius = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i].rows() - 1); // adjust radius based on number of nodes
@@ -1384,7 +1384,7 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
         // Draw Connections
         std::vector<Mann::Matrix>* MNN_WEIGHTS_ptr = &ui_context->selected_model->network->MNN_Weights;
 
-        for(int i=1; i < MNN_WEIGHTS_ptr->size(); ++i)
+        for(int i=0; i < MNN_WEIGHTS_ptr->size(); ++i)
         {
             float nodes_spacing_current = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
             float nodes_spacing_next = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i+1].rows() + 1);
