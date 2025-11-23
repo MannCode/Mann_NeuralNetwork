@@ -1,3 +1,4 @@
 .vscode/
+dependencies/
 .DS_Store
 build/
