@@ -13,13 +13,16 @@
 
 #include "mannui.h"
 #include "MNNetwork.h"
-#include "SystemProfiler.h"
+// #include "SystemProfiler.h"
 
+#define _USE_MATH_DEFINES
 #include <cmath>
+
 #include <numbers>
 #include <assert.h>
 
-#define IM_COL_RED(x) IM_COL32(255, 0, 0, x)
+#define IM_COL_RED(x) IM_COL32(234, 100, 0, x)
+#define IM_COL_BLUE(x) IM_COL32(0, 182, 236, x)
 #define IM_COL_GREEN(x) IM_COL32(0, 255, 0, x)
 #define IM_COL_WHITE(x) IM_COL32(255, 255, 255, x)
  
@@ -102,8 +105,8 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
 void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index);
 void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>> &pixel_data, Mann::Matrix &output_layer);
 void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, int &response_index);
-void NetworkVisualizationWindow_1(UIContext* ui_context, Mann::Matrix &output_layer_visual);
-void NetworkVisualizationWindow_2(UIContext* ui_context, Mann::Matrix &output_layer_visual);
+void NetworkVisualizationWindow_1(UIContext* ui_context);
+void NetworkVisualizationWindow_2(UIContext* ui_context);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
@@ -235,6 +238,11 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::Begin("Training Progress");
         TrainingWindow_2(ui_context, is_training, training_thread, testing_thread);
         ImGui::End();
+
+        ImGui::Begin("Network Visualizer");
+
+        NetworkVisualizationWindow_2(ui_context);
+        ImGui::End();
         break;
     case MannUI::TESTING_DATA_WINDOW:
         // Shared Global Static Variables
@@ -263,14 +271,13 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::End();
         break;
     case MannUI::NETWORK_VISUALIZER_WINDOW:
-        static Mann::Matrix output_layer_visual = Mann::Matrix(10, 1);
 
         ImGui::Begin("Network Visualizer Details");
-        NetworkVisualizationWindow_1(ui_context, output_layer_visual);
+        NetworkVisualizationWindow_1(ui_context);
         ImGui::End();
 
         ImGui::Begin("Network Visualizer");
-        NetworkVisualizationWindow_2(ui_context, output_layer_visual);
+        NetworkVisualizationWindow_2(ui_context);
         ImGui::End();
         break;
     default:
@@ -355,8 +362,8 @@ void LogWindow(std::stringstream &outputText)
 
 void ProfilerWindow(std::stringstream &outputText)
 {
-    SystemProfiler* profiler = new SystemProfiler();
-    profiler->renderGraphs();
+    // SystemProfiler* profiler = new SystemProfiler();
+    // profiler->renderGraphs();
 }
 
 /**
@@ -1204,7 +1211,7 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
     }
 }
 
-void NetworkVisualizationWindow_1(UIContext* ui_context, Mann::Matrix &output_layer)
+void NetworkVisualizationWindow_1(UIContext* ui_context)
 {
     ImGui::Text("Details Panel");
     if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW; 
@@ -1281,7 +1288,7 @@ void NetworkVisualizationWindow_1(UIContext* ui_context, Mann::Matrix &output_la
                 while(true) {
                     image_index = rand() % dataset_size;
                     image_data = data->mnist_images_data[image_index];
-                    output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
+                    Mann::Matrix output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
                     Mann::Matrix y(10, 1);
                     for (int i = 0; i < 10; ++i)
                     {
@@ -1299,7 +1306,7 @@ void NetworkVisualizationWindow_1(UIContext* ui_context, Mann::Matrix &output_la
                 }
             }
             else {
-                output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
+                ui_context->selected_model->network->predictSingleImage(image_data);
             }
             ImGui::NewLine();
 
@@ -1326,7 +1333,7 @@ void NetworkVisualizationWindow_1(UIContext* ui_context, Mann::Matrix &output_la
     }
 }
 
-void NetworkVisualizationWindow_2(UIContext* ui_context, Mann::Matrix &output_layer)
+void NetworkVisualizationWindow_2(UIContext* ui_context)
 {
     ImGui::Text("Network Visualizer");
     ImGui::Separator();
@@ -1347,9 +1354,10 @@ void NetworkVisualizationWindow_2(UIContext* ui_context, Mann::Matrix &output_la
 
         // Draw Nodes
         std::vector<Mann::Matrix>* MNN_NODES_ptr = &ui_context->selected_model->network->MNN_Nodes;
+        std::vector<Mann::Matrix>* MNN_BIAS_prt = &ui_context->selected_model->network->MNN_Bias;
         float layer_spacing = canvas_width / static_cast<float>(MNN_NODES_ptr->size() + 1);
 
-        for(int i=0; i < MNN_NODES_ptr->size(); ++i)
+        for(int i=1; i < MNN_NODES_ptr->size(); ++i)
         {
             float nodes_spacing = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
             float radius = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i].rows() - 1); // adjust radius based on number of nodes
@@ -1362,13 +1370,21 @@ void NetworkVisualizationWindow_2(UIContext* ui_context, Mann::Matrix &output_la
                 // drawlist->AddCircleFilled(ImVec2(x, y), radius, IM_COL32(0, 255, 0, 255));
                 ImU8 brightness_value = static_cast<ImU8>((*MNN_NODES_ptr)[i][j][0] * 255.0f);
                 drawlist->AddCircleFilled(ImVec2(x, y), radius, IM_COL_WHITE(brightness_value));
+                // circle border
+
+                if(i > 0)
+                {
+                    ImU8 bias_brightness = static_cast<ImU8>((*MNN_BIAS_prt)[i-1][j][0] * 255.0f);
+                    drawlist->AddCircle(ImVec2(x, y), radius + 1.0f, IM_COL_GREEN(bias_brightness), 0, 3);
+                }
+                drawlist->AddCircle(ImVec2(x, y), radius, IM_COL32(250, 250, 255, 255));
             }
         }
 
         // Draw Connections
         std::vector<Mann::Matrix>* MNN_WEIGHTS_ptr = &ui_context->selected_model->network->MNN_Weights;
 
-        for(int i=0; i < MNN_WEIGHTS_ptr->size(); ++i)
+        for(int i=1; i < MNN_WEIGHTS_ptr->size(); ++i)
         {
             float nodes_spacing_current = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
             float nodes_spacing_next = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i+1].rows() + 1);
@@ -1396,15 +1412,13 @@ void NetworkVisualizationWindow_2(UIContext* ui_context, Mann::Matrix &output_la
                     else
                     {
                         weight_value = std::clamp((-weight_value - 0.5f) / 0.5f, 0.0f, 1.0f); // remap to 0-1 range
-                        color = IM_COL_GREEN(weight_value * 120.0f);
+                        color = IM_COL_BLUE(weight_value * 120.0f);
                     }
 
                     drawlist->AddLine(ImVec2(x1 + radius_current, y1), ImVec2(x2 - radius_next, y2), color);
                 }
             }
         }
-
-
     }
     else
     {

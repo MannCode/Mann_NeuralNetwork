@@ -73,7 +73,10 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
                 MNN_d_biases[j].nullMatrix();
             }
 
-            for (int i = batch * m_batch_size; i < (batch + 1) * m_batch_size; i++) {
+            int start = static_cast<int>(batch * m_batch_size);
+            int end = static_cast<int>((batch + 1) * m_batch_size);
+
+            for (int i = start; i < end; i++) {
                 // if (i == 10)
                 //     sample_image_label = image_data->mnist_labels_data[i][0]; // just a random number to initialize
 

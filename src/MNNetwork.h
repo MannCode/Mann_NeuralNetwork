@@ -5,6 +5,7 @@
 #include "structs.hpp"
 #include "mnist.h"
 #include "GLFW/glfw3.h"
+#include <queue>
 
 /**
  * @file MNNetwork.h
