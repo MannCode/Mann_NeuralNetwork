@@ -29,18 +29,18 @@ class MNNetwork
 public:
     /**
      * @brief Constructs a neural network by loading from a file.
-     * @param filename The name of the file containing the network configuration and weights.
+     * @param model_id The identifier of the model containing the network configuration and weights.
      */
-    MNNetwork(std::string filename);
+    MNNetwork(std::string model_id);
 
     /**
      * @brief Constructs a neural network with specified hidden layer sizes.
-     * @param filename The name of the file to save/load the network configuration.
+     * @param model_id The identifier of the model to save/load the network configuration.
      * @param hidden_layers_size A vector specifying the number of neurons in each hidden layer.
      * @param learning_rate The learning rate for weight updates during training.
      * @param batch_size The size of each training batch.
      */
-    MNNetwork(std::string filename, NetworkConfiguration* network_configuration);
+    MNNetwork(std::string model_id, NetworkConfiguration* network_configuration);
 
     /**
      * @brief Destructor for the MNNetwork class.
@@ -61,8 +61,6 @@ public:
     /**
      * @brief Tests the neural network interactively with user-provided data.
      * @param images_data A vector of input image data for testing.
-     * @param labels_data A vector of corresponding label data for testing.
-     * @param filename The file containing the network configuration.
      */
     Mann::Matrix predictSingleImage(std::vector<double> &image_data);
 
@@ -134,18 +132,18 @@ public:
      * @param nodes A vector of matrices to store the node values in each layer.
      * @param weights A vector of matrices to store the weights between layers.
      * @param biases A vector of matrices to store the biases for each layer.
-     * @param filename The file containing the network configuration.
+     * @param model_id The identifier of the model containing the network configuration.
      */
-    void loadNetwork(const std::string &filename);
+    void loadNetwork(const std::string &model_id);
 
     /**
      * @brief Saves image and label data to a file.
      * @param image_data A vector containing the image data.
      * @param label_data A vector containing the corresponding label data.
-     * @param filename The file to save the image and label data.
+     * @param model_id The identifier of the model to save the image and label data.
      */
     void saveImageDataToFile(Mnist::MnistData* image_data,
-                             const std::string& filename);
+                             const std::string& model_id);
 
     /**
      * @brief Prints the labels from a matrix.
@@ -155,12 +153,6 @@ public:
 
     /**
      * @brief Creates a neural network with the specified configuration.
-     * @param layers_size A vector to store the size of each layer.
-     * @param nodes A vector of matrices to store the node values in each layer.
-     * @param weights A vector of matrices to store the weights between layers.
-     * @param biases A vector of matrices to store the biases for each layer.
-     * @param hidden_layers_size A vector specifying the number of neurons in each hidden layer.
-     * @param modelName The name of the neural network model.
      */
     void CreateNetwork(NetworkArchitecture* network_arch);
 
@@ -173,8 +165,9 @@ public:
      * @struct Networks
      * @brief A structure to store multiple neural network models and their names.
      */
-
-    std::string m_filename;
+    
+    std::string m_model_id;
+    std::string m_model_name;
     float m_learning_rate;
     size_t m_batch_size;
     float m_accuracy;

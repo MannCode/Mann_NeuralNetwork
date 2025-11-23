@@ -176,10 +176,10 @@ extern Mnist* mnist;
 
 struct NetworkEntry
 {
-    std::string modelName; ///< Name of the neural network model.
+    std::string model_id; ///< Name of the neural network model.
     MNNetwork* network;    ///< Pointer to neural network instance.
 
-    NetworkEntry(const std::string& name, MNNetwork* net) : modelName(name), network(net) {}
+    NetworkEntry(const std::string& id, MNNetwork* net) : model_id(id), network(net) {}
 
     NetworkEntry(const NetworkEntry&) = delete;
     NetworkEntry(NetworkEntry&&) noexcept = default;

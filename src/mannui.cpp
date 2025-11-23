@@ -108,6 +108,7 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
 void NetworkVisualizationWindow_1(UIContext* ui_context);
 void NetworkVisualizationWindow_2(UIContext* ui_context);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
+void PopupsContainer(UIContext* ui_context);
 
 /**
  * @brief Renders the ImGui-based user interface.
@@ -182,9 +183,9 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::DockBuilderFinish(dockspace_id);
 
         // load the networks
-        for (const std::string &name : filenames)
+        for (const std::string &filename : filenames)
         {
-            Networks.emplace_back(name, new MNNetwork(name + ".mms"));
+            Networks.emplace_back(filename, new MNNetwork(filename));
         }
 
         // Temporary code will delete later
@@ -203,7 +204,7 @@ void MannUI::Render(std::stringstream &outputText)
                 accuracy = entry.network->testNetwork(&mnist->mnist_trainingData);
                 entry.network->m_accuracy = accuracy;
 
-                MannLogger::info(outputText) << entry.modelName << " --- Accuracy: " << entry.network->m_accuracy_testdata << "%" << std::endl;
+                MannLogger::info(outputText) << entry.network->m_model_name << " --- Accuracy: " << entry.network->m_accuracy_testdata << "%" << std::endl;
                 // std::lock_guard<std::mutex> lock(resultsMutex);
             });
             test_thread.detach();
@@ -222,6 +223,13 @@ void MannUI::Render(std::stringstream &outputText)
     ImGui::Begin("System Profiler");
     ProfilerWindow(outputText);
     ImGui::End();
+
+    if( ui_context->open_popup.to_open ) {
+        ImGui::OpenPopup( ui_context->open_popup.name.c_str() );
+        ui_context->open_popup.to_open = false;
+    }
+
+    PopupsContainer(ui_context);
     
     // Top Windows
     switch (shown_windows_enum)
@@ -372,20 +380,16 @@ void ProfilerWindow(std::stringstream &outputText)
  */
 void ShowAvalModels(UIContext* ui_context)
 {
-    if( ui_context->open_popup.to_open ) {
-        ImGui::OpenPopup( ui_context->open_popup.name.c_str() );
-        ui_context->open_popup.to_open = false;
-    }
 
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
     {
-        ImGui::PushID(entry.modelName.c_str());
+        ImGui::PushID(entry.model_id.c_str());
 
-        if (ImGui::Button(entry.modelName.c_str()))
+        if (ImGui::Button(entry.network->m_model_name.c_str()))
         {
             // ... show the details of the model in a popup
-            ImGui::OpenPopup((entry.modelName + "Details").c_str());
+            ImGui::OpenPopup((entry.network->m_model_name + "Details").c_str());
         }
 
         ImGui::SameLine();
@@ -412,13 +416,23 @@ void ShowAvalModels(UIContext* ui_context)
         }
 
         // popup for model details
-        if (ImGui::BeginPopupModal((entry.modelName + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::BeginPopupModal((entry.network->m_model_name + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             // Non Graphical things
             ui_context->selected_model = &entry;
 
             // Show model details here
-            ImGui::Text("Model Name: %s", entry.modelName.c_str());
+            ImGui::Text("Model Name: %s", entry.network->m_model_name.c_str());
+            ImGui::SameLine();
+            // edit button on same line
+            // ImGui::SetCursorPosX(-1);
+            if (ImGui::Button("Edit"))
+            {
+                // Open Edit Model Details popup
+                ui_context->open_popup.name = "Edit Model Details";
+                ui_context->open_popup.to_open = true;
+                ImGui::CloseCurrentPopup();
+            }
             ImGui::NewLine();
             // show layers size
             ImGui::Text("Layers: ");
@@ -496,7 +510,7 @@ void ShowAvalModels(UIContext* ui_context)
             modelName = modelNameBuffer;
         }
 
-        NetworkConfiguration* network_configuration = new NetworkConfiguration{hidden_layers, learning_rate, batch_size};
+        NetworkConfiguration* network_configuration = new NetworkConfiguration{modelName, hidden_layers, learning_rate, batch_size};
         NetworkConfigUI(network_configuration);
 
         if (ImGui::Button("Create"))
@@ -519,8 +533,19 @@ void ShowAvalModels(UIContext* ui_context)
                 // Create the network
                 // MNNetwork network(modelName + ".mms", hidden_layers, learning_rate, batch_size);
 
-                NetworkConfiguration* network_configuration = new NetworkConfiguration{hidden_layers, learning_rate, batch_size};
-                Networks.push_back({modelName, new MNNetwork(modelName + ".mms", network_configuration)});
+                // Generate a unique model ID
+                static const char alphanum[] =
+                    "0123456789"
+                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    "abcdefghijklmnopqrstuvwxyz";
+                std::string model_id;
+                model_id.reserve(16);
+                for(int i = 0; i < 16; ++i) {
+                    model_id += alphanum[rand() % (sizeof(alphanum) - 1)];
+                }
+
+                NetworkConfiguration* network_configuration = new NetworkConfiguration{modelName, hidden_layers, learning_rate, batch_size};
+                Networks.push_back({model_id, new MNNetwork(model_id, network_configuration)});
 
                 auto &newEntry = Networks.back();
 
@@ -564,23 +589,6 @@ void ShowAvalModels(UIContext* ui_context)
         ImGui::EndPopup();
     }
 
-    if(ImGui::BeginPopupModal("ConfirmVisualizerPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-        ImGui::Text("This was your decision to open the Network Visualizer. If your system blast with smoke, I am not responsible.\nI am asking you one last time, are you sure you want to open the Network Visualizer?");
-        
-        if (ImGui::Button("I am using high-end system. I do not care"))
-        {
-            // Open Network Visualizer
-            ui_context->shown_windows_enum = MannUI::NETWORK_VISUALIZER_WINDOW;
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("No, take me back"))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
 }
 
 /**
@@ -653,7 +661,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
-            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
             ImGui::Text("Layers: ");
             ImGui::SameLine();
             for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
@@ -702,7 +710,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
                     testing_thread.join();
 
                 // Start training logic
-                MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->modelName << std::endl;
+                MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->network->m_model_name << std::endl;
                 
                 
                 training_thread = std::thread([ui_context, &is_training]() {
@@ -757,7 +765,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
                 // Stop training logic
                 is_training = false;
 
-                MannLogger::info(ui_context->outputText) << "Training stopped for model: " << ui_context->selected_model->modelName << std::endl;
+                MannLogger::info(ui_context->outputText) << "Training stopped for model: " << ui_context->selected_model->network->m_model_name << std::endl;
             }
 
             // Here you can add a progress bar or other indicators
@@ -851,7 +859,7 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
-            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
             ImGui::Text("Layers: ");
             ImGui::SameLine();
             for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
@@ -1043,7 +1051,7 @@ void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
-            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
             ImGui::Text("Layers: ");
             ImGui::SameLine();
             for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
@@ -1222,7 +1230,7 @@ void NetworkVisualizationWindow_1(UIContext* ui_context)
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
-            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
             ImGui::Text("Layers: ");
             ImGui::SameLine();
             for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
@@ -1342,7 +1350,7 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
     if (ui_context->selected_model)
     {
         // Render the network visualization
-        ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+        ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
         ImGui::NewLine();
 
         auto drawlist = ImGui::GetWindowDrawList();
@@ -1423,5 +1431,66 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
     else
     {
         ImGui::Text("No Model Selected");
+    }
+}
+
+void PopupsContainer(UIContext* ui_context)
+{
+    
+    if(ImGui::BeginPopupModal("Edit Model Details", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        // variables to hold edited values
+        static std::string _model_name = ui_context->selected_model->network->m_model_name;
+        static float _learning_rate = ui_context->selected_model->network->m_learning_rate;
+        static int _batch_size = ui_context->selected_model->network->m_batch_size;
+
+        // Input fields
+        char model_name_buffer[256];
+        std::strncpy(model_name_buffer, _model_name.c_str(), sizeof(model_name_buffer));
+        if (ImGui::InputText("Model Name", model_name_buffer, sizeof(model_name_buffer)))
+        {
+            _model_name = std::string(model_name_buffer);
+        }
+        ImGui::InputFloat("Learning Rate", &_learning_rate);
+        ImGui::InputInt("Batch Size", &_batch_size);    
+        ImGui::NewLine();
+        if (ImGui::Button("Save Changes"))
+        {
+            // Apply changes to the selected model
+            ui_context->selected_model->network->m_model_name = _model_name;
+            ui_context->selected_model->network->m_learning_rate = _learning_rate;
+            ui_context->selected_model->network->m_batch_size = _batch_size;
+
+            ui_context->selected_model->network->saveNetwork();
+
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+
+        if(ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+
+    if(ImGui::BeginPopupModal("ConfirmVisualizerPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("This was your decision to open the Network Visualizer. If your system blast with smoke, I am not responsible.\nI am asking you one last time, are you sure you want to open the Network Visualizer?");
+        
+        if (ImGui::Button("I am using high-end system. I do not care"))
+        {
+            // Open Network Visualizer
+            ui_context->shown_windows_enum = MannUI::NETWORK_VISUALIZER_WINDOW;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("No, take me back"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
 }
