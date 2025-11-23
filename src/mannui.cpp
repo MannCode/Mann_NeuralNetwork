@@ -77,6 +77,7 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
 void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index);
 void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>> &pixel_data, Mann::Matrix &output_layer);
 void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, int &response_index);
+void NetworkVisualizationWindow(UIContext* ui_context);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
@@ -122,6 +123,7 @@ void MannUI::Render(std::stringstream &outputText)
 
         // Dock your windows into the nodes
         ImGui::DockBuilderDockWindow("Models", dock_id_top);
+        ImGui::DockBuilderDockWindow("Network Visualizer", dock_id_top);
         ImGui::DockBuilderDockWindow("Output", dock_id_bottom);
 
         ImGuiID dock_id_top_left;
@@ -213,7 +215,7 @@ void MannUI::Render(std::stringstream &outputText)
     }
     ImGui::End();
 
-    UIContext* ui_context = new UIContext{outputText, shown_windows_enum, selected_model};
+    UIContext* ui_context = new UIContext{outputText, shown_windows_enum, selected_model, open_popup};
     
     // Control Panel
     switch (shown_windows_enum)
@@ -257,6 +259,10 @@ void MannUI::Render(std::stringstream &outputText)
         TestingWindowCanvas_2(ui_context, output_layer_canvas, response_index);
         ImGui::End();
         break;
+    case MannUI::NETWORK_VISUALIZER_WINDOW:
+        ImGui::Begin("Network Visualizer");
+        NetworkVisualizationWindow(ui_context);
+        ImGui::End();
     default:
         break;
     }
@@ -302,6 +308,11 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
  */
 void ShowAvalModels(UIContext* ui_context)
 {
+    if( ui_context->open_popup.to_open ) {
+        ImGui::OpenPopup( ui_context->open_popup.name.c_str() );
+        ui_context->open_popup.to_open = false;
+    }
+
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
     {
@@ -380,6 +391,13 @@ void ShowAvalModels(UIContext* ui_context)
                 
                 // Test the network by canvas
                 ui_context->shown_windows_enum = MannUI::TESTING_CANVAS_WINDOW;
+                ImGui::CloseCurrentPopup();
+            }
+            if (ImGui::Button("Network Visualizer"))
+            { 
+               // Open Network Visualizer confirmation popup
+                ui_context->open_popup.name = "ConfirmVisualizerPopup";
+                ui_context->open_popup.to_open = true;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
@@ -479,6 +497,24 @@ void ShowAvalModels(UIContext* ui_context)
             ImGui::CloseCurrentPopup();
         }
 
+        ImGui::EndPopup();
+    }
+
+    if(ImGui::BeginPopupModal("ConfirmVisualizerPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("This was your decision to open the Network Visualizer. If your system blast with smoke, I am not responsible.\nI am asking you one last time, are you sure you want to open the Network Visualizer?");
+        
+        if (ImGui::Button("I am using high-end system. I do not care"))
+        {
+            // Open Network Visualizer
+            ui_context->shown_windows_enum = MannUI::NETWORK_VISUALIZER_WINDOW;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("No, take me back"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
         ImGui::EndPopup();
     }
 }
@@ -1109,4 +1145,24 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
     {
         ImGui::Text("%d: %.2f%%", pred.first, pred.second*100.0f);
     }
+}
+
+void NetworkVisualizationWindow(UIContext* ui_context)
+{
+    ImGui::Text("Network Visualizer");
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    if (ui_context->selected_model)
+    {
+        // Render the network visualization
+        ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());   
+    }
+    else
+    {
+        ImGui::Text("No Model Selected");
+    }
+
+    ImGui::Separator();
+    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
 }
