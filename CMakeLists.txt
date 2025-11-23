@@ -1,51 +1,3 @@
-# cmake_minimum_required(VERSION 3.10)
-# project(Mann_NeuralNetwork VERSION 1.0 LANGUAGES CXX)
-
-# set(CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-# # Include directories
-# include_directories(src dependencies/includes/GLFW dependencies/includes/imgui .)
-
-# # Source files
-# set(SOURCES
-#     src/main.cpp
-#     src/mannui.cpp
-#     src/mann.cpp
-#     src/mnist.cpp
-#     src/MNNetwork.cpp
-# )
-
-# set(IMGUI_SOURCES
-#     dependencies/includes/imgui/imgui.cpp
-#     dependencies/includes/imgui/imgui_demo.cpp
-#     dependencies/includes/imgui/imgui_draw.cpp
-#     dependencies/includes/imgui/imgui_tables.cpp
-#     dependencies/includes/imgui/imgui_widgets.cpp
-#     dependencies/includes/imgui/backends/imgui_impl_glfw.cpp
-#     dependencies/includes/imgui/backends/imgui_impl_opengl3.cpp
-# )
-
-# # set(boost_min_ver 1.50.0)
-# # set(boost_libs system filesystem)
-
-# # Find required packages
-# find_package(OpenGL REQUIRED)
-# find_package(glfw3 3.3 REQUIRED)
-# # find_package(Boost ${boost_min_ver})
-
-
-# # if(Boost_FOUND)
-# #     find_package(Boost ${boost_min_ver} COMPONENTS ${boost_libs})
-# # endif()
-
-# # Add executable
-# add_executable(NN ${SOURCES} ${IMGUI_SOURCES})
-# # Link libraries
-# target_link_libraries(NN PRIVATE OpenGL::GL glfw)
-
-
-
 cmake_minimum_required(VERSION 3.10)
 project(Mann_NeuralNetwork VERSION 1.0 LANGUAGES CXX)
 
@@ -60,8 +12,13 @@ include_directories(src dependencies/includes/GLFW dependencies/includes/imgui .
 # all .cpp files in src/ except for those starting with test_
 file(GLOB_RECURSE SOURCES
     "src/*.cpp"
+    "src/*.mm"
 )
 list(FILTER SOURCES EXCLUDE REGEX "src/test_.*\\.cpp$")
+
+set_source_files_properties(src/SystemProfiler.mm PROPERTIES
+    COMPILE_FLAGS "-ObjC++"
+)
 
 set(IMGUI_SOURCES
     dependencies/includes/imgui/imgui.cpp
@@ -104,11 +61,14 @@ else()
     find_package(glfw3 3.3 REQUIRED)
 endif()
 
-# Add executable
-add_executable(NN ${SOURCES} ${IMGUI_SOURCES} ${IMPLOT_SOURCES})  # Fixed: Used IMPLOT_SOURCES instead of IMPLOT
+add_executable(NN
+    ${SOURCES}
+    ${IMGUI_SOURCES}
+    ${IMPLOT_SOURCES}
+)
 
 # Link libraries
-target_link_libraries(NN PRIVATE OpenGL::GL)
+target_link_libraries(NN PRIVATE OpenGL::GL m)
 
 if(WIN32 AND NOT glfw3_FOUND)
     # Link to the FetchContent glfw target
@@ -117,3 +77,30 @@ else()
     # Link to system glfw3
     target_link_libraries(NN PRIVATE glfw)
 endif()
+
+# macOS Metal support
+if(APPLE)
+    target_link_libraries(NN PRIVATE
+        "-framework Metal"
+        "-framework IOKit"
+        "-framework CoreFoundation"
+    )
+endif()
+
+# Windows NVML
+if(WIN32)
+    set(NVML_PATH "C:/Program Files/NVIDIA Corporation/NVSMI")
+    target_include_directories(NN PRIVATE "${NVML_PATH}")
+    target_link_libraries(NN PRIVATE "${NVML_PATH}/nvml.lib")
+endif()
+
+# Linux NVML
+if(UNIX AND NOT APPLE)
+    find_library(NVML_LIB nvidia-ml)
+    if(NVML_LIB)
+        target_link_libraries(NN PRIVATE ${NVML_LIB})
+    else()
+        message(WARNING "NVML not found. GPU monitoring disabled.")
+    endif()
+endif()
+
