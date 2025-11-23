@@ -575,9 +575,10 @@ void MNNetwork::printLables(const Mann::Matrix &matrix)
 
 void MNNetwork::saveHistoryData()
 {
-    std::ofstream file("../models/modelsLogData/Log_" + m_filename);
+    std::string Logfile = "Log_" + m_filename.substr(0, m_filename.size() - 1) + "l";
+    std::ofstream file("../models/modelsLogData/" + Logfile);
     if (!file.is_open()) {
-        std::cerr << "Error opening file for saving network: " << m_filename << std::endl;
+        std::cerr << "Error opening file for saving network: " << Logfile << std::endl;
         return;
     }
     // save m_accuracy_history
@@ -605,12 +606,13 @@ void MNNetwork::saveHistoryData()
 void MNNetwork::loadHistoryData()
 {
     float accuracy_value;
-    std::ifstream file(("../models/modelsLogData/Log_" + m_filename));
+    std::string Logfile = "Log_" + m_filename.substr(0, m_filename.size() - 1) + "l";
+    std::ifstream file(("../models/modelsLogData/" + Logfile));
 
     if (!file.is_open()) {
-        std::cerr << "Error opening file for loading network: " << m_filename << std::endl;
+        std::cerr << "Error opening file for loading network: " << Logfile << std::endl;
         saveHistoryData();
-        std::cout << "Created new log file for network: " << m_filename << std::endl;
+        std::cout << "Created new log file for network: " << Logfile << std::endl;
         return;
     }
 

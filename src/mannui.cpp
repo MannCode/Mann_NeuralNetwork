@@ -239,10 +239,10 @@ void MannUI::Render(std::stringstream &outputText)
         TrainingWindow_2(ui_context, is_training, training_thread, testing_thread);
         ImGui::End();
 
-        ImGui::Begin("Network Visualizer");
+        // ImGui::Begin("Network Visualizer");
 
-        NetworkVisualizationWindow_2(ui_context);
-        ImGui::End();
+        // NetworkVisualizationWindow_2(ui_context);
+        // ImGui::End();
         break;
     case MannUI::TESTING_DATA_WINDOW:
         // Shared Global Static Variables
