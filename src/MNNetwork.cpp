@@ -73,7 +73,10 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
                 MNN_d_biases[j].nullMatrix();
             }
 
-            for (int i = batch * m_batch_size; i < (batch + 1) * m_batch_size; i++) {
+            int start = static_cast<int>(batch * m_batch_size);
+            int end = static_cast<int>((batch + 1) * m_batch_size);
+
+            for (int i = start; i < end; i++) {
                 // if (i == 10)
                 //     sample_image_label = image_data->mnist_labels_data[i][0]; // just a random number to initialize
 
@@ -572,9 +575,10 @@ void MNNetwork::printLables(const Mann::Matrix &matrix)
 
 void MNNetwork::saveHistoryData()
 {
-    std::ofstream file("../models/modelsLogData/Log_" + m_filename);
+    std::string Logfile = "Log_" + m_filename.substr(0, m_filename.size() - 1) + "l";
+    std::ofstream file("../models/modelsLogData/" + Logfile);
     if (!file.is_open()) {
-        std::cerr << "Error opening file for saving network: " << m_filename << std::endl;
+        std::cerr << "Error opening file for saving network: " << Logfile << std::endl;
         return;
     }
     // save m_accuracy_history
@@ -602,12 +606,13 @@ void MNNetwork::saveHistoryData()
 void MNNetwork::loadHistoryData()
 {
     float accuracy_value;
-    std::ifstream file(("../models/modelsLogData/Log_" + m_filename));
+    std::string Logfile = "Log_" + m_filename.substr(0, m_filename.size() - 1) + "l";
+    std::ifstream file(("../models/modelsLogData/" + Logfile));
 
     if (!file.is_open()) {
-        std::cerr << "Error opening file for loading network: " << m_filename << std::endl;
+        std::cerr << "Error opening file for loading network: " << Logfile << std::endl;
         saveHistoryData();
-        std::cout << "Created new log file for network: " << m_filename << std::endl;
+        std::cout << "Created new log file for network: " << Logfile << std::endl;
         return;
     }
 

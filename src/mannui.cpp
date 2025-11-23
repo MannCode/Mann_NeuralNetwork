@@ -13,8 +13,34 @@
 
 #include "mannui.h"
 #include "MNNetwork.h"
+// #include "SystemProfiler.h"
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
+#include <numbers>
 #include <assert.h>
+
+#define IM_COL_RED(x) IM_COL32(234, 100, 0, x)
+#define IM_COL_BLUE(x) IM_COL32(0, 182, 236, x)
+#define IM_COL_GREEN(x) IM_COL32(0, 255, 0, x)
+#define IM_COL_WHITE(x) IM_COL32(255, 255, 255, x)
+ 
+inline float lerp(float a, float b, float t) {
+    return a + t * (b - a);
+}
+
+inline ImU32 GetFadingRed(float t)
+{
+    float fade = 0.08f * (1.0f + sinf(t * M_PI));
+
+    float (*lerp_f)(float, float, float) = [](float a, float b, float t) {
+        return a + (b - a) * t;
+    };
+
+    int alpha = static_cast<int>(lerp_f(0.f, 255.f, fade));
+    return IM_COL32(255, 0, 0, alpha);
+}
 
 /**
  * @brief Global vector of model filenames retrieved from the models directory.
@@ -70,6 +96,8 @@ inline MannUI::~MannUI()
 }
 
 // PROTOTYPES
+void LogWindow(std::stringstream &outputText);
+void ProfilerWindow(std::stringstream &outputText);
 void ShowAvalModels(UIContext* ui_context);
 void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
 void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
@@ -77,6 +105,8 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
 void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index);
 void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>> &pixel_data, Mann::Matrix &output_layer);
 void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, int &response_index);
+void NetworkVisualizationWindow_1(UIContext* ui_context);
+void NetworkVisualizationWindow_2(UIContext* ui_context);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
 
 /**
@@ -118,11 +148,18 @@ void MannUI::Render(std::stringstream &outputText)
         ImGuiID dock_main_id = dockspace_id;
         ImGuiID dock_id_top;
         ImGuiID dock_id_bottom;
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.85f, &dock_id_top, &dock_id_bottom);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.8f, &dock_id_top, &dock_id_bottom);
 
         // Dock your windows into the nodes
         ImGui::DockBuilderDockWindow("Models", dock_id_top);
-        ImGui::DockBuilderDockWindow("Output", dock_id_bottom);
+
+        ImGuiID dock_id_bottom_left;
+        ImGuiID dock_id_bottom_right;
+
+        ImGui::DockBuilderSplitNode(dock_id_bottom, ImGuiDir_Left, 0.35f, &dock_id_bottom_left, &dock_id_bottom_right);
+
+        ImGui::DockBuilderDockWindow("Log Output", dock_id_bottom_left);
+        ImGui::DockBuilderDockWindow("System Profiler", dock_id_bottom_right);
 
         ImGuiID dock_id_top_left;
         ImGuiID dock_id_top_right;
@@ -135,11 +172,11 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::DockBuilderDockWindow("Data Testing Details", dock_id_top_left);
         ImGui::DockBuilderDockWindow("Data Testing Output", dock_id_top_right);
 
-        // make left 50% for details
-        // ImGui::DockBuilderSplitNode(dock_id_top, ImGuiDir_Left, 0.5f, &dock_id_top_left, &dock_id_top_right);
-
         ImGui::DockBuilderDockWindow("Canvas Testing Details", dock_id_top_left);
         ImGui::DockBuilderDockWindow("Canvas Testing Output", dock_id_top_right);
+
+        ImGui::DockBuilderDockWindow("Network Visualizer Details", dock_id_top_left);
+        ImGui::DockBuilderDockWindow("Network Visualizer", dock_id_top_right);
 
         // Finish dock builder
         ImGui::DockBuilderFinish(dockspace_id);
@@ -149,6 +186,9 @@ void MannUI::Render(std::stringstream &outputText)
         {
             Networks.emplace_back(name, new MNNetwork(name + ".mms"));
         }
+
+        // Temporary code will delete later
+        selected_model = &Networks.front();
 
         MannLogger::info(outputText) << "Calculating model accuracy:" << std::endl;
         for (auto &entry : Networks)
@@ -172,50 +212,18 @@ void MannUI::Render(std::stringstream &outputText)
 
     ImGui::End();
 
-    // Output Window
-    ImGui::Begin("Output");
-    std::stringstream tempStream;
-    tempStream << outputText.str(); // Copy current content
-    std::string line;
-    while (std::getline(tempStream, line))
-    {
-        if (line.empty())
-            continue;
-        // Find the second occurrence of "[" to get the log level (e.g., [DEBUG], [INFO])
-        size_t firstBracket = line.find("[");
-        size_t secondBracket = line.find("[", firstBracket + 1);
-        size_t thirdBracket = line.find("[", secondBracket + 1);
-        size_t thirdBracketEnd = line.find("]", thirdBracket + 1);
-        if (thirdBracket != std::string::npos && thirdBracketEnd != std::string::npos)
-        {
-            std::string levelStr = line.substr(thirdBracket + 1, thirdBracketEnd - thirdBracket - 1);
-            ImVec4 color = IMGUI_COLOR_INFO; // Default to INFO color
-            if (levelStr == "DEBUG")
-                color = IMGUI_COLOR_DEBUG;
-            else if (levelStr == "INFO")
-                color = IMGUI_COLOR_INFO;
-            else if (levelStr == "WARN")
-                color = IMGUI_COLOR_WARN;
-            else if (levelStr == "ERROR")
-                color = IMGUI_COLOR_ERROR;
+    UIContext* ui_context = new UIContext{outputText, shown_windows_enum, selected_model, open_popup};
 
-            ImGui::PushStyleColor(ImGuiCol_Text, color);
-            ImGui::TextWrapped("%s", line.c_str());
-            ImGui::PopStyleColor();
-        }
-        else
-            ImGui::TextWrapped("%s", line.c_str());
-    }
-    if (ImGui::Button("Clear Output"))
-    {
-        outputText.str("");
-        outputText.clear();
-    }
+    // Output Window
+    ImGui::Begin("Log Output");
+    LogWindow(outputText);
     ImGui::End();
 
-    UIContext* ui_context = new UIContext{outputText, shown_windows_enum, selected_model};
+    ImGui::Begin("System Profiler");
+    ProfilerWindow(outputText);
+    ImGui::End();
     
-    // Control Panel
+    // Top Windows
     switch (shown_windows_enum)
     {
     case MannUI::MODELS_WINDOW:
@@ -230,6 +238,11 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::Begin("Training Progress");
         TrainingWindow_2(ui_context, is_training, training_thread, testing_thread);
         ImGui::End();
+
+        // ImGui::Begin("Network Visualizer");
+
+        // NetworkVisualizationWindow_2(ui_context);
+        // ImGui::End();
         break;
     case MannUI::TESTING_DATA_WINDOW:
         // Shared Global Static Variables
@@ -255,6 +268,16 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::End();
         ImGui::Begin("Canvas Testing Output");
         TestingWindowCanvas_2(ui_context, output_layer_canvas, response_index);
+        ImGui::End();
+        break;
+    case MannUI::NETWORK_VISUALIZER_WINDOW:
+
+        ImGui::Begin("Network Visualizer Details");
+        NetworkVisualizationWindow_1(ui_context);
+        ImGui::End();
+
+        ImGui::Begin("Network Visualizer");
+        NetworkVisualizationWindow_2(ui_context);
         ImGui::End();
         break;
     default:
@@ -296,12 +319,64 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
     return !output.empty();
 }
 
+void LogWindow(std::stringstream &outputText)
+{
+    std::stringstream tempStream;
+    tempStream << outputText.str(); // Copy current content
+    std::string line;
+    while (std::getline(tempStream, line))
+    {
+        if (line.empty())
+            continue;
+        // Find the second occurrence of "[" to get the log level (e.g., [DEBUG], [INFO])
+        size_t firstBracket = line.find("[");
+        size_t secondBracket = line.find("[", firstBracket + 1);
+        size_t thirdBracket = line.find("[", secondBracket + 1);
+        size_t thirdBracketEnd = line.find("]", thirdBracket + 1);
+        if (thirdBracket != std::string::npos && thirdBracketEnd != std::string::npos)
+        {
+            std::string levelStr = line.substr(thirdBracket + 1, thirdBracketEnd - thirdBracket - 1);
+            ImVec4 color = IMGUI_COLOR_INFO; // Default to INFO color
+            if (levelStr == "DEBUG")
+                color = IMGUI_COLOR_DEBUG;
+            else if (levelStr == "INFO")
+                color = IMGUI_COLOR_INFO;
+            else if (levelStr == "WARN")
+                color = IMGUI_COLOR_WARN;
+            else if (levelStr == "ERROR")
+                color = IMGUI_COLOR_ERROR;
+
+            ImGui::PushStyleColor(ImGuiCol_Text, color);
+            ImGui::TextWrapped("%s", line.c_str());
+            ImGui::PopStyleColor();
+        }
+        else
+            ImGui::TextWrapped("%s", line.c_str());
+    }
+    if (ImGui::Button("Clear Output"))
+    {
+        outputText.str("");
+        outputText.clear();
+    }
+}
+
+void ProfilerWindow(std::stringstream &outputText)
+{
+    // SystemProfiler* profiler = new SystemProfiler();
+    // profiler->renderGraphs();
+}
+
 /**
  * @brief Displays available models and a button to create a new model.
  * @param outputText A stringstream to append output messages for display in the UI.
  */
 void ShowAvalModels(UIContext* ui_context)
 {
+    if( ui_context->open_popup.to_open ) {
+        ImGui::OpenPopup( ui_context->open_popup.name.c_str() );
+        ui_context->open_popup.to_open = false;
+    }
+
     // MannLogger::info(outputText) << "Available Models:" << std::endl;
     for (auto &entry : Networks)
     {
@@ -380,6 +455,13 @@ void ShowAvalModels(UIContext* ui_context)
                 
                 // Test the network by canvas
                 ui_context->shown_windows_enum = MannUI::TESTING_CANVAS_WINDOW;
+                ImGui::CloseCurrentPopup();
+            }
+            if (ImGui::Button("Network Visualizer"))
+            { 
+               // Open Network Visualizer confirmation popup
+                ui_context->open_popup.name = "ConfirmVisualizerPopup";
+                ui_context->open_popup.to_open = true;
                 ImGui::CloseCurrentPopup();
             }
             ImGui::SameLine();
@@ -479,6 +561,24 @@ void ShowAvalModels(UIContext* ui_context)
             ImGui::CloseCurrentPopup();
         }
 
+        ImGui::EndPopup();
+    }
+
+    if(ImGui::BeginPopupModal("ConfirmVisualizerPopup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("This was your decision to open the Network Visualizer. If your system blast with smoke, I am not responsible.\nI am asking you one last time, are you sure you want to open the Network Visualizer?");
+        
+        if (ImGui::Button("I am using high-end system. I do not care"))
+        {
+            // Open Network Visualizer
+            ui_context->shown_windows_enum = MannUI::NETWORK_VISUALIZER_WINDOW;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("No, take me back"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
         ImGui::EndPopup();
     }
 }
@@ -1108,5 +1208,220 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
     for (const auto &pred : predictions)
     {
         ImGui::Text("%d: %.2f%%", pred.first, pred.second*100.0f);
+    }
+}
+
+void NetworkVisualizationWindow_1(UIContext* ui_context)
+{
+    ImGui::Text("Details Panel");
+    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW; 
+    ImGui::Separator();
+
+    if (ui_context->selected_model)
+    {
+        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
+        if (ImGui::TreeNodeEx("Model Details", node_flags))
+        {
+            ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+            ImGui::Text("Layers: ");
+            ImGui::SameLine();
+            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+            {
+                ImGui::Text("%zu,", layer);
+                ImGui::SameLine();
+            }
+            ImGui::NewLine();
+            ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
+            // show total time trained in hr:min:sec format
+            float total_time = ui_context->selected_model->network->m_total_training_time;
+            int hours = static_cast<int>(total_time) / 3600;
+            int minutes = (static_cast<int>(total_time) % 3600) / 60;
+            float seconds = total_time - (hours * 3600) - (minutes * 60);
+            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+
+            ImGui::TreePop();
+        }
+
+        ImGui::NewLine();
+
+        if(ImGui::TreeNodeEx("Visualization Controls", node_flags))
+        {
+            static const char* visualizer_types[]{"Full Network (WARNING!!)", "Simplified Network"};
+            static int selected_visualizer = 1;
+            ImGui::Combo("Select Visualizer Type", &selected_visualizer, visualizer_types, IM_ARRAYSIZE(visualizer_types));
+            
+
+            ImGui::TreePop();
+        }
+        ImGui::NewLine();
+
+        if (ImGui::TreeNodeEx("Testing Controls", node_flags))
+        {
+            //select dataset for testing
+            static const char* datasets[]{"MNIST Test Data", "MNIST Training Data"};
+            static int selected_dataset = 0;
+            static int image_index = 0;
+            int dataset_size = (selected_dataset == 0) ? mnist->mnist_testData.mnist_images_data.size() : mnist->mnist_trainingData.mnist_images_data.size();
+            if(ImGui::Combo("Select Dataset", &selected_dataset, datasets, IM_ARRAYSIZE(datasets)))
+            {
+                image_index = dataset_size / 4;
+            }
+            ImGui::NewLine();
+
+            //image index slider
+            ImGui::Text("Dataset Size: %d", dataset_size);
+            if(ImGui::Button("Random Image"))
+            {
+                image_index = rand() % dataset_size;
+            }
+            ImGui::SliderInt("Input Index", &image_index, 0, dataset_size - 1);
+            ImGui::NewLine();
+
+
+            Mnist::MnistData* data = (selected_dataset == 0) ? &mnist->mnist_testData : &mnist->mnist_trainingData;
+            std::vector<double> image_data = data->mnist_images_data[image_index];
+
+            if (ImGui::Button("Find Wrong Prediction"))
+            {
+                int i = 0;
+                while(true) {
+                    image_index = rand() % dataset_size;
+                    image_data = data->mnist_images_data[image_index];
+                    Mann::Matrix output_layer = ui_context->selected_model->network->predictSingleImage(image_data);
+                    Mann::Matrix y(10, 1);
+                    for (int i = 0; i < 10; ++i)
+                    {
+                        y[i][0] = data->mnist_labels_data[image_index][i];
+                    }
+                    if(!ui_context->selected_model->network->IsPredictionCorrect(output_layer, y)){
+                        break;
+                    }
+                    i++;
+                    // This will never happen (like its impossible to have 100% accuracy on MNIST) but just in case to avoid infinite loop
+                    if(i > dataset_size) {
+                        MannLogger::info(ui_context->outputText) << "All predictions are correct in the dataset!" << std::endl;
+                        break;
+                    }
+                }
+            }
+            else {
+                ui_context->selected_model->network->predictSingleImage(image_data);
+            }
+            ImGui::NewLine();
+
+            // Display the input image
+            ImGui::Text("Input Image:");
+            auto drawlist = ImGui::GetWindowDrawList();
+            
+            ImVec2 p = ImGui::GetCursorScreenPos();
+
+            // draw 28x28 image scaled by 10
+            float scale = 10.0f;
+            for (int y = 0; y < 28; ++y )
+            {
+                for (int x = 0; x < 28; ++x)
+                {
+                    float pixel_value = data->mnist_images_data[image_index][y * 28 + x];
+                    ImU32 col = IM_COL32(static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), static_cast<ImU8>(pixel_value * 255), 255);
+                    drawlist->AddRectFilled(ImVec2(p.x + x * scale, p.y + y * scale), ImVec2(p.x + (x + 1) * scale, p.y + (y + 1) * scale), col);
+                }
+            }
+
+            ImGui::TreePop();
+        }
+    }
+}
+
+void NetworkVisualizationWindow_2(UIContext* ui_context)
+{
+    ImGui::Text("Network Visualizer");
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    if (ui_context->selected_model)
+    {
+        // Render the network visualization
+        ImGui::Text("Model Name: %s", ui_context->selected_model->modelName.c_str());
+        ImGui::NewLine();
+
+        auto drawlist = ImGui::GetWindowDrawList();
+        ImVec2 p = ImGui::GetCursorScreenPos();
+
+        // std::vector<ImVec2> canvas_boundary_points;
+        float canvas_width = ImGui::GetContentRegionAvail().x - 30.0f;
+        float canvas_height = ImGui::GetContentRegionAvail().y - 50.0f;
+
+        // Draw Nodes
+        std::vector<Mann::Matrix>* MNN_NODES_ptr = &ui_context->selected_model->network->MNN_Nodes;
+        std::vector<Mann::Matrix>* MNN_BIAS_prt = &ui_context->selected_model->network->MNN_Bias;
+        float layer_spacing = canvas_width / static_cast<float>(MNN_NODES_ptr->size() + 1);
+
+        for(int i=0; i < MNN_NODES_ptr->size(); ++i)
+        {
+            float nodes_spacing = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
+            float radius = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i].rows() - 1); // adjust radius based on number of nodes
+            // float radius = 10.0f;
+
+            for(int j = 0; j < (*MNN_NODES_ptr)[i].rows(); ++j)
+            {
+                float x = p.x + (i + 1) * layer_spacing;
+                float y = p.y + (j + 1) * nodes_spacing;
+                // drawlist->AddCircleFilled(ImVec2(x, y), radius, IM_COL32(0, 255, 0, 255));
+                ImU8 brightness_value = static_cast<ImU8>((*MNN_NODES_ptr)[i][j][0] * 255.0f);
+                drawlist->AddCircleFilled(ImVec2(x, y), radius, IM_COL_WHITE(brightness_value));
+                // circle border
+
+                if(i > 0)
+                {
+                    ImU8 bias_brightness = static_cast<ImU8>((*MNN_BIAS_prt)[i-1][j][0] * 255.0f);
+                    drawlist->AddCircle(ImVec2(x, y), radius + 1.0f, IM_COL_GREEN(bias_brightness), 0, 3);
+                }
+                drawlist->AddCircle(ImVec2(x, y), radius, IM_COL32(250, 250, 255, 255));
+            }
+        }
+
+        // Draw Connections
+        std::vector<Mann::Matrix>* MNN_WEIGHTS_ptr = &ui_context->selected_model->network->MNN_Weights;
+
+        for(int i=0; i < MNN_WEIGHTS_ptr->size(); ++i)
+        {
+            float nodes_spacing_current = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
+            float nodes_spacing_next = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i+1].rows() + 1);
+            float radius_current = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i].rows() - 1);
+            float radius_next = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i+1].rows() - 1);
+
+            for(int j = 0; j < (*MNN_WEIGHTS_ptr)[i].rows(); ++j)
+            {
+                for(int k = 0; k < (*MNN_WEIGHTS_ptr)[i].cols(); ++k)
+                {
+                    float x1 = p.x + (i + 1) * layer_spacing;
+                    float y1 = p.y + (k + 1) * nodes_spacing_current;
+                    float x2 = p.x + (i + 2) * layer_spacing;
+                    float y2 = p.y + (j + 1) * nodes_spacing_next;
+
+                    // determine color based on weight value
+                    float weight_value = (*MNN_WEIGHTS_ptr)[i][j][k];
+                    weight_value = std::max(-1.0f, std::min(1.0f, weight_value)); // clamp between -1 and 1
+                    ImU32 color;
+                    if(weight_value > 0)
+                    {
+                        weight_value = std::clamp((weight_value - 0.5f) / 0.5f, 0.0f, 1.0f); // remap to 0-1 range
+                        color = IM_COL_RED(weight_value * 120.0f);
+                    }
+                    else
+                    {
+                        weight_value = std::clamp((-weight_value - 0.5f) / 0.5f, 0.0f, 1.0f); // remap to 0-1 range
+                        color = IM_COL_BLUE(weight_value * 120.0f);
+                    }
+
+                    drawlist->AddLine(ImVec2(x1 + radius_current, y1), ImVec2(x2 - radius_next, y2), color);
+                }
+            }
+        }
+    }
+    else
+    {
+        ImGui::Text("No Model Selected");
     }
 }
