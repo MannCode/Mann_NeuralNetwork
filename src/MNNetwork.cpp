@@ -56,10 +56,14 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
 {
     float start_time = static_cast<float>(glfwGetTime());
 
+    training_threads_mutex.lock();
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
     std::vector<Mann::Matrix> MNN_d_weights = MNN_Weights;
     std::vector<Mann::Matrix> MNN_d_biases = MNN_Bias;
+    
+    std::vector<Mann::Matrix> MNN_Nodes_local = MNN_Nodes;
+    training_threads_mutex.unlock();
 
     for(int n = 0; n < iterations; n++) {
         // float avg_cost_bulk = 0.0f;
@@ -81,29 +85,33 @@ void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_da
                 //     sample_image_label = image_data->mnist_labels_data[i][0]; // just a random number to initialize
 
                 // load image data in network
-                for (int j =0; j < MNN_Nodes[0].rows(); j++) {
-                    MNN_Nodes[0][j][0] = image_data->mnist_images_data[i][j];
+                for (int j =0; j < MNN_Nodes_local[0].rows(); j++) {
+                    MNN_Nodes_local[0][j][0] = image_data->mnist_images_data[i][j];
                 }
                 for (int j = 0; j < MNN_y.rows(); j++) {
                     MNN_y[j][0] = image_data->mnist_labels_data[i][j];
                 }
 
-                feedForward(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias);
+                feedForward(MNN_Nodes_local, MNN_weighted_sum, MNN_Weights, MNN_Bias);
 
-                Mann::Matrix MNN_cost = (MNN_Nodes[MNN_Nodes.size() - 1] - MNN_y);
+                Mann::Matrix MNN_cost = (MNN_Nodes_local[MNN_Nodes_local.size() - 1] - MNN_y);
                 MNN_cost = MNN_cost ^ MNN_cost;
                 float avg_cost = 0;
                 for (int j = 0; j < MNN_cost.rows(); j++) {
                     avg_cost += MNN_cost[j][0];
                 }
 
-                if (IsPredictionCorrect(MNN_Nodes[MNN_Nodes.size() - 1], MNN_y)) correct_pred++;
+                if (IsPredictionCorrect(MNN_Nodes_local[MNN_Nodes_local.size() - 1], MNN_y)) correct_pred++;
 
-                std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
+                std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes_local, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
                 for(int j = 0; j < MNN_d_weights.size(); j++) {
                     MNN_d_weights[j] = (MNN_d_weights[j] + MNN_d_weights_biases[0][j])/2;
                     MNN_d_biases[j] = (MNN_d_biases[j] + MNN_d_weights_biases[1][j])/2;
                 }
+
+                training_threads_mutex.lock();
+                MNN_Nodes = MNN_Nodes_local;
+                training_threads_mutex.unlock();
             }
 
 

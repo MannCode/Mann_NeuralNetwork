@@ -192,7 +192,7 @@ void MannUI::Render(std::stringstream &outputText)
         }
 
         // Temporary code will delete later
-        selected_model = &Networks.front();
+        // selected_model = &Networks.front();
 
         MannLogger::info(outputText) << "Calculating model accuracy:" << std::endl;
         for (auto &entry : Networks)
@@ -250,10 +250,10 @@ void MannUI::Render(std::stringstream &outputText)
         TrainingWindow_2(ui_context, is_training, training_thread, testing_thread);
         ImGui::End();
 
-        // ImGui::Begin("Network Visualizer");
+        ImGui::Begin("Network Visualizer");
 
-        // NetworkVisualizationWindow_2(ui_context);
-        // ImGui::End();
+        NetworkVisualizationWindow_2(ui_context);
+        ImGui::End();
         break;
     case MannUI::TESTING_DATA_WINDOW:
         // Shared Global Static Variables
@@ -1343,6 +1343,27 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
 
     if (ui_context->selected_model)
     {
+        static std::vector<Mann::Matrix> MNN_NODES_live;
+        static std::vector<Mann::Matrix> MNN_WEIGHTS_live;
+        static std::vector<Mann::Matrix> MNN_BIAS_live;
+        float count = 0.0f;
+
+        // Update live node activations, weights, and biases
+        if(count <= 0.0f)
+        {
+            ui_context->selected_model->network->training_threads_mutex.lock();
+            MNN_NODES_live = ui_context->selected_model->network->MNN_Nodes;
+            MNN_WEIGHTS_live = ui_context->selected_model->network->MNN_Weights;
+            MNN_BIAS_live = ui_context->selected_model->network->MNN_Bias;
+            ui_context->selected_model->network->training_threads_mutex.unlock();
+            count = 1000.0f;
+        }
+        else
+        {
+            count -= 1.0f;
+        }
+        
+
         // Render the network visualization
         ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
         ImGui::NewLine();
@@ -1355,28 +1376,26 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
         float canvas_height = ImGui::GetContentRegionAvail().y - 50.0f;
 
         // Draw Nodes
-        std::vector<Mann::Matrix>* MNN_NODES_ptr = &ui_context->selected_model->network->MNN_Nodes;
-        std::vector<Mann::Matrix>* MNN_BIAS_prt = &ui_context->selected_model->network->MNN_Bias;
-        float layer_spacing = canvas_width / static_cast<float>(MNN_NODES_ptr->size() + 1);
+        float layer_spacing = canvas_width / static_cast<float>(MNN_NODES_live.size() + 1);
 
-        for(int i=0; i < MNN_NODES_ptr->size(); ++i)
+        for(int i=0; i < MNN_NODES_live.size(); ++i)
         {
-            float nodes_spacing = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
-            float radius = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i].rows() - 1); // adjust radius based on number of nodes
+            float nodes_spacing = canvas_height / static_cast<float>(MNN_NODES_live[i].rows() + 1);
+            float radius = 10.0f - (8.0f / 783.0f) * (MNN_NODES_live[i].rows() - 1); // adjust radius based on number of nodes
             // float radius = 10.0f;
 
-            for(int j = 0; j < (*MNN_NODES_ptr)[i].rows(); ++j)
+            for(int j = 0; j < MNN_NODES_live[i].rows(); ++j)
             {
                 float x = p.x + (i + 1) * layer_spacing;
                 float y = p.y + (j + 1) * nodes_spacing;
                 // drawlist->AddCircleFilled(ImVec2(x, y), radius, IM_COL32(0, 255, 0, 255));
-                ImU8 brightness_value = static_cast<ImU8>((*MNN_NODES_ptr)[i][j][0] * 255.0f);
+                ImU8 brightness_value = static_cast<ImU8>(MNN_NODES_live[i][j][0] * 255.0f);
                 drawlist->AddCircleFilled(ImVec2(x, y), radius, IM_COL_WHITE(brightness_value));
                 // circle border
 
                 if(i > 0)
                 {
-                    ImU8 bias_brightness = static_cast<ImU8>((*MNN_BIAS_prt)[i-1][j][0] * 255.0f);
+                    ImU8 bias_brightness = static_cast<ImU8>(MNN_BIAS_live[i-1][j][0] * 255.0f);
                     drawlist->AddCircle(ImVec2(x, y), radius + 1.0f, IM_COL_GREEN(bias_brightness), 0, 3);
                 }
                 drawlist->AddCircle(ImVec2(x, y), radius, IM_COL32(250, 250, 255, 255));
@@ -1384,18 +1403,17 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
         }
 
         // Draw Connections
-        std::vector<Mann::Matrix>* MNN_WEIGHTS_ptr = &ui_context->selected_model->network->MNN_Weights;
 
-        for(int i=0; i < MNN_WEIGHTS_ptr->size(); ++i)
+        for(int i=0; i < MNN_WEIGHTS_live.size(); ++i)
         {
-            float nodes_spacing_current = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i].rows() + 1);
-            float nodes_spacing_next = canvas_height / static_cast<float>((*MNN_NODES_ptr)[i+1].rows() + 1);
-            float radius_current = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i].rows() - 1);
-            float radius_next = 10.0f - (8.0f / 783.0f) * ((*MNN_NODES_ptr)[i+1].rows() - 1);
+            float nodes_spacing_current = canvas_height / static_cast<float>(MNN_NODES_live[i].rows() + 1);
+            float nodes_spacing_next = canvas_height / static_cast<float>(MNN_NODES_live[i+1].rows() + 1);
+            float radius_current = 10.0f - (8.0f / 783.0f) * (MNN_NODES_live[i].rows() - 1);
+            float radius_next = 10.0f - (8.0f / 783.0f) * (MNN_NODES_live[i+1].rows() - 1);
 
-            for(int j = 0; j < (*MNN_WEIGHTS_ptr)[i].rows(); ++j)
+            for(int j = 0; j < MNN_WEIGHTS_live[i].rows(); ++j)
             {
-                for(int k = 0; k < (*MNN_WEIGHTS_ptr)[i].cols(); ++k)
+                for(int k = 0; k < MNN_WEIGHTS_live[i].cols(); ++k)
                 {
                     float x1 = p.x + (i + 1) * layer_spacing;
                     float y1 = p.y + (k + 1) * nodes_spacing_current;
@@ -1403,7 +1421,7 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
                     float y2 = p.y + (j + 1) * nodes_spacing_next;
 
                     // determine color based on weight value
-                    float weight_value = (*MNN_WEIGHTS_ptr)[i][j][k];
+                    float weight_value = MNN_WEIGHTS_live[i][j][k];
                     weight_value = std::max(-1.0f, std::min(1.0f, weight_value)); // clamp between -1 and 1
                     ImU32 color;
                     if(weight_value > 0)
@@ -1432,15 +1450,17 @@ void PrintLayers(UIContext* ui_context)
 {
     ImGui::Text("Layers:");
     ImGui::SameLine();
+    int i = 0;
     for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
     {
         ImGui::Text("%zu", layer);
-        if( layer != ui_context->selected_model->network->MNN_Layers_size.back() )
+        if( i < ui_context->selected_model->network->MNN_Layers_size.size() - 1)
         {
             ImGui::SameLine();
             ImGui::Text("->");
             ImGui::SameLine();
         }
+        i++;
     }
 }
 
