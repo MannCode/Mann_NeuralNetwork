@@ -100,6 +100,7 @@ void LogWindow(std::stringstream &outputText);
 void ProfilerWindow(std::stringstream &outputText);
 void ShowAvalModels(UIContext* ui_context);
 void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
+void CreateTrainingThreads(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
 void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
 void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int &selected_dataset, int &image_index);
 void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index);
@@ -108,7 +109,9 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
 void NetworkVisualizationWindow_1(UIContext* ui_context);
 void NetworkVisualizationWindow_2(UIContext* ui_context);
 void NetworkConfigUI(NetworkConfiguration* network_configuration);
-void PopupsContainer(UIContext* ui_context);
+void PrintLayers(UIContext* ui_context);
+void PrintTime(float total_time);
+void PopupsContainer(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread);
 
 /**
  * @brief Renders the ImGui-based user interface.
@@ -229,7 +232,7 @@ void MannUI::Render(std::stringstream &outputText)
         ui_context->open_popup.to_open = false;
     }
 
-    PopupsContainer(ui_context);
+    PopupsContainer(ui_context, is_training, training_thread, testing_thread);
     
     // Top Windows
     switch (shown_windows_enum)
@@ -389,7 +392,7 @@ void ShowAvalModels(UIContext* ui_context)
         if (ImGui::Button(entry.network->m_model_name.c_str()))
         {
             // ... show the details of the model in a popup
-            ImGui::OpenPopup((entry.network->m_model_name + "Details").c_str());
+            ImGui::OpenPopup((entry.network->m_model_name + " Details").c_str());
         }
 
         ImGui::SameLine();
@@ -415,8 +418,10 @@ void ShowAvalModels(UIContext* ui_context)
             ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy_testdata);
         }
 
+        ImGui::NewLine();
+
         // popup for model details
-        if (ImGui::BeginPopupModal((entry.network->m_model_name + "Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        if (ImGui::BeginPopupModal((entry.network->m_model_name + " Details").c_str(), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             // Non Graphical things
             ui_context->selected_model = &entry;
@@ -425,7 +430,7 @@ void ShowAvalModels(UIContext* ui_context)
             ImGui::Text("Model Name: %s", entry.network->m_model_name.c_str());
             ImGui::SameLine();
             // edit button on same line
-            // ImGui::SetCursorPosX(-1);
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 100);
             if (ImGui::Button("Edit"))
             {
                 // Open Edit Model Details popup
@@ -433,20 +438,22 @@ void ShowAvalModels(UIContext* ui_context)
                 ui_context->open_popup.to_open = true;
                 ImGui::CloseCurrentPopup();
             }
-            ImGui::NewLine();
-            // show layers size
-            ImGui::Text("Layers: ");
             ImGui::SameLine();
-            for (const size_t &layer : entry.network->MNN_Layers_size)
-            {
-                ImGui::Text("%zu,", layer);
-                ImGui::SameLine();
-            }
+            if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+            ImGui::Separator();
             ImGui::NewLine();
-            ImGui::Text("Accuracy: %.2f%%", entry.network->m_accuracy);
-            ImGui::Text("Learning Rate: %.6f", entry.network->m_learning_rate);
-            ImGui::Text("Batch Size: %zu", entry.network->m_batch_size);
-            ImGui::Text("Total Time Trained: %.2f", entry.network->m_total_training_time);
+            
+            PrintLayers(ui_context);
+            // ImGui::NewLine();
+            ImGui::Text("Learning Rate: %.5f", ui_context->selected_model->network->m_learning_rate);
+            ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
+            ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
+            ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
+            // show total time trained in hr:min:sec format
+            float total_time = ui_context->selected_model->network->m_total_training_time;
+            ImGui::Text("Total Time Trained:");
+            ImGui::SameLine();
+            PrintTime(total_time);
 
             ImGui::NewLine();
             // buttons (train, test network on data, test network by canvas)
@@ -471,6 +478,7 @@ void ShowAvalModels(UIContext* ui_context)
                 ui_context->shown_windows_enum = MannUI::TESTING_CANVAS_WINDOW;
                 ImGui::CloseCurrentPopup();
             }
+            ImGui::SameLine();
             if (ImGui::Button("Network Visualizer"))
             { 
                // Open Network Visualizer confirmation popup
@@ -478,11 +486,7 @@ void ShowAvalModels(UIContext* ui_context)
                 ui_context->open_popup.to_open = true;
                 ImGui::CloseCurrentPopup();
             }
-            ImGui::SameLine();
-            if (ImGui::Button("Close"))
-            {
-                ImGui::CloseCurrentPopup();
-            }
+
             ImGui::EndPopup();
         }
 
@@ -655,21 +659,33 @@ void NetworkConfigUI(NetworkConfiguration* network_configuration)
 void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
 {
     ImGui::Text("Details Panel");
+    // if(!is_training) 
+    // {
+    if (is_training) ImGui::BeginDisabled();
+
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 50);
+    if (ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
+    // }
+    if (is_training) ImGui::EndDisabled();
     ImGui::Separator();
+    ImGui::NewLine();
     if (ui_context->selected_model)
     {
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_DefaultOpen;
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
-            ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
-            ImGui::Text("Layers: ");
             ImGui::SameLine();
-            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 50);
+            if (ImGui::Button("Edit"))
             {
-                ImGui::Text("%zu,", layer);
-                ImGui::SameLine();
+                // Open Edit Model Details popup
+                ui_context->open_popup.name = "Edit Model Details";
+                ui_context->open_popup.to_open = true;
+                ImGui::CloseCurrentPopup();
             }
-            ImGui::NewLine();
+            ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
+            PrintLayers(ui_context);
             ImGui::Text("Learning Rate: %.6f", ui_context->selected_model->network->m_learning_rate);
             ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
 
@@ -687,15 +703,14 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
             // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
 
             // show total time trained in hr:min:sec format
-            float total_time = ui_context->selected_model->network->m_total_training_time;
-            int hours = static_cast<int>(total_time) / 3600;
-            int minutes = (static_cast<int>(total_time) % 3600) / 60;
-            float seconds = total_time - (hours * 3600) - (minutes * 60);
-            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+            ImGui::Text("Total Time Trained:");
+            ImGui::SameLine();
+            PrintTime(ui_context->selected_model->network->m_total_training_time);
             ImGui::Text("Average Time per Batch: %.4f seconds", ui_context->selected_model->network->m_averageTimePerBatch);
             ImGui::TreePop();
         }
 
+        ImGui::NewLine();
         ImGui::Separator();
         ImGui::NewLine();
 
@@ -703,58 +718,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
         if (!is_training) {
             if (ImGui::Button("Start Training"))
             {
-                if(training_thread.joinable())
-                    training_thread.join();
-
-                if(testing_thread.joinable())
-                    testing_thread.join();
-
-                // Start training logic
-                MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->network->m_model_name << std::endl;
-                
-                
-                training_thread = std::thread([ui_context, &is_training]() {
-                    // Access selected_model via ui_context
-                    if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
-                        ui_context->selected_model->network->trainNetwork(1000, &mnist->mnist_trainingData, &is_training);
-                    } else {
-                        // Handle error: e.g., log to outputText if available
-                        if (ui_context && ui_context->outputText) {
-                            ui_context->outputText << "Error: Invalid ui_context or selected_model for training." << std::endl;
-                            is_training = false;
-                        }
-                    }
-                });
-
-                is_training = true;
-
-                testing_thread = std::thread([ui_context, &is_training]() {
-                    // This thread is used to predict accuracy while training for better UI experience
-                    while (is_training)
-                    {
-                        if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
-                            float accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_trainingData);
-                            ui_context->selected_model->network->m_accuracy = accuracy;
-                            // Update accuracy history for UI graph
-                            ui_context->selected_model->network->m_accuracy_history.push_back(ui_context->selected_model->network->m_accuracy);
-
-                            ui_context->selected_model->network->m_average_cost_history.push_back(ui_context->selected_model->network->m_average_cost);
-
-
-                            accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_testData);
-                            ui_context->selected_model->network->m_accuracy_testdata = accuracy;
-                            // Update accuracy history for UI graph
-                            ui_context->selected_model->network->m_accuracy_testdata_history.push_back(ui_context->selected_model->network->m_accuracy_testdata);
-
-                            ui_context->selected_model->network->m_average_cost_testdata_history.push_back(ui_context->selected_model->network->m_average_cost);
-
-                            ui_context->selected_model->network->saveHistoryData();
-
-                            MannLogger::info(ui_context->outputText) << "Graph Data Saved" << std::endl;
-                        }
-                    }
-                    
-                });
+                CreateTrainingThreads(ui_context, is_training, training_thread, testing_thread);
             }
         }
         else {
@@ -767,16 +731,66 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
 
                 MannLogger::info(ui_context->outputText) << "Training stopped for model: " << ui_context->selected_model->network->m_model_name << std::endl;
             }
-
-            // Here you can add a progress bar or other indicators
         }
     }
     else
         ImGui::Text("No Model Selected");
+}
 
-    if(!is_training) {
-    if (ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
-    }
+void CreateTrainingThreads(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
+{
+    if(training_thread.joinable())
+        training_thread.join();
+
+    if(testing_thread.joinable())
+        testing_thread.join();
+
+    // Start training logic
+    MannLogger::info(ui_context->outputText) << "Starting training for model: " << ui_context->selected_model->network->m_model_name << std::endl;
+
+
+    training_thread = std::thread([ui_context, &is_training]() {
+        // Access selected_model via ui_context
+        if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
+            ui_context->selected_model->network->trainNetwork(1000, &mnist->mnist_trainingData, &is_training);
+        } else {
+            // Handle error: e.g., log to outputText if available
+            if (ui_context && ui_context->outputText) {
+                ui_context->outputText << "Error: Invalid ui_context or selected_model for training." << std::endl;
+                is_training = false;
+            }
+        }
+    });
+
+    is_training = true;
+
+    testing_thread = std::thread([ui_context, &is_training]() {
+        // This thread is used to predict accuracy while training for better UI experience
+        while (is_training)
+        {
+            if (ui_context && ui_context->selected_model && ui_context->selected_model->network) {
+                float accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_trainingData);
+                ui_context->selected_model->network->m_accuracy = accuracy;
+                // Update accuracy history for UI graph
+                ui_context->selected_model->network->m_accuracy_history.push_back(ui_context->selected_model->network->m_accuracy);
+
+                ui_context->selected_model->network->m_average_cost_history.push_back(ui_context->selected_model->network->m_average_cost);
+
+
+                accuracy = ui_context->selected_model->network->testNetwork(&mnist->mnist_testData);
+                ui_context->selected_model->network->m_accuracy_testdata = accuracy;
+                // Update accuracy history for UI graph
+                ui_context->selected_model->network->m_accuracy_testdata_history.push_back(ui_context->selected_model->network->m_accuracy_testdata);
+
+                ui_context->selected_model->network->m_average_cost_testdata_history.push_back(ui_context->selected_model->network->m_average_cost);
+
+                ui_context->selected_model->network->saveHistoryData();
+
+                MannLogger::info(ui_context->outputText) << "Graph Data Saved" << std::endl;
+            }
+        }
+        
+    });
 }
 
 void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
@@ -852,7 +866,11 @@ void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &tra
 void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int &selected_dataset, int &image_index)
 {
     ImGui::Text("Details Panel");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 50);
+    if (ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
     ImGui::Separator();
+    ImGui::NewLine();
 
     if (ui_context->selected_model)
     {
@@ -860,22 +878,13 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
             ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
-            ImGui::Text("Layers: ");
-            ImGui::SameLine();
-            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
-            {
-                ImGui::Text("%zu,", layer);
-                ImGui::SameLine();
-            }
-            ImGui::NewLine();
+            PrintLayers(ui_context);
             ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
             // show total time trained in hr:min:sec format
-            float total_time = ui_context->selected_model->network->m_total_training_time;
-            int hours = static_cast<int>(total_time) / 3600;
-            int minutes = (static_cast<int>(total_time) % 3600) / 60;
-            float seconds = total_time - (hours * 3600) - (minutes * 60);
-            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+            ImGui::Text("Total Time Trained:");
+            ImGui::SameLine();
+            PrintTime(ui_context->selected_model->network->m_total_training_time);
 
             ImGui::TreePop();
         }
@@ -936,9 +945,6 @@ void TestingWindowData_1(UIContext* ui_context, Mann::Matrix &output_layer, int 
             ImGui::TreePop();
         }
     }
-
-    ImGui::Separator();
-    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
 }
 
 void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int selected_dataset, int image_index)
@@ -1040,11 +1046,12 @@ void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int 
 
 void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>> &pixel_data, Mann::Matrix &output_layer)
 {
-    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
-    ImGui::Separator();
-
     ImGui::Text("Details Panel");
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 50);
+    if (ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
     ImGui::Separator();
+    ImGui::NewLine();
 
     if (ui_context->selected_model)
     {
@@ -1054,20 +1061,13 @@ void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>
             ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
             ImGui::Text("Layers: ");
             ImGui::SameLine();
-            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
-            {
-                ImGui::Text("%zu,", layer);
-                ImGui::SameLine();
-            }
-            ImGui::NewLine();
+            PrintLayers(ui_context);
             ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
             // show total time trained in hr:min:sec format
-            float total_time = ui_context->selected_model->network->m_total_training_time;
-            int hours = static_cast<int>(total_time) / 3600;
-            int minutes = (static_cast<int>(total_time) % 3600) / 60;
-            float seconds = total_time - (hours * 3600) - (minutes * 60);
-            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+            ImGui::Text("Total Time Trained:");
+            ImGui::SameLine();
+            PrintTime(ui_context->selected_model->network->m_total_training_time);
 
             ImGui::TreePop();
         }
@@ -1222,8 +1222,11 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
 void NetworkVisualizationWindow_1(UIContext* ui_context)
 {
     ImGui::Text("Details Panel");
-    if(ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW; 
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 50);
+    if (ImGui::Button("Close")) ui_context->shown_windows_enum = MannUI::MODELS_WINDOW;
     ImGui::Separator();
+    ImGui::NewLine();
 
     if (ui_context->selected_model)
     {
@@ -1231,22 +1234,13 @@ void NetworkVisualizationWindow_1(UIContext* ui_context)
         if (ImGui::TreeNodeEx("Model Details", node_flags))
         {
             ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
-            ImGui::Text("Layers: ");
-            ImGui::SameLine();
-            for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
-            {
-                ImGui::Text("%zu,", layer);
-                ImGui::SameLine();
-            }
-            ImGui::NewLine();
+            PrintLayers(ui_context);
             ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
             // show total time trained in hr:min:sec format
-            float total_time = ui_context->selected_model->network->m_total_training_time;
-            int hours = static_cast<int>(total_time) / 3600;
-            int minutes = (static_cast<int>(total_time) % 3600) / 60;
-            float seconds = total_time - (hours * 3600) - (minutes * 60);
-            ImGui::Text("Total Time Trained: %02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+            ImGui::Text("Total Time Trained:");
+            ImGui::SameLine();
+            PrintTime(ui_context->selected_model->network->m_total_training_time);
 
             ImGui::TreePop();
         }
@@ -1434,7 +1428,30 @@ void NetworkVisualizationWindow_2(UIContext* ui_context)
     }
 }
 
-void PopupsContainer(UIContext* ui_context)
+void PrintLayers(UIContext* ui_context)
+{
+    ImGui::Text("Layers:");
+    ImGui::SameLine();
+    for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+    {
+        ImGui::Text("%zu", layer);
+        if( layer != ui_context->selected_model->network->MNN_Layers_size.back() )
+        {
+            ImGui::SameLine();
+            ImGui::Text("->");
+            ImGui::SameLine();
+        }
+    }
+}
+
+void PrintTime(float total_time) {
+    int hours = static_cast<int>(total_time) / 3600;
+    int minutes = (static_cast<int>(total_time) % 3600) / 60;
+    float seconds = total_time - (hours * 3600) - (minutes * 60);
+    ImGui::Text("%02d:%02d:%05.2f (hh:mm:ss)", hours, minutes, seconds);
+}
+
+void PopupsContainer(UIContext* ui_context, bool &is_training, std::thread &training_thread, std::thread &testing_thread)
 {
     
     if(ImGui::BeginPopupModal("Edit Model Details", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -1456,10 +1473,30 @@ void PopupsContainer(UIContext* ui_context)
         ImGui::NewLine();
         if (ImGui::Button("Save Changes"))
         {
+            bool was_training = is_training;
+            if(is_training)
+            {
+                //stop training before applying changes
+                is_training = false;
+                if(training_thread.joinable())
+                    training_thread.join();
+                if(testing_thread.joinable())
+                    testing_thread.join();
+            }
+
             // Apply changes to the selected model
             ui_context->selected_model->network->m_model_name = _model_name;
             ui_context->selected_model->network->m_learning_rate = _learning_rate;
             ui_context->selected_model->network->m_batch_size = _batch_size;
+
+            if(was_training)
+            {
+                //restart training if it was stopped
+                is_training = true;
+                CreateTrainingThreads(ui_context, is_training, training_thread, testing_thread);
+
+                // click the start training button
+            }
 
             ui_context->selected_model->network->saveNetwork();
 

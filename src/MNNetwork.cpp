@@ -451,8 +451,7 @@ void MNNetwork::loadNetwork(const std::string &model_id)
     for (size_t i = 0; i < MNN_Layers_size.size() - 1; ++i) {   
         Mann::Matrix weight(MNN_Layers_size[i + 1], MNN_Layers_size[i]);
         for (size_t j = 0; j < MNN_Layers_size[i + 1]; ++j) {
-            for (size_t k = 0; k < MNN_Layers_size[i]; ++k) {
-                std::cerr << "Loading network: " << std::endl; 
+            for (size_t k = 0; k < MNN_Layers_size[i]; ++k) { 
                 file >> weight[j][k];
             }
         }
