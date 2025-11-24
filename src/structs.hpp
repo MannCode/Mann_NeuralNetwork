@@ -4,6 +4,7 @@
 
 struct NetworkConfiguration
 {
+  std::string model_name;
   std::vector<size_t> &hidden_layers;
   float &learning_rate;
   size_t &batch_size;

@@ -6,13 +6,13 @@
  * @brief Constructs a neural network by loading from a file.
  * @param filename The name of the file containing the network configuration and weights.
  */
-MNNetwork::MNNetwork(std::string filename)
-        : m_filename(filename)
+MNNetwork::MNNetwork(std::string model_id)
+        : m_model_id(model_id)
 {
     m_accuracy = 0.0f;
     m_total_training_time = 0.0f;
 
-    loadNetwork(m_filename);
+    loadNetwork(m_model_id);
 }
 
 /**
@@ -23,16 +23,16 @@ MNNetwork::MNNetwork(std::string filename)
  * @param batch_size The size of each training batch.
 
  */
-MNNetwork::MNNetwork(std::string filename, NetworkConfiguration* network_configuration)
-                    : m_learning_rate(network_configuration->learning_rate), m_batch_size(network_configuration->batch_size), m_filename(filename)
+MNNetwork::MNNetwork(std::string m_model_id, NetworkConfiguration* network_configuration)
+                    : m_learning_rate(network_configuration->learning_rate), m_batch_size(network_configuration->batch_size), m_model_id(m_model_id), m_model_name(network_configuration->model_name)
 {
     m_current_epoch = 1;
     m_total_training_time = 0.0f;
     NetworkInitialization* network_initalization = new NetworkInitialization{MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias};
     NetworkArchitecture* network_arch = new NetworkArchitecture{network_initalization, network_configuration->hidden_layers};
 
-    std::ifstream file("../models/" + m_filename);
-    file.good() ?  loadNetwork(m_filename)
+    std::ifstream file("../models/" + m_model_id + ".mms");
+    file.good() ?  loadNetwork(m_model_id)
     : CreateNetwork(network_arch);
 };
 
@@ -375,11 +375,13 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
  */
 void MNNetwork::saveNetwork()
 {
-    std::ofstream file("../models/" + m_filename);
+    std::ofstream file("../models/" + m_model_id + ".mms");
     if (!file.is_open()) {
-        std::cerr << "Error opening file for saving network: " << m_filename << std::endl;
+        std::cerr << "Error opening file for saving network: " << m_model_id << std::endl;
         return;
     }
+    // Save Model Name
+    file << m_model_name << "\n";
     // Save layers_size
     for (size_t i = 0; i < MNN_Layers_size.size(); ++i) {
         file << MNN_Layers_size[i] << (i + 1 < MNN_Layers_size.size() ? " " : "\n");
@@ -406,19 +408,22 @@ void MNNetwork::saveNetwork()
 
 /**
  * @brief Loads the neural network configuration and weights from a file.
- * @param filename The file containing the network configuration.
+ * @param model_id The identifier of the model containing the network configuration.
  */
-void MNNetwork::loadNetwork(const std::string &filename)
+void MNNetwork::loadNetwork(const std::string &model_id)
 {
     size_t layer_size;
-    std::ifstream file(("../models/" + filename));
+    std::ifstream file(("../models/" + model_id + ".mms"));
 
     if (!file.is_open()) {
-        std::cerr << "Error opening file for loading network: " << filename << std::endl;
+        std::cerr << "Error opening file for loading network: " << model_id << std::endl;
         return;
     }
 
-    // get first line (layers size)
+    // get first line (Model name)
+    std::getline(file, m_model_name);
+
+    // get second line (layers size)
     std::string line;
     std::getline(file, line);
     std::istringstream iss(line);
@@ -427,33 +432,32 @@ void MNNetwork::loadNetwork(const std::string &filename)
     }
 
 
-    // Get second line (current epoch)
+    // Get third line (current epoch)
     file >> m_current_epoch;
 
-    // Get third line (learning rate)
+    // Get fourth line (learning rate)
     file >> m_learning_rate;
 
-    // Get fourth line (batch size)
+    // Get fifth line (batch size)
     file >> m_batch_size;
 
-    // Get fifth line (accuracy)
+    // Get sixth line (accuracy)
     file >> m_accuracy;
 
-
-
-    // Get fifth line (total training time)
+    // Get seventh line (total training time)
     file >> m_total_training_time;
 
     // Load weights
-    for (size_t i = 0; i < MNN_Layers_size.size() - 1; ++i) {
+    for (size_t i = 0; i < MNN_Layers_size.size() - 1; ++i) {   
         Mann::Matrix weight(MNN_Layers_size[i + 1], MNN_Layers_size[i]);
         for (size_t j = 0; j < MNN_Layers_size[i + 1]; ++j) {
-            for (size_t k = 0; k < MNN_Layers_size[i]; ++k) {
+            for (size_t k = 0; k < MNN_Layers_size[i]; ++k) { 
                 file >> weight[j][k];
             }
         }
         MNN_Weights.push_back(weight);
     }
+
     // Load biases
     for (size_t i = 0; i < MNN_Layers_size.size() - 1; ++i) {
         Mann::Matrix bias(MNN_Layers_size[i + 1], 1);
@@ -485,7 +489,8 @@ void MNNetwork::loadNetwork(const std::string &filename)
  */
 void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
 {
-    std::string path = "../models/" + m_filename;
+
+    std::string path = "../models/" + m_model_id + ".mms";
     std::ofstream outfile(path); // mandeep model storage
 
     if (!outfile)
@@ -516,12 +521,12 @@ void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
  * @brief Saves image and label data to a file in a formatted manner.
  * @param image_data A vector containing the image data.
  * @param label_data A vector containing the corresponding label data.
- * @param filename The file to save the image and label data.
+ * @param model_id The identifier of the model to save the image and label data.
  */
 void MNNetwork::saveImageDataToFile(Mnist::MnistData* image_data,
-                                   const std::string& filename)
+                                   const std::string& model_id)
 {
-    std::ofstream file(filename);
+    std::ofstream file("../models/" + model_id + ".mms");
     if (file.is_open())
     {
         for (int i = 0; i < 28; i++)
@@ -575,7 +580,7 @@ void MNNetwork::printLables(const Mann::Matrix &matrix)
 
 void MNNetwork::saveHistoryData()
 {
-    std::string Logfile = "Log_" + m_filename.substr(0, m_filename.size() - 1) + "l";
+    std::string Logfile = "Log_" + m_model_id + ".mml";
     std::ofstream file("../models/modelsLogData/" + Logfile);
     if (!file.is_open()) {
         std::cerr << "Error opening file for saving network: " << Logfile << std::endl;
@@ -606,7 +611,7 @@ void MNNetwork::saveHistoryData()
 void MNNetwork::loadHistoryData()
 {
     float accuracy_value;
-    std::string Logfile = "Log_" + m_filename.substr(0, m_filename.size() - 1) + "l";
+    std::string Logfile = "Log_" + m_model_id + ".mml";
     std::ifstream file(("../models/modelsLogData/" + Logfile));
 
     if (!file.is_open()) {
