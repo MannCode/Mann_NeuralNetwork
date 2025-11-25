@@ -4,6 +4,7 @@
 
 #include "structs.hpp"
 #include "mnist.h"
+#include "mannlogger.hpp"
 
 #include "GLFW/glfw3.h"
 

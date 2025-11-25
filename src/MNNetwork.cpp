@@ -422,7 +422,7 @@ void MNNetwork::saveNetwork()
 void MNNetwork::loadNetwork(const std::string &model_id)
 {
     int layer_size;
-    std::ifstream file(("../models/" + model_id + ".mms"));
+    std::ifstream file(getModels(model_id));
 
     if (!file.is_open()) {
         std::cerr << "Error opening file for loading network: " << model_id << std::endl;
