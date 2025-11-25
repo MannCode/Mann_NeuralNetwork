@@ -4,7 +4,10 @@
 
 #include "structs.hpp"
 #include "mnist.h"
+#include "mannlogger.hpp"
+
 #include "GLFW/glfw3.h"
+
 #include <queue>
 
 /**
@@ -48,6 +51,25 @@ public:
      * Cleans up resources used by the neural network.
      */
     ~MNNetwork();
+
+    inline std::string getRoot()
+    {
+        #ifdef _WIN32
+            return "../../";
+        #else
+            return "../";
+        #endif
+    }
+
+    inline std::string getModels(std::string _id)
+    {
+        return getRoot() + "models/" + _id + ".mms";
+    }
+
+    inline std::string getLogModelFiles(std::string LogFile)
+    {
+        return getRoot() + "models/modelsLogData/" + LogFile;
+    }
 
     /**
      * @brief Trains the neural network using the provided dataset.

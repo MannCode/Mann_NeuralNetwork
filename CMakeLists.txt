@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(Mann_NeuralNetwork VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address")
+# set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-sanitize=address")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=address")
+
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -76,31 +79,18 @@ add_executable(NN
     ${IMPLOT_SOURCES}
 )
 
-# Link libraries
-target_link_libraries(NN PRIVATE OpenGL::GL m)
-
 if(WIN32 AND NOT glfw3_FOUND)
     # Link to the FetchContent glfw target
-    target_link_libraries(NN PRIVATE glfw)
-else()
-    # Link to system glfw3
-    target_link_libraries(NN PRIVATE glfw)
+    target_link_libraries(NN PRIVATE glfw opengl32 dxgi pdh)
 endif()
 
 # macOS Metal support
 if(APPLE)
-    target_link_libraries(NN PRIVATE
+    target_link_libraries(NN PRIVATE OpenGL::GL "glfw" 
         "-framework Metal"
         "-framework IOKit"
         "-framework CoreFoundation"
     )
-endif()
-
-# Windows NVML
-if(WIN32)
-    set(NVML_PATH "C:/Program Files/NVIDIA Corporation/NVSMI")
-    target_include_directories(NN PRIVATE "${NVML_PATH}")
-    target_link_libraries(NN PRIVATE "${NVML_PATH}/nvml.lib")
 endif()
 
 # Linux NVML
@@ -112,4 +102,3 @@ if(UNIX AND NOT APPLE)
         message(WARNING "NVML not found. GPU monitoring disabled.")
     endif()
 endif()
-

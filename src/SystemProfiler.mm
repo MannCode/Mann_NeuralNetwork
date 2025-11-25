@@ -6,10 +6,11 @@
 
 #ifdef _WIN32
     #include <windows.h>
+    #include <sysinfoapi.h>
     #include <pdh.h>
     #include <pdhmsg.h>
     #include <psapi.h>
-    #include <nvml.h>
+    #include <dxgi1_6.h>
 #elif __APPLE__
     #include <sys/sysctl.h>
     #include <mach/mach.h>
@@ -184,8 +185,9 @@ float SystemProfiler::getCPUUsage(int)
 float SystemProfiler::getRAMUsage(int)
 {
     #ifdef _WIN32
-        MEMORYSTATUSX  mem = { sizeof(mem); }
-        GlobalMemoryStatusX(&mem);
+        MEMORYSTATUSEX  mem;
+        mem.dwLength = sizeof(MEMORYSTATUSEX);
+        GlobalMemoryStatusEx(&mem); 
 
         return (float)(mem.ullTotalPhys - mem.ullAvailPhys) / mem.ullTotalPhys * 100.0f;
     #elif __APPLE__
@@ -220,23 +222,72 @@ float SystemProfiler::getRAMUsage(int)
     #endif
 }
 
-int SystemProfiler::detectGpuCount()
+int SystemProfiler::detectDXGIGpuCount()
 {
+#ifdef _WIN32
+    IDXGIFactory1* factory = nullptr;
+    if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory)))
+        return 0;
+
+    UINT index = 0;
+    IDXGIAdapter1* adapter = nullptr;
+    int count = 0;
+
+    while (factory->EnumAdapters1(index, &adapter) != DXGI_ERROR_NOT_FOUND)
+    {
+        DXGI_ADAPTER_DESC1 desc;
+        adapter->GetDesc1(&desc);
+
+        if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
+            count++;
+
+        adapter->Release();
+        index++;
+    }
+
+    factory->Release();
+    return count;
+#else
+    return 2;
+#endif
+}
+
+int SystemProfiler::detectGpuCount()
+{   
     #ifdef _WIN32
+        return 0;
     #elif __APPLE__
         NSArray* devs = MTLCopyAllDevices();
         return (int)[devs count];
     #else   // Linux
         nvmlInit(); 
         unsigned int count = 0;
-        nvmlDeviesGetCount(&count);
+        nvmlDeviceGetCount(&count);
         return (int)count;
     #endif
 }
 
 float SystemProfiler::getGPUUsage(int gpuIndex)
 {
-    #ifdef __APPLE__
+    #ifdef _WIN32
+        static PDH_HQUERY query = nullptr;
+        static PDH_HCOUNTER counter;
+
+        if (!query)
+        {
+            PdhOpenQuery(NULL, NULL, &query);
+            PdhAddCounterW(query, L"\\GPU Engine(*)\\Utilization Percentage", 0, &counter);
+            PdhCollectQueryData(query);
+            Sleep(100);
+        }
+
+        PdhCollectQueryData(query);
+
+        PDH_FMT_COUNTERVALUE value;
+        PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &value);
+
+        return (float)value.doubleValue;
+    #elif __APPLE__
         @autoreleasepool {
             NSArray* devs = MTLCopyAllDevices();
             if (gpuIndex >= [devs count]) return 0.0f;
@@ -249,7 +300,7 @@ float SystemProfiler::getGPUUsage(int gpuIndex)
 
             return (float)used / total * 100.0f;
         }
-    #else   // Linux | Windows
+    #else   // Linux
         nvmlDevice_t dev;
 
         if (nvmlDeviceGetHandleByIndex(gpuIndex, &dev) != NVML_SUCCESS)

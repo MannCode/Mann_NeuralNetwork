@@ -31,7 +31,7 @@ MNNetwork::MNNetwork(std::string m_model_id, NetworkConfiguration* network_confi
     NetworkInitialization* network_initalization = new NetworkInitialization{MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias};
     NetworkArchitecture* network_arch = new NetworkArchitecture{network_initalization, network_configuration->hidden_layers};
 
-    std::ifstream file("../models/" + m_model_id + ".mms");
+    std::ifstream file(getModels(m_model_id));
     file.good() ?  loadNetwork(m_model_id)
     : CreateNetwork(network_arch);
 };
@@ -176,6 +176,10 @@ Mann::Matrix MNNetwork::predictSingleImage(std::vector<double> &image_data)
 float MNNetwork::testNetwork(Mnist::MnistData* image_data)
 {
 
+    if (MNN_Layers_size.empty()) {
+        std::cerr << "ERROR: MNN_Layers_size is empty" << std::endl;
+        std::abort();
+    }
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
@@ -380,7 +384,7 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
  */
 void MNNetwork::saveNetwork()
 {
-    std::ofstream file("../models/" + m_model_id + ".mms");
+    std::ofstream file(getModels(m_model_id));
     if (!file.is_open()) {
         std::cerr << "Error opening file for saving network: " << m_model_id << std::endl;
         return;
@@ -418,7 +422,7 @@ void MNNetwork::saveNetwork()
 void MNNetwork::loadNetwork(const std::string &model_id)
 {
     int layer_size;
-    std::ifstream file(("../models/" + model_id + ".mms"));
+    std::ifstream file(getModels(model_id));
 
     if (!file.is_open()) {
         std::cerr << "Error opening file for loading network: " << model_id << std::endl;
@@ -495,7 +499,7 @@ void MNNetwork::loadNetwork(const std::string &model_id)
 void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
 {
 
-    std::string path = "../models/" + m_model_id + ".mms";
+    std::string path = getModels(m_model_id);
     std::ofstream outfile(path); // mandeep model storage
 
     if (!outfile)
@@ -586,7 +590,7 @@ void MNNetwork::printLables(const Mann::Matrix &matrix)
 void MNNetwork::saveHistoryData()
 {
     std::string Logfile = "Log_" + m_model_id + ".mml";
-    std::ofstream file("../models/modelsLogData/" + Logfile);
+    std::ofstream file(getLogModelFiles(Logfile));
     if (!file.is_open()) {
         std::cerr << "Error opening file for saving network: " << Logfile << std::endl;
         return;
@@ -617,7 +621,7 @@ void MNNetwork::loadHistoryData()
 {
     float accuracy_value;
     std::string Logfile = "Log_" + m_model_id + ".mml";
-    std::ifstream file(("../models/modelsLogData/" + Logfile));
+    std::ifstream file((getLogModelFiles(Logfile)));
 
     if (!file.is_open()) {
         std::cerr << "Error opening file for loading network: " << Logfile << std::endl;
