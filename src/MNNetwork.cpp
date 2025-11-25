@@ -176,6 +176,10 @@ Mann::Matrix MNNetwork::predictSingleImage(std::vector<double> &image_data)
 float MNNetwork::testNetwork(Mnist::MnistData* image_data)
 {
 
+    if (MNN_Layers_size.empty()) {
+        std::cerr << "ERROR: MNN_Layers_size is empty" << std::endl;
+        std::abort();
+    }
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
     Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size()-1], 1);
     std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;

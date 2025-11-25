@@ -32,7 +32,7 @@ inline float lerp(float a, float b, float t) {
 
 inline ImU32 GetFadingRed(float t)
 {
-    float fade = 0.08f * (1.0f + sinf(t * M_PI));
+    float fade = 0.08f * (1.0f + sinf(t * 3.14159265358979323846));
 
     float (*lerp_f)(float, float, float) = [](float a, float b, float t) {
         return a + (b - a) * t;
@@ -233,6 +233,15 @@ void MannUI::Render(std::stringstream &outputText)
 
     PopupsContainer(ui_context, is_training, training_thread, testing_thread);
     
+    // Shared Global Static Variables
+    static int selected_dataset = 0;
+    static int image_index = 0;
+    static Mann::Matrix output_layer = Mann::Matrix(10, 1);
+
+    static std::vector<std::vector<float>> pixel_data = std::vector<std::vector<float>>(28, std::vector<float>(28, 0.0f)); // 28x28 canvas
+    static Mann::Matrix output_layer_canvas = Mann::Matrix(10, 1);
+    static int response_index = 0;
+
     // Top Windows
     switch (shown_windows_enum)
     {
@@ -255,12 +264,6 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::End();
         break;
     case MannUI::TESTING_DATA_WINDOW:
-        // Shared Global Static Variables
-        static int selected_dataset = 0;
-        static int image_index = 0;
-
-        static Mann::Matrix output_layer = Mann::Matrix(10, 1);
-    
         ImGui::Begin("Data Testing Details");
         TestingWindowData_1(ui_context, output_layer, selected_dataset, image_index);
         ImGui::End();
@@ -269,10 +272,6 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::End();
         break;
     case MannUI::TESTING_CANVAS_WINDOW:
-        static std::vector<std::vector<float>> pixel_data = std::vector<std::vector<float>>(28, std::vector<float>(28, 0.0f)); // 28x28 canvas
-        static Mann::Matrix output_layer_canvas = Mann::Matrix(10, 1);
-        static int response_index = 0;
-
         ImGui::Begin("Canvas Testing Details");
         TestingWindowCanvas_1(ui_context, pixel_data, output_layer_canvas);
         ImGui::End();
@@ -281,7 +280,6 @@ void MannUI::Render(std::stringstream &outputText)
         ImGui::End();
         break;
     case MannUI::NETWORK_VISUALIZER_WINDOW:
-
         ImGui::Begin("Network Visualizer Details");
         NetworkVisualizationWindow_1(ui_context);
         ImGui::End();

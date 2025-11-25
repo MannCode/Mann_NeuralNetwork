@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 project(Mann_NeuralNetwork VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-sanitize=address")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=address")
+# set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-sanitize=address")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=address")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -105,4 +105,3 @@ if(UNIX AND NOT APPLE)
         message(WARNING "NVML not found. GPU monitoring disabled.")
     endif()
 endif()
-

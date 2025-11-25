@@ -41,6 +41,7 @@ private:
     static float getRAMUsage(int index);
     static float getGPUUsage(int index);
 
+    static int detectDXGIGpuCount();
     static int detectGpuCount();
 };
 
