@@ -73,7 +73,6 @@ MannUI::MannUI(GLFWwindow *window, Mnist *mnist)
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
     ImGui::StyleColorsDark();
-    // SetModernDarkTheme();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 150");
@@ -300,12 +299,12 @@ void MannUI::Render(std::stringstream &outputText)
 }
 
 /**
- * @brief Parses a CSV string into a std::vector<size_t> with exactly three values.
+ * @brief Parses a CSV string into a std::vector<int> with exactly three values.
  * @param input The input CSV string.
  * @param output The vector to store parsed integers.
  * @return True if exactly three valid non-negative integers were parsed, false otherwise.
  */
-bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &output)
+bool ParseCSVToHiddenLayers(const std::string &input, std::vector<int> &output)
 {
     output.clear();
     std::stringstream ss(input);
@@ -318,7 +317,7 @@ bool ParseCSVToHiddenLayers(const std::string &input, std::vector<size_t> &outpu
 
         try
         {
-            size_t value = std::stoul(token);
+            int value = std::stoul(token);
             output.push_back((value > 699) ? 699 : value);
         }
         catch (const std::exception &e)
@@ -340,10 +339,10 @@ void LogWindow(std::stringstream &outputText)
         if (line.empty())
             continue;
         // Find the second occurrence of "[" to get the log level (e.g., [DEBUG], [INFO])
-        size_t firstBracket = line.find("[");
-        size_t secondBracket = line.find("[", firstBracket + 1);
-        size_t thirdBracket = line.find("[", secondBracket + 1);
-        size_t thirdBracketEnd = line.find("]", thirdBracket + 1);
+        int firstBracket = line.find("[");
+        int secondBracket = line.find("[", firstBracket + 1);
+        int thirdBracket = line.find("[", secondBracket + 1);
+        int thirdBracketEnd = line.find("]", thirdBracket + 1);
         if (thirdBracket != std::string::npos && thirdBracketEnd != std::string::npos)
         {
             std::string levelStr = line.substr(thirdBracket + 1, thirdBracketEnd - thirdBracket - 1);
@@ -446,7 +445,7 @@ void ShowAvalModels(UIContext* ui_context)
             PrintLayers(ui_context);
             // ImGui::NewLine();
             ImGui::Text("Learning Rate: %.5f", ui_context->selected_model->network->m_learning_rate);
-            ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
+            ImGui::Text("Batch Size: %d", ui_context->selected_model->network->m_batch_size);
             ImGui::Text("Training Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy);
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
             // show total time trained in hr:min:sec format
@@ -503,9 +502,9 @@ void ShowAvalModels(UIContext* ui_context)
         ImGui::Text("Enter new model details here.");
 
         static std::string modelName = "";
-        static std::vector<size_t> hidden_layers{50, 10};
+        static std::vector<int> hidden_layers{50, 10};
         static float learning_rate = 0.01f;
-        static size_t batch_size = 32;
+        static int batch_size = 32;
 
         // Buffer for model name input
         static char modelNameBuffer[256] = "";
@@ -529,7 +528,7 @@ void ShowAvalModels(UIContext* ui_context)
                 if (modelName.empty())
                     modelName = getRandomModelName();
                 std::stringstream layersStr;
-                for (size_t i = 0; i < hidden_layers.size(); ++i)
+                for (int i = 0; i < hidden_layers.size(); ++i)
                 {
                     layersStr << hidden_layers[i];
                 }
@@ -611,7 +610,7 @@ void NetworkConfigUI(NetworkConfiguration* network_configuration)
     if (ImGui::Button("Add Layers"))
     {
         std::string input(csv_buffer);
-        std::vector<size_t> new_layers;
+        std::vector<int> new_layers;
         if (ParseCSVToHiddenLayers(input, new_layers))
         {
             network_configuration->hidden_layers.insert(network_configuration->hidden_layers.end(), new_layers.begin(), new_layers.end());
@@ -621,10 +620,10 @@ void NetworkConfigUI(NetworkConfiguration* network_configuration)
 
     // Display current hidden_layers with Remove buttons
     ImGui::Text("Current Layers:");
-    for (size_t i = 0; i < network_configuration->hidden_layers.size(); ++i)
+    for (int i = 0; i < network_configuration->hidden_layers.size(); ++i)
     {
         ImGui::PushID(i);
-        ImGui::Text("Layer %zu: %zu", i + 1, network_configuration->hidden_layers[i]);
+        ImGui::Text("Layer %d: %d", i + 1, network_configuration->hidden_layers[i]);
         ImGui::SameLine();
         if (ImGui::Button("Remove"))
         {
@@ -651,7 +650,7 @@ void NetworkConfigUI(NetworkConfiguration* network_configuration)
     if (ImGui::InputInt("Batch Size", &batch_size_int, 0, 0, ImGuiInputTextFlags_CharsNoBlank))
     {
         if (batch_size_int > 0)
-            network_configuration->batch_size = static_cast<size_t>((batch_size_int > 200) ? 200 : batch_size_int);
+            network_configuration->batch_size = static_cast<int>((batch_size_int > 200) ? 200 : batch_size_int);
     }
 }
 
@@ -687,7 +686,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
             ImGui::Text("Model Name: %s", ui_context->selected_model->network->m_model_name.c_str());
             PrintLayers(ui_context);
             ImGui::Text("Learning Rate: %.6f", ui_context->selected_model->network->m_learning_rate);
-            ImGui::Text("Batch Size: %zu", ui_context->selected_model->network->m_batch_size);
+            ImGui::Text("Batch Size: %d", ui_context->selected_model->network->m_batch_size);
 
             ImGui::TreePop();
         }
@@ -699,7 +698,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
             ImGui::Text("Epoch #: %d", ui_context->selected_model->network->m_current_epoch);
             ImGui::Text("Epoch Completion: %.2f%%", static_cast<float>(ui_context->selected_model->network->current_batch * ui_context->selected_model->network->m_batch_size) / static_cast<float>(mnist->mnist_trainingData.mnist_images_data.size()) * 100.0f);
-            ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
+            ImGui::Text("Batch #: %d/%d", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
             // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
 
             // show total time trained in hr:min:sec format
@@ -977,7 +976,7 @@ void TestingWindowData_2(UIContext* ui_context, Mann::Matrix &output_layer, int 
     Mann::Matrix Cost = (output_layer - y);
     Cost = Cost ^ Cost;
     float total_cost = 0.0f;
-    for (size_t i = 0; i < Cost.rows(); ++i)
+    for (int i = 0; i < Cost.rows(); ++i)
     {
         total_cost += Cost[i][0];
     }
@@ -1451,9 +1450,9 @@ void PrintLayers(UIContext* ui_context)
     ImGui::Text("Layers:");
     ImGui::SameLine();
     int i = 0;
-    for (const size_t &layer : ui_context->selected_model->network->MNN_Layers_size)
+    for (const int &layer : ui_context->selected_model->network->MNN_Layers_size)
     {
-        ImGui::Text("%zu", layer);
+        ImGui::Text("%d", layer);
         if( i < ui_context->selected_model->network->MNN_Layers_size.size() - 1)
         {
             ImGui::SameLine();

@@ -52,7 +52,7 @@ MNNetwork::~MNNetwork() {};
  * @param filename The file to save the trained network.
  * @param learning_rate The learning rate for weight updates during training.
  */
-void MNNetwork::trainNetwork(const size_t iterations, Mnist::MnistData* image_data, bool *is_training)
+void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData* image_data, bool *is_training)
 {
     float start_time = static_cast<float>(glfwGetTime());
 
@@ -254,7 +254,7 @@ void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes,
                            std::vector<Mann::Matrix> &weights,
                            std::vector<Mann::Matrix> &biases)
 {
-    for (size_t i = 0; i < nodes.size() - 1; ++i)
+    for (int i = 0; i < nodes.size() - 1; ++i)
     {
         weighted_sum[i] = weights[i] * nodes[i] + biases[i];
         activationFunction(nodes[i + 1], weighted_sum[i]);
@@ -268,9 +268,9 @@ void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes,
  */
 void MNNetwork::activationFunction(Mann::Matrix &matrix, const Mann::Matrix &weighted_sum)
 {
-    for (size_t i = 0; i < matrix.rows(); ++i)
+    for (int i = 0; i < matrix.rows(); ++i)
     {
-        for (size_t j = 0; j < matrix.cols(); ++j)
+        for (int j = 0; j < matrix.cols(); ++j)
         {
             matrix[i][j] = 1.0 / (1.0 + exp(-weighted_sum[i][j]));
         }
@@ -331,8 +331,8 @@ std::vector<std::vector<Mann::Matrix>> MNNetwork::backPropagation(std::vector<Ma
     std::vector<Mann::Matrix> d_weights;
     std::vector<Mann::Matrix> d_biases;
 
-    std::vector<size_t> layers_size;
-    for (size_t i = 0; i < nodes.size(); ++i) { layers_size.push_back(nodes[i].rows()); }
+    std::vector<int> layers_size;
+    for (int i = 0; i < nodes.size(); ++i) { layers_size.push_back(nodes[i].rows()); }
     NetworkInitialization* network_initialization = new NetworkInitialization{layers_size, d_nodes, d_weights, d_biases};
     initializeNetwork(network_initialization);
     d_a_weighted_sum = d_biases;
@@ -388,7 +388,7 @@ void MNNetwork::saveNetwork()
     // Save Model Name
     file << m_model_name << "\n";
     // Save layers_size
-    for (size_t i = 0; i < MNN_Layers_size.size(); ++i) {
+    for (int i = 0; i < MNN_Layers_size.size(); ++i) {
         file << MNN_Layers_size[i] << (i + 1 < MNN_Layers_size.size() ? " " : "\n");
     }
     // Save Current Epoch
@@ -417,7 +417,7 @@ void MNNetwork::saveNetwork()
  */
 void MNNetwork::loadNetwork(const std::string &model_id)
 {
-    size_t layer_size;
+    int layer_size;
     std::ifstream file(("../models/" + model_id + ".mms"));
 
     if (!file.is_open()) {
@@ -433,7 +433,7 @@ void MNNetwork::loadNetwork(const std::string &model_id)
     std::getline(file, line);
     std::istringstream iss(line);
     while (iss >> layer_size) {
-        MNN_Layers_size.push_back(static_cast<size_t>(layer_size));
+        MNN_Layers_size.push_back(static_cast<int>(layer_size));
     }
 
 
@@ -453,10 +453,10 @@ void MNNetwork::loadNetwork(const std::string &model_id)
     file >> m_total_training_time;
 
     // Load weights
-    for (size_t i = 0; i < MNN_Layers_size.size() - 1; ++i) {   
+    for (int i = 0; i < MNN_Layers_size.size() - 1; ++i) {   
         Mann::Matrix weight(MNN_Layers_size[i + 1], MNN_Layers_size[i]);
-        for (size_t j = 0; j < MNN_Layers_size[i + 1]; ++j) {
-            for (size_t k = 0; k < MNN_Layers_size[i]; ++k) { 
+        for (int j = 0; j < MNN_Layers_size[i + 1]; ++j) {
+            for (int k = 0; k < MNN_Layers_size[i]; ++k) { 
                 file >> weight[j][k];
             }
         }
@@ -464,16 +464,16 @@ void MNNetwork::loadNetwork(const std::string &model_id)
     }
 
     // Load biases
-    for (size_t i = 0; i < MNN_Layers_size.size() - 1; ++i) {
+    for (int i = 0; i < MNN_Layers_size.size() - 1; ++i) {
         Mann::Matrix bias(MNN_Layers_size[i + 1], 1);
-        for (size_t j = 0; j < MNN_Layers_size[i + 1]; ++j) {
+        for (int j = 0; j < MNN_Layers_size[i + 1]; ++j) {
             file >> bias[j][0];
         }
         MNN_Bias.push_back(bias);
     }
 
     // Initialize nodes
-    for (size_t i = 0; i < MNN_Layers_size.size(); ++i) {
+    for (int i = 0; i < MNN_Layers_size.size(); ++i) {
         MNN_Nodes.emplace_back(Mann::Matrix(MNN_Layers_size[i], 1));
     }
 
@@ -506,7 +506,7 @@ void MNNetwork::CreateNetwork(NetworkArchitecture* network_arch)
 
     // [783, hidden, 10]
     network_arch->network_initialization->layers_size.push_back(784); // input layer
-    for (size_t i = 0; i < network_arch->hidden_layers_size.size(); i++) {
+    for (int i = 0; i < network_arch->hidden_layers_size.size(); i++) {
         network_arch->network_initialization->layers_size.push_back(network_arch->hidden_layers_size[i]); // hidden layers
     }
     network_arch->network_initialization->layers_size.push_back(10);  // output layer
@@ -592,22 +592,22 @@ void MNNetwork::saveHistoryData()
         return;
     }
     // save m_accuracy_history
-    for (size_t i = 0; i < m_accuracy_history.size(); ++i) {
+    for (int i = 0; i < m_accuracy_history.size(); ++i) {
         file << m_accuracy_history[i] << " ";
     }
     file << "\n";
     // save m_accuracy_testdata_history
-    for (size_t i = 0; i < m_accuracy_testdata_history.size(); ++i) {
+    for (int i = 0; i < m_accuracy_testdata_history.size(); ++i) {
         file << m_accuracy_testdata_history[i] << " ";
     }
     file << "\n";
     // save m_average_cost_history
-    for (size_t i = 0; i < m_average_cost_history.size(); ++i) {
+    for (int i = 0; i < m_average_cost_history.size(); ++i) {
         file << m_average_cost_history[i] << " ";
     }
     file << "\n";
     // save m_average_cost_testdata_history
-    for (size_t i = 0; i < m_average_cost_testdata_history.size(); ++i) {
+    for (int i = 0; i < m_average_cost_testdata_history.size(); ++i) {
         file << m_average_cost_testdata_history[i] << " ";
     }
     file << "\n";

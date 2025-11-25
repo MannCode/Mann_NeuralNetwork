@@ -55,7 +55,7 @@ public:
      * @param images_data A vector of input image data for training.
      * @param labels_data A vector of corresponding label data for training.
      */
-    void trainNetwork(const size_t iterations, Mnist::MnistData* image_data, bool *is_training);
+    void trainNetwork(const int iterations, Mnist::MnistData* image_data, bool *is_training);
 
 
     /**
@@ -169,7 +169,7 @@ public:
     std::string m_model_id;
     std::string m_model_name;
     float m_learning_rate;
-    size_t m_batch_size;
+    int m_batch_size;
     float m_accuracy;
     float m_accuracy_testdata;
     float m_average_cost;
@@ -191,7 +191,7 @@ public:
 
 
 // private:
-    std::vector<size_t> MNN_Layers_size;      ///< Sizes of the layers in the neural network.
+    std::vector<int> MNN_Layers_size;      ///< Sizes of the layers in the neural network.
     std::vector<Mann::Matrix> MNN_Nodes;      ///< Nodes (activations) for each layer.
     std::vector<Mann::Matrix> MNN_Weights;    ///< Weights between layers.
     std::vector<Mann::Matrix> MNN_Bias;       ///< Biases for each layer.

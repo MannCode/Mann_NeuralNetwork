@@ -24,7 +24,7 @@ namespace Mann
      * @param rows The number of rows in the matrix.
      * @param cols The number of columns in the matrix.
      */
-    Matrix::Matrix(size_t rows, size_t cols) : m_rows(rows), m_cols(cols), m_data(rows, std::vector<float>(cols, 0.0f)) {}
+    Matrix::Matrix(int rows, int cols) : m_rows(rows), m_cols(cols), m_data(rows, std::vector<float>(cols, 0.0f)) {}
 
     /**
      * @brief Gets the number of rows in the matrix.
@@ -77,8 +77,8 @@ namespace Mann
             throw std::invalid_argument("Matrix dimensions do not match for addition.");
         }
 
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; i++)
@@ -105,8 +105,8 @@ namespace Mann
             throw std::invalid_argument("Matrix dimensions do not match for subtraction.");
         }
 
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; i++)
@@ -127,8 +127,8 @@ namespace Mann
      */
     Matrix Matrix::operator+(float scaler) const
     {
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; i++)
@@ -149,8 +149,8 @@ namespace Mann
      */
     Matrix Matrix::operator-(float scaler) const
     {
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; i++)
@@ -184,8 +184,8 @@ namespace Mann
             throw std::invalid_argument("Matrix dimensions do not allow multiplication.");
         }
 
-        size_t rows = m_data.size();
-        size_t cols = other.m_data[0].size();
+        int rows = m_data.size();
+        int cols = other.m_data[0].size();
         Matrix result(rows, cols);
 
         std::function<void(int, int)> multiplyTile = [&](int rowStart, int colStart)
@@ -230,8 +230,8 @@ namespace Mann
      */
     Matrix Matrix::operator*(double scalar) const
     {
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; i++)
@@ -259,14 +259,14 @@ namespace Mann
             throw std::invalid_argument("Matrix dimensions do not match for element-wise multiplication.");
         }
 
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
 
-        for (size_t i = 0; i < m_rows; ++i)
+        for (int i = 0; i < m_rows; ++i)
         {
-            for (size_t j = 0; j < m_cols; ++j)
+            for (int j = 0; j < m_cols; ++j)
             {
                 result[i][j] = m_data[i][j] * other.m_data[i][j];
             }
@@ -288,8 +288,8 @@ namespace Mann
             throw std::invalid_argument("Division by zero.");
         }
 
-        size_t rows = m_data.size();
-        size_t cols = m_data[0].size();
+        int rows = m_data.size();
+        int cols = m_data[0].size();
         Matrix result(rows, cols);
 
         for (int i = 0; i < rows; i++)
@@ -319,7 +319,7 @@ namespace Mann
 
         m_data.resize(m_rows);
 
-        size_t index = 0;
+        int index = 0;
         for (const auto& row : init)
         {
             m_data[index++] = row;
@@ -358,8 +358,8 @@ namespace Mann
         std::random_device rd;
         std::mt19937 eng(rd());
         std::uniform_real_distribution<float> distr(-1.0f, 1.0f);
-        for (size_t i = 0; i < m_rows; ++i) {
-            for (size_t j = 0; j < m_cols; ++j) {
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = distr(eng);
             }
         }
@@ -377,8 +377,8 @@ namespace Mann
         std::random_device rd;
         std::mt19937 eng(rd());
         std::uniform_real_distribution<float> distr(min, max);
-        for (size_t i = 0; i < m_rows; ++i) {
-            for (size_t j = 0; j < m_cols; ++j) {
+        for (int i = 0; i < m_rows; ++i) {
+            for (int j = 0; j < m_cols; ++j) {
                 m_data[i][j] = distr(eng);
             }
         }
@@ -391,7 +391,7 @@ namespace Mann
      */
     Matrix Matrix::nullMatrix()
     {
-        for (size_t i = 0; i < m_rows; ++i) {
+        for (int i = 0; i < m_rows; ++i) {
             std::fill(m_data[i].begin(), m_data[i].end(), 0.0f);
         }
         return *this;

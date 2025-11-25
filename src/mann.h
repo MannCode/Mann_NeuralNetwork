@@ -52,8 +52,8 @@ namespace Mann
     class Matrix
     {
     private:
-        size_t m_rows; ///< Number of rows in the matrix.
-        size_t m_cols; ///< Number of columns in the matrix.
+        int m_rows; ///< Number of rows in the matrix.
+        int m_cols; ///< Number of columns in the matrix.
         std::vector<std::vector<float>> m_data; ///< 2D vector storing matrix data.
     public:
         /**
@@ -61,7 +61,7 @@ namespace Mann
          * @param rows The number of rows in the matrix.
          * @param cols The number of columns in the matrix.
          */
-        Matrix(size_t rows, size_t cols);
+        Matrix(int rows, int cols);
         
         /**
          * @brief Gets the number of rows in the matrix.

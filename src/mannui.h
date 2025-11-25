@@ -98,7 +98,7 @@ inline std::vector<std::string> getTxtFileNamesWithoutExtension() {
 #ifdef _WIN32
 
 #else
-        size_t pos = line.find_last_of('/');
+        int pos = line.find_last_of('/');
         if (pos != std::string::npos) {
             line = line.substr(pos + 1);
         }
@@ -225,7 +225,6 @@ public:
      * @param outputText A stringstream to append output messages for display in the UI.
      */
     void Render(std::stringstream &outputText);
-    void SetModernDarkTheme();
 
 private:
     GLFWwindow* window;              ///< The GLFW window for rendering the UI.
