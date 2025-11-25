@@ -49,6 +49,24 @@ public:
      */
     ~MNNetwork();
 
+    inline std::string getModels(std::string _id)
+    {
+        #ifdef _WIN32
+            return "../../models/" + _id + ".mms";
+        #else
+            return "../models/" + _id + ".mms";
+        #endif
+    }
+
+    inline std::string getLogModelFiles(std::string LogFile)
+    {
+        #ifdef _WIN32
+            return "../../models/modelsLogData/" + LogFile;
+        #else
+            return "../models/modelsLogData/" + Logfile;
+        #endif
+    }
+
     /**
      * @brief Trains the neural network using the provided dataset.
      * @param iterations The number of training iterations.
