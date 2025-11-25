@@ -4,7 +4,9 @@
 
 #include "structs.hpp"
 #include "mnist.h"
+
 #include "GLFW/glfw3.h"
+
 #include <queue>
 
 /**
@@ -49,22 +51,23 @@ public:
      */
     ~MNNetwork();
 
-    inline std::string getModels(std::string _id)
+    inline std::string getRoot()
     {
         #ifdef _WIN32
-            return "../../models/" + _id + ".mms";
+            return "../../";
         #else
-            return "../models/" + _id + ".mms";
+            return "../";
         #endif
+    }
+
+    inline std::string getModels(std::string _id)
+    {
+        return getRoot() + "models/" + _id + ".mms";
     }
 
     inline std::string getLogModelFiles(std::string LogFile)
     {
-        #ifdef _WIN32
-            return "../../models/modelsLogData/" + LogFile;
-        #else
-            return "../models/modelsLogData/" + Logfile;
-        #endif
+        return getRoot() + "models/modelsLogData/" + LogFile;
     }
 
     /**

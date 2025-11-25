@@ -224,6 +224,7 @@ float SystemProfiler::getRAMUsage(int)
 
 int SystemProfiler::detectDXGIGpuCount()
 {
+#ifdef _WIN32
     IDXGIFactory1* factory = nullptr;
     if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory)))
         return 0;
@@ -246,6 +247,9 @@ int SystemProfiler::detectDXGIGpuCount()
 
     factory->Release();
     return count;
+#else
+    return 2;
+#endif
 }
 
 int SystemProfiler::detectGpuCount()

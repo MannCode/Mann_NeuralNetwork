@@ -82,14 +82,11 @@ add_executable(NN
 if(WIN32 AND NOT glfw3_FOUND)
     # Link to the FetchContent glfw target
     target_link_libraries(NN PRIVATE glfw opengl32 dxgi pdh)
-else()
-    # Link to system glfw3
-    target_link_libraries(NN PRIVATE glfw opengl32 dxgi pdh)
 endif()
 
 # macOS Metal support
 if(APPLE)
-    target_link_libraries(NN PRIVATE
+    target_link_libraries(NN PRIVATE OpenGL::GL "glfw" 
         "-framework Metal"
         "-framework IOKit"
         "-framework CoreFoundation"
