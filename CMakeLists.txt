@@ -21,6 +21,16 @@ file(GLOB_RECURSE SOURCES
     "src/*.mm"
 )
 list(FILTER SOURCES EXCLUDE REGEX "src/test_.*\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "src/platforms/MAC/.*")
+list(FILTER SOURCES EXCLUDE REGEX "src/platforms/WINDOWS/.*")
+
+if(APPLE)
+    file(GLOB PLATFORM_SOURCES "src/platforms/MAC/*.mm")
+endif()
+
+if(WIN32)
+    file(GLOB PLATFORM_SOURCES "src/platforms/WINDOWS/*.cpp")
+endif()
 
 set_source_files_properties(src/SystemProfiler.mm PROPERTIES
     COMPILE_FLAGS "-ObjC++"
@@ -75,6 +85,7 @@ endif()
 
 add_executable(NN
     ${SOURCES}
+    ${PLATFORM_SOURCES}
     ${IMGUI_SOURCES}
     ${IMPLOT_SOURCES}
 )
