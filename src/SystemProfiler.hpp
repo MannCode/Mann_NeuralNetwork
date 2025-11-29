@@ -37,6 +37,14 @@ private:
     void workerThread();
     void pushValue(Track& t, float v);
 
+    inline int GetDynamicColumns(float minPlotWidth = 250.0f)
+    {
+        float totalWidth = ImGui::GetContentRegionAvail().x;
+        int columns = std::max(1, (int)(totalWidth / minPlotWidth));
+        return columns;
+    }
+
+
     static float getCPUUsage(int index);
     static float getRAMUsage(int index);
     static float getGPUUsage(int index);

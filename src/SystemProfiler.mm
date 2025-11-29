@@ -1,4 +1,4 @@
-#include "SystemProfiler.h"
+#include "SystemProfiler.hpp"
 
 #include <chrono>
 #include <cstring>
@@ -86,35 +86,35 @@ void SystemProfiler::renderGraphs()
     std::lock_guard<std::mutex> lock(swapMutex);
 
     float totalWidth = ImGui::GetContentRegionAvail().x;
-    float plotSize = (totalWidth - ImGui::GetStyle().ItemSpacing.x * 2) / 3.0f;
+    float spacing = ImGui::GetStyle().ItemSpacing.x;
 
-    ImVec2 size(plotSize, plotSize);
+    int columns = GetDynamicColumns(280.0f);
+
+    float plotWidth = (totalWidth - (columns - 1) * spacing) / columns;
+    ImVec2 plotSize(plotWidth, plotWidth * 0.75f);
 
     int index = 0;
 
     for (auto& tr : tracks)
     {
-        if (ImPlot::BeginPlot(tr.name, size)) 
+        if (ImPlot::BeginPlot(tr.name, plotSize))
         {
             ImPlot::SetupAxes("Time", "Usage %");
             ImPlot::SetupAxisLimits(ImAxis_X1, 0, BUFFER_SIZE, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, tr.maxValue, ImGuiCond_Always);
 
-            ImPlot::PlotLine(
-                tr.name,
-                tr.timestamps,
-                tr.values,
-                BUFFER_SIZE
-            );
+            ImPlot::PlotLine(tr.name, tr.timestamps, tr.values, BUFFER_SIZE);
 
             ImPlot::EndPlot();
         }
 
         index++;
-        if (index % 3 != 0)
+
+        if (index % columns != 0)
             ImGui::SameLine();
     }
 }
+
 
 
 float SystemProfiler::getCPUUsage(int)

@@ -13,7 +13,7 @@
 
 #include "mannui.h"
 #include "MNNetwork.h"
-// #include "SystemProfiler.h"
+#include "SystemProfiler.hpp"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -370,8 +370,8 @@ void LogWindow(std::stringstream &outputText)
 
 void ProfilerWindow(std::stringstream &outputText)
 {
-    // SystemProfiler* profiler = new SystemProfiler();
-    // profiler->renderGraphs();
+    SystemProfiler* profiler = new SystemProfiler();
+    profiler->renderGraphs();
 }
 
 /**
