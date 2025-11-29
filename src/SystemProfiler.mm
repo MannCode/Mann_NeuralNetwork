@@ -4,6 +4,8 @@
 #include <cstring>
 #include <cmath>
 
+#include "mannlogger.hpp"
+
 #ifdef _WIN32
     #include <windows.h>
     #include <sysinfoapi.h>
@@ -16,11 +18,6 @@
     #include <mach/mach.h>
     #include <mach/mach_host.h>
     #import <Metal/Metal.h>
-#else   // Linux
-    #include <fstream>
-    #include <sstream>
-    #include <unistd.h>
-    #include <nvml.h>
 #endif
 
 SystemProfiler::SystemProfiler() : running(true)
@@ -37,11 +34,12 @@ SystemProfiler::SystemProfiler() : running(true)
     ram.fn = getRAMUsage;
     tracks.push_back(ram);
 
-    auto gpuCount = detectGpuCount();
+    std::stringstream outputText;
+
+    int gpuCount = detectGpuCount();
     for (int i = 0; i < gpuCount; i++) {
         Track gpu = {};
-        static std::string name; name = "GPU " + std::to_string(i);
-        gpu.name = name.c_str();
+        gpu.name = "GPU " + std::to_string(i);
         gpu.maxValue = 100.0f;
         gpu.fn = getGPUUsage;
         tracks.push_back(gpu);
@@ -66,7 +64,7 @@ void SystemProfiler::workerThread()
             std::chrono::seconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
 
-        for (auto& tr : tracks)
+        for (Track& tr : tracks)
             pushValue(tr, tr.fn(tr.gpuIndex));   // call CPU/GPU/RAM function
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -95,15 +93,15 @@ void SystemProfiler::renderGraphs()
 
     int index = 0;
 
-    for (auto& tr : tracks)
+    for (Track& tr : tracks)
     {
-        if (ImPlot::BeginPlot(tr.name, plotSize))
+        if (ImPlot::BeginPlot(tr.name.c_str(), plotSize))
         {
             ImPlot::SetupAxes("Time", "Usage %");
             ImPlot::SetupAxisLimits(ImAxis_X1, 0, BUFFER_SIZE, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0, tr.maxValue, ImGuiCond_Always);
 
-            ImPlot::PlotLine(tr.name, tr.timestamps, tr.values, BUFFER_SIZE);
+            ImPlot::PlotLine(tr.name.c_str(), tr.timestamps, tr.values, BUFFER_SIZE);
 
             ImPlot::EndPlot();
         }
@@ -120,77 +118,78 @@ void SystemProfiler::renderGraphs()
 float SystemProfiler::getCPUUsage(int)
 {
     #ifdef _WIN32
-        static PDH_HQUERY query;
-        static PDH_HCOUNTER counter;
-        static bool init = false;
+        static FILETIME lastSysKernel, lastSysUser;
+        static FILETIME lastProcKernel, lastProcUser;
+        static bool initialized = false;
 
-        if (!init)
+        FILETIME ftSysIdle, ftSysKernel, ftSysUser;
+        FILETIME ftProcCreation, ftProcExit, ftProcKernel, ftProcUser;
+
+
+        if (!initialized)
         {
-            PdhOpenQuery(NULL, 0, &query);
-            PdhAddCounter(query, TEXT("\\Processor(_Total)\\% Processor Time"), 0, &counter);
-            PdhCollectQueryData(query);
-            init = true;
-            return 0;
+            GetSystemTimes(&ftSysIdle, &ftSysKernel, &ftSysUser);
+            GetProcessTimes(GetCurrentProcess(),
+                            &ftProcCreation, &ftProcExit,
+                            &ftProcKernel, &ftProcUser);
+            lastSysKernel = ftSysKernel;
+            lastSysUser   = ftSysUser;
+            lastProcKernel = ftProcKernel;
+            lastProcUser   = ftProcUser;
+            initialized = true;
+            return 0.0f;
         }
 
-        PdhCollectQueryData(query);
+        GetSystemTimes(&ftSysIdle, &ftSysKernel, &ftSysUser);
+        GetProcessTimes(GetCurrentProcess(),
+                        &ftProcCreation, &ftProcExit,
+                        &ftProcKernel, &ftProcUser);
 
-        PDH_FMT_COUNTERVALUE val;
-        PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &val);
+        ULONGLONG sysKernelDiff = (*(ULONGLONG*)&ftSysKernel - *(ULONGLONG*)&lastSysKernel);
+        ULONGLONG sysUserDiff   = (*(ULONGLONG*)&ftSysUser   - *(ULONGLONG*)&lastSysUser);
 
-        return (float)val.doubleValue;
-    #elif __APPLE__
-        host_cpu_load_info_data_t cpuInfo;
-        mach_msg_type_number_t count = HOST_CPU_LOAD_INFO_COUNT;
-        host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, (host_info_t)&cpuInfo, &count);
+        ULONGLONG procKernelDiff = (*(ULONGLONG*)&ftProcKernel - *(ULONGLONG*)&lastProcKernel);
+        ULONGLONG procUserDiff   = (*(ULONGLONG*)&ftProcUser   - *(ULONGLONG*)&lastProcUser);
 
-        static uint64_t lastIdle = 0;
-        static uint64_t lastTotal = 0;
+        lastSysKernel = ftSysKernel;
+        lastSysUser = ftSysUser;
+        lastProcKernel = ftProcKernel;
+        lastProcUser = ftProcUser;
 
-        uint64_t idle = cpuInfo.cpu_ticks[CPU_STATE_IDLE];
-        uint64_t total = idle + cpuInfo.cpu_ticks[CPU_STATE_USER] +
-                        cpuInfo.cpu_ticks[CPU_STATE_SYSTEM] +
-                        cpuInfo.cpu_ticks[CPU_STATE_NICE];
+        ULONGLONG sysTotal = sysKernelDiff + sysUserDiff;
+        ULONGLONG procTotal = procKernelDiff + procUserDiff;
 
-        uint64_t dIdle = idle - lastIdle;
-        uint64_t dTotal = total - lastTotal;
+        if (sysTotal == 0) return 0.0f;
 
-        lastIdle = idle;
-        lastTotal = total;
+        float cpu = (float)procTotal / (float)sysTotal * 100.0f;
+        return cpu;
 
-        if (dTotal == 0) return 0.0f;
-        return (1.0f - (float)dIdle / dTotal) * 100.0f;
-    #else   // Linux
-        static long long lastUser=0, lastNice=0, lastSys=0, lastIdle=0;
-
-        std::ifstream f("/proc/stat");
-        std::string cpu;
-        long long user, nice, sys, idle;
-        f >> cpu >> user >> nice >> sys >> idle;
-
-        long long dUser = user - lastUser;
-        long long dNice = nice - lastNice;
-        long long dSys  = sys  - lastSys;
-        long long dIdle = idle - lastIdle;
-
-        lastUser = user; lastNice = nice; lastSys = sys; lastIdle = idle;
-
-        long long total = dUser + dNice + dSys + dIdle;
-        if (total == 0) return 0;
-
-        return (float)(total - dIdle) / total * 100.0f;
+    #else // __APPLE__
+        return 0.0f;
     #endif
 }
 
 float SystemProfiler::getRAMUsage(int)
 {
     #ifdef _WIN32
-        MEMORYSTATUSEX  mem;
-        mem.dwLength = sizeof(MEMORYSTATUSEX);
-        GlobalMemoryStatusEx(&mem); 
+       PROCESS_MEMORY_COUNTERS_EX pmc = {};
 
-        return (float)(mem.ullTotalPhys - mem.ullAvailPhys) / mem.ullTotalPhys * 100.0f;
-    #elif __APPLE__
+        if (GetProcessMemoryInfo(GetCurrentProcess(),
+            (PROCESS_MEMORY_COUNTERS*)&pmc,
+            sizeof(pmc)))
+        {
+            SIZE_T used = pmc.PrivateUsage;
+
+            MEMORYSTATUSEX mem = {};
+            mem.dwLength = sizeof(mem);
+
+            GlobalMemoryStatusEx(&mem);
+
+            return (float)used / (float)mem.ullTotalPhys * 100.0f;
+        }
+
+        return 0.0f;
+    #else __APPLE__
         vm_size_t page;
         mach_port_t host = mach_host_self();
         vm_statistics64_data_t stats;
@@ -206,64 +205,37 @@ float SystemProfiler::getRAMUsage(int)
         sysctlbyname("hw.memsize", &total, &len, NULL, 0);
 
         return (float)used / total * 100.0f;
-    #else   // Linux
-        std::ifstream file("/proc/meminfo");
-        std::string line;
-        long memTotal = 0, memAvailable = 0;
-
-        while (std::getline(file, line)) {
-            if (line.find("MemTotal:") == 0)
-                sscanf(line, "MemTotal: %ld kB", &memTotal);
-            else if (line.find("MemAvailable:") == 0)
-                sscanf(line, "MemAvailable: %ld kB", &memAvailable);
-        }
-
-        return (float)(memTotal - memAvailable) / memTotal * 100.0f;
     #endif
-}
-
-int SystemProfiler::detectDXGIGpuCount()
-{
-#ifdef _WIN32
-    IDXGIFactory1* factory = nullptr;
-    if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory)))
-        return 0;
-
-    UINT index = 0;
-    IDXGIAdapter1* adapter = nullptr;
-    int count = 0;
-
-    while (factory->EnumAdapters1(index, &adapter) != DXGI_ERROR_NOT_FOUND)
-    {
-        DXGI_ADAPTER_DESC1 desc;
-        adapter->GetDesc1(&desc);
-
-        if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
-            count++;
-
-        adapter->Release();
-        index++;
-    }
-
-    factory->Release();
-    return count;
-#else
-    return 2;
-#endif
 }
 
 int SystemProfiler::detectGpuCount()
 {   
     #ifdef _WIN32
-        return 0;
+        IDXGIFactory1* factory = nullptr;
+        if (FAILED(CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)&factory)))
+            return 0;
+
+        UINT index = 0;
+        IDXGIAdapter1* adapter = nullptr;
+        int count = 0;
+
+        while (factory->EnumAdapters1(index, &adapter) != DXGI_ERROR_NOT_FOUND)
+        {
+            DXGI_ADAPTER_DESC1 desc;
+            adapter->GetDesc1(&desc);
+
+            if (!(desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE))
+                count++;
+
+            adapter->Release();
+            index++;
+        }
+
+        factory->Release();
+        return count;
     #elif __APPLE__
         NSArray* devs = MTLCopyAllDevices();
         return (int)[devs count];
-    #else   // Linux
-        nvmlInit(); 
-        unsigned int count = 0;
-        nvmlDeviceGetCount(&count);
-        return (int)count;
     #endif
 }
 
@@ -272,23 +244,33 @@ float SystemProfiler::getGPUUsage(int gpuIndex)
     #ifdef _WIN32
         static PDH_HQUERY query = nullptr;
         static PDH_HCOUNTER counter;
+        static bool init = false;
 
-        if (!query)
+        if (!init)
         {
-            PdhOpenQuery(NULL, NULL, &query);
-            PdhAddCounterW(query, L"\\GPU Engine(*)\\Utilization Percentage", 0, &counter);
+            init = true;
+
+            DWORD pid = GetCurrentProcessId();
+
+            std::wstring counterPath =
+                L"\\GPU Engine(pid_" +
+                std::to_wstring(pid) + 
+                L"_*)\\Utilization Percentage";
+
+            PdhOpenQuery(NULL, 0, &query);
+            PdhAddCounterW(query, counterPath.c_str(), 0, &counter);
             PdhCollectQueryData(query);
-            Sleep(100);
+            return 0.0f;
         }
 
         PdhCollectQueryData(query);
 
-        PDH_FMT_COUNTERVALUE value;
+        PDH_FMT_COUNTERVALUE value {};
         PdhGetFormattedCounterValue(counter, PDH_FMT_DOUBLE, NULL, &value);
 
         return (float)value.doubleValue;
-    #elif __APPLE__
-        @autoreleasepool {
+    #else __APPLE__
+       @autoreleasepool {
             NSArray* devs = MTLCopyAllDevices();
             if (gpuIndex >= [devs count]) return 0.0f;
 
@@ -298,18 +280,7 @@ float SystemProfiler::getGPUUsage(int gpuIndex)
 
             if (total == 0) return 0;
 
-            return (float)used / total * 100.0f;
+            return (float)used / total * 100.0 f;
         }
-    #else   // Linux
-        nvmlDevice_t dev;
-
-        if (nvmlDeviceGetHandleByIndex(gpuIndex, &dev) != NVML_SUCCESS)
-            return 0.0f;
-
-        nvmlUtilization_t util;
-        if (nvmlDeviceGetUtilizationRates(dev, &util) != NVML_SUCCESS)
-            return 0.0f;
-
-        return (float)util.gpu;
     #endif
 }

@@ -14,7 +14,7 @@ public:
     static const int BUFFER_SIZE = 120;
 
     struct Track {
-        const char* name;
+        std::string name;
         float values[BUFFER_SIZE];
         float timestamps[BUFFER_SIZE];
         int head;
@@ -49,7 +49,6 @@ private:
     static float getRAMUsage(int index);
     static float getGPUUsage(int index);
 
-    static int detectDXGIGpuCount();
     static int detectGpuCount();
 };
 
