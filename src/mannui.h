@@ -21,6 +21,7 @@
 #include "mannPopup.hpp"
 
 #include <iostream>
+#include <unordered_set>
 #include <memory>
 #include <future>
 #include <stdexcept>
@@ -128,6 +129,30 @@ inline std::string trim(const std::string& s)
     return str;
 }
 
+// Extern declarations for global variables
+extern std::vector<std::string> filenames;
+extern char csv_buffer[256];
+extern Mnist* mnist;
+
+struct NetworkEntry
+{
+    std::string model_id; ///< Name of the neural network model.
+    MNNetwork* network;    ///< Pointer to neural network instance.
+
+    NetworkEntry(const std::string& id, MNNetwork* net) : model_id(id), network(net) {}
+
+    NetworkEntry(const NetworkEntry&) = delete;
+    NetworkEntry(NetworkEntry&&) noexcept = default;
+    NetworkEntry& operator=(const NetworkEntry&) = default;
+    NetworkEntry& operator=(NetworkEntry&&) noexcept = default;
+
+    ~NetworkEntry() = default;
+
+    bool calculatingAccuracy = true;
+};
+
+extern std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
+
 /**
  * @brief Retrieves a random model name from a file.
  * @return A randomly selected model name from modelnames.txt.
@@ -163,35 +188,25 @@ inline std::string getRandomModelName()
         throw std::runtime_error("modelnames.txt is empty");
     }
 
+    std::unordered_set<std::string> usedNames;
+    for (const NetworkEntry& entry : Networks)
+        usedNames.insert(entry.model_id);
+
+    std::vector<std::string> available;
+    for (const std::string& name : lines)
+    {
+        if (usedNames.find(name) == usedNames.end())
+            available.push_back(name);
+    }
+    
+    if (available.empty())
+        throw std::runtime_error("No unused model names avaible!");
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, lines.size() - 1);
     return lines[dis(gen)];
 }
-
-// Extern declarations for global variables
-extern std::vector<std::string> filenames;
-extern char csv_buffer[256];
-extern Mnist* mnist;
-
-struct NetworkEntry
-{
-    std::string model_id; ///< Name of the neural network model.
-    MNNetwork* network;    ///< Pointer to neural network instance.
-
-    NetworkEntry(const std::string& id, MNNetwork* net) : model_id(id), network(net) {}
-
-    NetworkEntry(const NetworkEntry&) = delete;
-    NetworkEntry(NetworkEntry&&) noexcept = default;
-    NetworkEntry& operator=(const NetworkEntry&) = default;
-    NetworkEntry& operator=(NetworkEntry&&) noexcept = default;
-
-    ~NetworkEntry() = default;
-
-    bool calculatingAccuracy = true;
-};
-
-extern std::vector<NetworkEntry> Networks; ///< Vector to store multiple neural network models.
 
 /**
  * @class MannUI
