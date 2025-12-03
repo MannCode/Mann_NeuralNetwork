@@ -8,6 +8,11 @@ import os
 fn platform_dependent_execution() {
     mut commands := []string{}
 
+    os.chdir('build') or {
+        eprintln('Failed to change directory to build/: $err')
+        return
+    }
+
     if os.user_os() == 'macos' {
         commands = [
             'find . ! -name run.v -delete',
