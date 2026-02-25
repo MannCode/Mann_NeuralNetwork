@@ -1,18 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 project(Mann_NeuralNetwork VERSION 1.0 LANGUAGES CXX)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/)
 
-# set(CMAKE_BUILD_TYPE Debug)
-# set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-sanitize=address")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=address")
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-sanitize=address")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-sanitize=address")
 
-# set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -fsanitize=address")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_ARCHITECTURES "arm64")
 
 # Include directories
-include_directories(src dependencies/includes/GLFW dependencies/includes/imgui .)
+include_directories(src dependencies/includes/GLFW dependencies/includes/imgui dependencies/includes/metal-cpp .)
 
 # Source files
 # all .cpp files in src/ except for those starting with test_
@@ -25,7 +26,7 @@ list(FILTER SOURCES EXCLUDE REGEX "src/platforms/MAC/.*")
 list(FILTER SOURCES EXCLUDE REGEX "src/platforms/WINDOWS/.*")
 
 if(APPLE)
-    file(GLOB PLATFORM_SOURCES "src/platforms/MAC/*.mm")
+    file(GLOB PLATFORM_SOURCES "src/platforms/MAC/*.cpp")
 endif()
 
 if(WIN32)
@@ -56,6 +57,7 @@ find_package(OpenGL REQUIRED)
 
 if(APPLE)
     # On macOS, assume GLFW is installed (e.g., via Homebrew)
+    #link metal cpp
     find_package(glfw3 3.3 REQUIRED)
 elseif(WIN32)
     # On Windows, try to find glfw3 normally
@@ -97,10 +99,11 @@ endif()
 
 # macOS Metal support
 if(APPLE)
-    target_link_libraries(NN PRIVATE OpenGL::GL "glfw" 
+    target_link_libraries(NN PRIVATE OpenGL::GL "glfw"
         "-framework Metal"
-        "-framework IOKit"
-        "-framework CoreFoundation"
+        "-framework Foundation"
+        "-framework MetalKit"
+        "-framework QuartzCore"
     )
 endif()
 

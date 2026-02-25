@@ -14,11 +14,11 @@
  *
  * Provides the core functionality for the ImGui immediate-mode GUI library.
  */
-#include "../dependencies/includes/imgui/imgui.h"
-#include "../dependencies/includes/imgui/imgui_internal.h"
+#include "./dependencies/includes/imgui/imgui.h"
+#include "./dependencies/includes/imgui/imgui_internal.h"
 
-#include "../dependencies/includes/implot/implot.h"
-// #include "../dependencies/includes/implot/implot_internal.h"
+#include "./dependencies/includes/implot/implot.h"
+// #include "./dependencies/includes/implot/implot_internal.h"
 
 /**
  * @brief Suppresses OpenGL deprecation warnings.
@@ -33,18 +33,18 @@
  *
  * GLFW is used to create windows, handle input, and manage OpenGL contexts.
  */
-#include "../dependencies/includes/GLFW/include/GLFW/glfw3.h"
+#include "./dependencies/includes/GLFW/include/GLFW/glfw3.h"
 
 /**
  * @brief Include ImGui GLFW backend implementation.
  *
  * This backend integrates ImGui with GLFW for handling window and input events.
  */
-#include "../dependencies/includes/imgui/backends/imgui_impl_glfw.h"
+#include "./dependencies/includes/imgui/backends/imgui_impl_glfw.h"
 
 /**
  * @brief Include ImGui OpenGL3 backend implementation.
  *
  * This backend integrates ImGui with OpenGL3 for rendering the GUI.
  */
-#include "../dependencies/includes/imgui/backends/imgui_impl_opengl3.h"
+#include "./dependencies/includes/imgui/backends/imgui_impl_opengl3.h"

@@ -54,7 +54,7 @@ namespace Mann
     private:
         int m_rows; ///< Number of rows in the matrix.
         int m_cols; ///< Number of columns in the matrix.
-        std::vector<std::vector<float>> m_data; ///< 2D vector storing matrix data.
+        std::vector<float> m_data; ///< 1D vector storing matrix data in row-major order.
     public:
         /**
          * @brief Constructs a matrix with specified dimensions.
@@ -75,19 +75,21 @@ namespace Mann
          */
         int cols() const;
 
+        const std::vector<float> data() const;
+
         /**
          * @brief Accesses a row of the matrix for modification.
          * @param index The row index.
          * @return A reference to the row as a vector of floats.
          */
-        std::vector<float>& operator[](int index);
+        float& operator[](int index);
 
         /**
          * @brief Accesses a row of the matrix for read-only access.
          * @param index The row index.
          * @return A const reference to the row as a vector of floats.
          */
-        const std::vector<float>& operator[](int index) const;
+        const float& operator[](int index) const;
 
         /**
          * @brief Adds two matrices element-wise.
@@ -150,7 +152,7 @@ namespace Mann
          * @param init The initializer list of vectors containing matrix data.
          * @return A reference to the modified matrix.
          */
-        Matrix& operator=(std::initializer_list<std::vector<float>> init);
+        Matrix& operator=(std::initializer_list<float> init);
 
         /**
          * @brief Outputs the matrix to an output stream.

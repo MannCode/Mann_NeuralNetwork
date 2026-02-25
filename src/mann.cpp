@@ -1,3 +1,4 @@
+
 /**
  * @file mann.cpp
  * @brief Implementation of the Matrix class in the Mann namespace for neural network operations.
@@ -13,6 +14,7 @@
 #include "mann.h"
 #include <iomanip>
 
+
 /**
  * @namespace Mann
  * @brief Namespace for matrix-related classes and utilities used in neural networks.
@@ -24,7 +26,8 @@ namespace Mann
      * @param rows The number of rows in the matrix.
      * @param cols The number of columns in the matrix.
      */
-    Matrix::Matrix(int rows, int cols) : m_rows(rows), m_cols(cols), m_data(rows, std::vector<float>(cols, 0.0f)) {}
+    Matrix::Matrix(int rows, int cols) : m_rows(rows), m_cols(cols), m_data(rows * cols, 0.0f) {}
+
 
     /**
      * @brief Gets the number of rows in the matrix.
@@ -44,12 +47,17 @@ namespace Mann
         return m_cols;
     }
 
+    const std::vector<float> Matrix::data() const
+    {
+        return m_data;
+    }
+
     /**
      * @brief Accesses a row of the matrix for modification.
      * @param index The row index.
      * @return A reference to the row as a vector of floats.
      */
-    std::vector<float>& Matrix::operator[](int index)
+    float& Matrix::operator[](int index)
     {
         return m_data[index];
     }
@@ -59,7 +67,7 @@ namespace Mann
      * @param index The row index.
      * @return A const reference to the row as a vector of floats.
      */
-    const std::vector<float>& Matrix::operator[](int index) const
+    const float& Matrix::operator[](int index) const
     {
         return m_data[index];
     }
@@ -72,20 +80,18 @@ namespace Mann
      */
     Matrix Matrix::operator+(const Matrix& other) const
     {
-        if (m_data.size() != other.m_data.size() || m_data[0].size() != other.m_data[0].size())
+        if (this->rows() != other.rows() || this->cols() != other.cols())
         {
             throw std::invalid_argument("Matrix dimensions do not match for addition.");
         }
 
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
+        Matrix result(m_rows, m_cols);
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < m_rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < m_cols; j++)
             {
-                result[i][j] = m_data[i][j] + other.m_data[i][j];
+                result[i * m_cols + j] = m_data[i * m_cols + j] + other.m_data[i * m_cols + j];
             }
         }
 
@@ -100,20 +106,18 @@ namespace Mann
      */
     Matrix Matrix::operator-(const Matrix& other) const
     {
-        if (m_data.size() != other.m_data.size() || m_data[0].size() != other.m_data[0].size())
+        if (this->rows() != other.rows() || this->cols() != other.cols())
         {
             throw std::invalid_argument("Matrix dimensions do not match for subtraction.");
         }
 
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
+        Matrix result(m_rows, m_cols);
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < m_rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < m_cols; j++)
             {
-                result[i][j] = m_data[i][j] - other.m_data[i][j];
+                result[i * m_cols + j] = m_data[i * m_cols + j] - other.m_data[i * m_cols + j];
             }
         }
 
@@ -127,15 +131,14 @@ namespace Mann
      */
     Matrix Matrix::operator+(float scaler) const
     {
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
 
-        for (int i = 0; i < rows; i++)
+        Matrix result(m_rows, m_cols);
+
+        for (int i = 0; i < m_rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < m_cols; j++)
             {
-                result[i][j] = m_data[i][j] + scaler;
+                result[i * m_cols + j] = m_data[i * m_cols + j] + scaler;
             }
         }
 
@@ -149,15 +152,14 @@ namespace Mann
      */
     Matrix Matrix::operator-(float scaler) const
     {
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
 
-        for (int i = 0; i < rows; i++)
+        Matrix result(m_rows, m_cols);
+
+        for (int i = 0; i < m_rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < m_cols; j++)
             {
-                result[i][j] = m_data[i][j] - scaler;
+                result[i * m_cols + j] = m_data[i * m_cols + j] - scaler;
             }
         }
 
@@ -177,50 +179,67 @@ namespace Mann
      */
     Matrix Matrix::operator*(const Matrix& other) const
     {
-        static MU_SHORTC TS = 8;
+        Matrix result(m_rows, other.m_cols);
 
-        if (m_data[0].size() != other.m_data.size())
+        // std::cout << "Metal platform not available. Using CPU for matrix multiplication." << std::endl;
+        // Fallback to CPU implementation if Metal platform is not available
+        // static MU_SHORTC TS = 8;
+
+        // if (this->cols() != other.rows())
+        // {
+        //     throw std::invalid_argument("Matrix dimensions do not allow multiplication.");
+        // }
+
+        // std::function<void(int, int)> multiplyTile = [&](int rowStart, int colStart)
+        // {
+        //     for (int i = rowStart; i < rowStart + TS  && i < m_rows; i++)
+        //     {
+        //         for (int j = colStart; j < colStart + TS && j < other.m_cols; j++)
+        //         {
+        //             float sum = 0.0f;
+        //             for (int k = 0; k < m_cols; k++)
+        //             {
+        //                 sum += m_data[i * m_cols + k] * other.m_data[k * other.m_cols + j];
+        //             }
+        //             result[i * result.m_cols + j] += sum;
+        //         }
+        //     }
+        // };
+
+        // std::vector<std::future<void>> tasks;
+
+        // for (int i = 0; i < m_rows; i += TS)
+        // {
+        //     for (int j = 0; j < other.m_cols; j += TS)
+        //     {
+                
+        //         tasks.emplace_back(std::async(std::launch::async, multiplyTile, i, j));
+        //     }
+        // }
+
+        // for (auto& thread : tasks)
+        // {
+        //     thread.get();
+        // }
+
+        for (int i = 0; i < m_rows; i++)
         {
-            throw std::invalid_argument("Matrix dimensions do not allow multiplication.");
-        }
-
-        int rows = m_data.size();
-        int cols = other.m_data[0].size();
-        Matrix result(rows, cols);
-
-        std::function<void(int, int)> multiplyTile = [&](int rowStart, int colStart)
-        {
-            for (int i = rowStart; i < rowStart + TS && i < rows; ++i)
+            for (int j = 0; j < other.m_cols; j++)
             {
-                for (int j = colStart; j < colStart + TS && j < cols; ++j)
+                float sum = 0.0f;
+                for (int k = 0; k < m_cols; k++)
                 {
-                    float sum = 0.0f;
-                    for (int k = 0; k < m_data[0].size(); ++k)
-                    {
-                        sum += m_data[i][k] * other.m_data[k][j];
-                    }
-                    result[i][j] += sum;
+                    sum += m_data[i * m_cols + k] * other.m_data[k * other.m_cols + j];
                 }
+                result[i * result.m_cols + j] = sum;
             }
-        };
-
-        std::vector<std::future<void>> tasks;
-
-        for (int i = 0; i < rows; i += TS)
-        {
-            for (int j = 0; j < cols; j += TS)
-            {
-                tasks.emplace_back(std::async(std::launch::async, multiplyTile, i, j));
-            }
-        }
-
-        for (auto& thread : tasks)
-        {
-            thread.get();
         }
 
         return result;
     }
+
+
+    
 // #endif
 
     /**
@@ -230,15 +249,13 @@ namespace Mann
      */
     Matrix Matrix::operator*(double scalar) const
     {
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
+        Matrix result(m_rows, m_cols);
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < m_rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < m_cols; j++)
             {
-                result[i][j] = m_data[i][j] * scalar;
+                result[i * m_cols + j] = m_data[i * m_cols + j] * scalar;
             }
         }
 
@@ -254,21 +271,20 @@ namespace Mann
     Matrix Matrix::operator^(const Matrix& other) const
     {
         // Element-wise multiplication
-        if (m_data.size() != other.m_data.size() || m_data[0].size() != other.m_data[0].size())
+        if (m_rows != other.m_rows || m_cols != other.m_cols)
         {
             throw std::invalid_argument("Matrix dimensions do not match for element-wise multiplication.");
         }
 
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
+        
+        Matrix result(m_rows, m_cols);
 
 
         for (int i = 0; i < m_rows; ++i)
         {
             for (int j = 0; j < m_cols; ++j)
             {
-                result[i][j] = m_data[i][j] * other.m_data[i][j];
+                result[i * m_cols + j] = m_data[i * m_cols + j] * other.m_data[i * m_cols + j];
             }
         }
 
@@ -288,15 +304,14 @@ namespace Mann
             throw std::invalid_argument("Division by zero.");
         }
 
-        int rows = m_data.size();
-        int cols = m_data[0].size();
-        Matrix result(rows, cols);
+        
+        Matrix result(m_rows, m_cols);
 
-        for (int i = 0; i < rows; i++)
+        for (int i = 0; i < m_rows; i++)
         {
-            for (int j = 0; j < cols; j++)
+            for (int j = 0; j < m_cols; j++)
             {
-                result[i][j] = m_data[i][j] / scalar;
+                result[i * m_cols + j] = m_data[i * m_cols + j] / scalar;
             }
         }
 
@@ -308,22 +323,13 @@ namespace Mann
      * @param init The initializer list of vectors containing matrix data.
      * @return A reference to the modified matrix.
      */
-    Matrix& Matrix::operator=(std::initializer_list<std::vector<float>> init)
+    Matrix& Matrix::operator=(std::initializer_list<float> init)
     {
-        m_rows = init.size();
-
-        if (m_rows > 0)
-            m_cols = init.begin()->size();
-        else
-            m_cols = 0;
-
-        m_data.resize(m_rows);
-
-        int index = 0;
-        for (const auto& row : init)
+        if (init.size() != m_rows * m_cols)
         {
-            m_data[index++] = row;
+            throw std::invalid_argument("Initializer list size does not match matrix size.");
         }
+        std::copy(init.begin(), init.end(), m_data.begin());
         return *this;
     }
 
@@ -335,14 +341,11 @@ namespace Mann
      */
     std::ostream& operator<<(std::ostream& os, const Matrix& matrix)
     {
-        for (const auto& row : matrix.m_data)
+        for (int i = 0; i < matrix.m_rows; ++i)
         {
-            for (const auto& elem : row)
+            for (int j = 0; j < matrix.m_cols; ++j)
             {
-                if(elem > 0) {
-                    os << "+";
-                }
-                os << std::fixed << std::setprecision(6) << elem << " ";
+                os << std::fixed << std::setprecision(4) << matrix.m_data[i * matrix.m_cols + j] << " ";
             }
             os << std::endl;
         }
@@ -360,7 +363,7 @@ namespace Mann
         std::uniform_real_distribution<float> distr(-1.0f, 1.0f);
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
-                m_data[i][j] = distr(eng);
+                m_data[i * m_cols + j] = distr(eng);
             }
         }
         return *this;
@@ -379,7 +382,7 @@ namespace Mann
         std::uniform_real_distribution<float> distr(min, max);
         for (int i = 0; i < m_rows; ++i) {
             for (int j = 0; j < m_cols; ++j) {
-                m_data[i][j] = distr(eng);
+                m_data[i * m_cols + j] = distr(eng);
             }
         }
         return *this;
@@ -391,8 +394,8 @@ namespace Mann
      */
     Matrix Matrix::nullMatrix()
     {
-        for (int i = 0; i < m_rows; ++i) {
-            std::fill(m_data[i].begin(), m_data[i].end(), 0.0f);
+        for(int i = 0; i < m_rows * m_cols; ++i) {
+            m_data[i] = 0.0f;
         }
         return *this;
     }

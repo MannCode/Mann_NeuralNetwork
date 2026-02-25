@@ -79,7 +79,7 @@ inline std::vector<std::string> getTxtFileNamesWithoutExtension() {
 #ifdef _WIN32
     const char* cmd = "dir /b ..\\..\\models\\*.mms";
 #else
-    const char* cmd = "ls ../models/*.mms 2> /dev/null";
+    const char* cmd = "ls models/*.mms 2> /dev/null";
 #endif
 
     FILE* pipe = popen(cmd, "r");
@@ -163,7 +163,7 @@ inline std::string getRandomModelName()
 #ifdef _WIN32
     std::ifstream file("../../src/modelnames.txt");
 #else
-    std::ifstream file("../src/modelnames.txt");
+    std::ifstream file("./src/modelnames.txt");
 #endif
 
     if (!file.is_open())
@@ -255,10 +255,12 @@ public:
         TRAINING_WINDOW,
         TESTING_DATA_WINDOW,
         TESTING_CANVAS_WINDOW,
-        NETWORK_VISUALIZER_WINDOW,
     } shown_windows_enum = MODELS_WINDOW;
 
     //models_window specific variables
+
+    //Network Visualizer specific variables
+    bool show_network_visualizer = false;
 
     //training window specific variables
     bool is_training = false;
@@ -276,6 +278,7 @@ public:
 struct UIContext {
   std::stringstream &outputText;
   MannUI::Shown_Windows &shown_windows_enum;
+  bool &show_network_visualizer;
   NetworkEntry* &selected_model;
   MannUI::OpenPopup &open_popup;
 };

@@ -8,6 +8,8 @@
 
 #include "GLFW/glfw3.h"
 
+#include "platforms/platform.h"
+
 #include <queue>
 
 /**
@@ -57,7 +59,7 @@ public:
         #ifdef _WIN32
             return "../../";
         #else
-            return "../";
+            return "./";
         #endif
     }
 
@@ -107,10 +109,10 @@ public:
      * @param weights A vector of matrices representing the weights between layers.
      * @param biases A vector of matrices representing the biases for each layer.
      */
-    void feedForward(std::vector<Mann::Matrix> &nodes,
+    void feedForward(std::vector<Mann::Matrix> nodes,
                      std::vector<Mann::Matrix> &weighted_sum,
-                     std::vector<Mann::Matrix> &weights,
-                     std::vector<Mann::Matrix> &biases);
+                     std::vector<Mann::Matrix> weights,
+                     std::vector<Mann::Matrix> biases);
 
     /**
      * @brief Performs backpropagation to compute gradients for weight updates.
@@ -209,6 +211,8 @@ public:
     std::queue<float> m_batch_accuracy_history;
     std::mutex training_threads_mutex;
     float m_averageTimePerBatch;
+
+    MetalPlatform metalPlatform;
     
 
 

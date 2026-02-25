@@ -59,7 +59,7 @@ int Mnist::ReverseInt (int i)
 void Mnist::ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<std::vector<double>> &arr, bool isTraining)
 {
     arr.resize(NumberOfImages, std::vector<double>(DataOfAnImage));
-    std::ifstream file (isTraining ? "../dependencies/includes/train-images-idx3-ubyte" : "../dependencies/includes/t10k-images-idx3-ubyte", std::ios::binary);
+    std::ifstream file (isTraining ? "./dependencies/includes/train-images-idx3-ubyte" : "./dependencies/includes/t10k-images-idx3-ubyte", std::ios::binary);
     
     if (file.is_open())
     {
@@ -98,7 +98,7 @@ void Mnist::ReadMNISTimages(int NumberOfImages, int DataOfAnImage, std::vector<s
 void Mnist::ReadMNISTlabels(int NumberOfImages, std::vector<std::vector<double>> &arr, bool isTraining)
 {
     arr.resize(NumberOfImages,std::vector<double>(10));
-    std::ifstream file (isTraining ? "../dependencies/includes/train-labels-idx1-ubyte" : "../dependencies/includes/t10k-labels-idx1-ubyte", std::ios::binary);
+    std::ifstream file (isTraining ? "./dependencies/includes/train-labels-idx1-ubyte" : "./dependencies/includes/t10k-labels-idx1-ubyte", std::ios::binary);
     if (file.is_open())
     {
         int magic_number=0;
