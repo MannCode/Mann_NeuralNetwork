@@ -695,7 +695,7 @@ void TrainingWindow_1(UIContext* ui_context, bool &is_training, std::thread &tra
             ImGui::Text("Test Data Accuracy: %.2f%%", ui_context->selected_model->network->m_accuracy_testdata);
             ImGui::Text("Epoch #: %d", ui_context->selected_model->network->m_current_epoch);
             ImGui::Text("Epoch Completion: %.2f%%", static_cast<float>(ui_context->selected_model->network->current_batch * ui_context->selected_model->network->m_batch_size) / static_cast<float>(mnist->mnist_trainingData.mnist_images_data.size()) * 100.0f);
-            ImGui::Text("Batch #: %d/%lf", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
+            ImGui::Text("Batch #: %d/%zu", ui_context->selected_model->network->current_batch, (mnist->mnist_trainingData.mnist_images_data.size() / ui_context->selected_model->network->m_batch_size));
             // ImGui::Text("Time per Batch: %.4f seconds", ui_context->selected_model->network->m_time_per_batch);
 
             // show total time trained in hr:min:sec format

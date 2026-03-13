@@ -14,7 +14,6 @@
 #include "mann.h"
 #include <iomanip>
 
-
 /**
  * @namespace Mann
  * @brief Namespace for matrix-related classes and utilities used in neural networks.

@@ -5,7 +5,7 @@
 
 import os
 
-fn platform_dependent_execution() {
+    fn platform_dependent_execution() {
     // Create build directory if it doesn't exist
     if !os.exists('build') {
         os.mkdir('build') or {
@@ -18,8 +18,6 @@ fn platform_dependent_execution() {
         eprintln('Failed to change directory to build: $err')
         return
     }
-
-
     mut commands := []string{}
 
     if os.user_os() == 'macos' {
