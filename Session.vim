@@ -13,41 +13,29 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +5 ~/bugfarm/projects/MannNeuralNetwork/run.v
-badd +6 ~/bugfarm/projects/MannNeuralNetwork/src/main.cpp
-badd +3 ~/bugfarm/projects/MannNeuralNetwork/src/mann.cpp
-badd +3 ~/bugfarm/projects/MannNeuralNetwork/src/mannui.h
-badd +38 ~/bugfarm/projects/MannNeuralNetwork/src/utils.h
-badd +1 after/plugin/lspConfig.lua
-badd +52 after/plugin/neotree.lua
-badd +12 after/plugin/snakes.lua
+badd +111 ~/bugfarm/projects/MannNeuralNetwork/src/MNNetwork.h
+badd +151 ~/bugfarm/projects/MannNeuralNetwork/src/mann.cpp
+badd +8 ~/bugfarm/projects/MannNeuralNetwork/src/structs.hpp
+badd +4 ~/bugfarm/projects/MannNeuralNetwork/src/mnist.h
+badd +22 lua/mannlua/maphelp.txt
+badd +88 ~/bugfarm/projects/MannNeuralNetwork/src/MNNetwork.cpp
+badd +671 ~/bugfarm/projects/MannNeuralNetwork/src/mannui.cpp
+badd +178 ~/bugfarm/projects/MannNeuralNetwork/src/mann.h
+badd +74 ~/bugfarm/projects/MannNeuralNetwork/src/main.cpp
+badd +2 term://~/bugfarm/projects/MannNeuralNetwork//15830:/bin/zsh
+badd +2 term://~/bugfarm/projects/MannNeuralNetwork//16328:/bin/zsh
+badd +12 lua/mannlua/remap.lua
+badd +13 lua/mannlua/plugins.lua
+badd +118 after/plugin/lspConfig.lua
+badd +33 ~/bugfarm/projects/MannNeuralNetwork/run.v
+badd +26 after/plugin/windows.lua
+badd +288 ~/bugfarm/projects/MannNeuralNetwork/src/mannui.h
+badd +93 ~/bugfarm/projects/MannNeuralNetwork/models/mWqBlQ9wQj99nsQz.mms
 argglobal
 %argdel
-set stal=2
-tabnew +setlocal\ bufhidden=wipe
-tabrewind
-edit ~/bugfarm/projects/MannNeuralNetwork/run.v
+edit after/plugin/windows.lua
 argglobal
-balt ~/bugfarm/projects/MannNeuralNetwork/src/mannui.h
-setlocal foldmethod=manual
-setlocal foldexpr=0
-setlocal foldmarker={{{,}}}
-setlocal foldignore=#
-setlocal foldlevel=0
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldenable
-silent! normal! zE
-let &fdl = &fdl
-let s:l = 5 - ((4 * winheight(0) + 24) / 48)
-if s:l < 1 | let s:l = 1 | endif
-keepjumps exe s:l
-normal! zt
-keepjumps 5
-normal! 0
-tabnext
-edit after/plugin/snakes.lua
-argglobal
+balt after/plugin/lspConfig.lua
 setlocal foldmethod=manual
 setlocal foldexpr=v:lua.vim.treesitter.foldexpr()
 setlocal foldmarker={{{,}}}
@@ -58,15 +46,13 @@ setlocal foldnestmax=20
 setlocal foldenable
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 12 - ((11 * winheight(0) + 23) / 47)
+let s:l = 26 - ((24 * winheight(0) + 28) / 57)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 12
+keepjumps 26
 normal! 0
-lcd ~/.config/nvim
-tabnext 2
-set stal=1
+tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif

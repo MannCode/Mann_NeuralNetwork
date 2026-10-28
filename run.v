@@ -28,7 +28,7 @@ import os
             // make NN executable in root folder
             'make -j8',
             'go to root',
-            './NN',
+            //'./NN',
         ]
     } else if os.user_os() == 'windows' {
         commands = [

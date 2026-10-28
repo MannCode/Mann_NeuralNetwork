@@ -351,6 +351,22 @@ namespace Mann
         return os;
     }
 
+    std::string Matrix::display()
+    {
+        std::string out = "";
+        for (int i = 0; i < m_rows; ++i)
+        {
+            out += "[ ";
+            for (int j = 0; j < m_cols; ++j)
+            {
+                out += std::to_string(m_data[i * m_cols + j]) + " ";
+            }
+            out += "]\n";
+        }
+
+        return out;
+    }
+
     /**
      * @brief Randomizes the matrix elements with values between -1.0 and 1.0.
      * @return A reference to the modified matrix.

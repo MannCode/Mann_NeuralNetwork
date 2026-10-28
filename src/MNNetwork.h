@@ -11,6 +11,7 @@
 #include "platforms/platform.h"
 
 #include <queue>
+#include <chrono>
 
 /**
  * @file MNNetwork.h
@@ -20,7 +21,7 @@
  * @version 1.0
  */
 
- /**
+/**
  * @class MNNetwork
  * @brief A class representing a multi-layer neural network for machine learning tasks.
  *
@@ -32,6 +33,8 @@
 class MNNetwork
 {
 public:
+    struct NetworkGradients;
+
     /**
      * @brief Constructs a neural network by loading from a file.
      * @param model_id The identifier of the model containing the network configuration and weights.
@@ -45,7 +48,7 @@ public:
      * @param learning_rate The learning rate for weight updates during training.
      * @param batch_size The size of each training batch.
      */
-    MNNetwork(std::string model_id, NetworkConfiguration* network_configuration);
+    MNNetwork(std::string model_id, NetworkConfiguration *network_configuration);
 
     /**
      * @brief Destructor for the MNNetwork class.
@@ -56,11 +59,11 @@ public:
 
     inline std::string getRoot()
     {
-        #ifdef _WIN32
-            return "../../";
-        #else
-            return "./";
-        #endif
+#ifdef _WIN32
+        return "../../";
+#else
+        return "./";
+#endif
     }
 
     inline std::string getModels(std::string _id)
@@ -79,8 +82,7 @@ public:
      * @param images_data A vector of input image data for training.
      * @param labels_data A vector of corresponding label data for training.
      */
-    void trainNetwork(const int iterations, Mnist::MnistData* image_data, bool *is_training);
-
+    void trainNetwork(const int iterations, Mnist::MnistData *image_data, bool *is_training);
 
     /**
      * @brief Tests the neural network interactively with user-provided data.
@@ -91,7 +93,7 @@ public:
     /**
      * @brief Tests the neural network using the provided dataset.
      */
-    float testNetwork(Mnist::MnistData* image_data);
+    float testNetwork(Mnist::MnistData *image_data);
 
     /**
      * @brief Initializes the neural network with the specified layer sizes.
@@ -100,7 +102,7 @@ public:
      * @param weights A vector of matrices representing the weights between layers.
      * @param biases A vector of matrices representing the biases for each layer.
      */
-    void initializeNetwork(NetworkInitialization* network_initialization);
+    void initializeNetwork(NetworkInitialization *network_initialization);
 
     /**
      * @brief Performs the feedforward operation on the neural network.
@@ -109,7 +111,7 @@ public:
      * @param weights A vector of matrices representing the weights between layers.
      * @param biases A vector of matrices representing the biases for each layer.
      */
-    void feedForward(std::vector<Mann::Matrix> nodes,
+    void feedForward(std::vector<Mann::Matrix> &nodes,
                      std::vector<Mann::Matrix> &weighted_sum,
                      std::vector<Mann::Matrix> weights,
                      std::vector<Mann::Matrix> biases);
@@ -123,11 +125,12 @@ public:
      * @param target The target output matrix for the current input.
      * @return A vector of vectors of matrices containing gradients for weights and biases.
      */
-    std::vector<std::vector<Mann::Matrix>> backPropagation(std::vector<Mann::Matrix> &nodes,
-                                                          std::vector<Mann::Matrix> &weighted_sum,
-                                                          std::vector<Mann::Matrix> &weights,
-                                                          std::vector<Mann::Matrix> &biases,
-                                                          const Mann::Matrix &target);
+    void backPropagation(std::vector<Mann::Matrix> &nodes,
+                        std::vector<Mann::Matrix> &weighted_sum,
+                        std::vector<Mann::Matrix> &weights,
+                        std::vector<Mann::Matrix> &biases,
+                        const Mann::Matrix &target,
+                        NetworkGradients &gradients);
 
     /**
      * @brief Applies the activation function to the weighted sum.
@@ -166,8 +169,8 @@ public:
      * @param label_data A vector containing the corresponding label data.
      * @param model_id The identifier of the model to save the image and label data.
      */
-    void saveImageDataToFile(Mnist::MnistData* image_data,
-                             const std::string& model_id);
+    void saveImageDataToFile(Mnist::MnistData *image_data,
+                             const std::string &model_id);
 
     /**
      * @brief Prints the labels from a matrix.
@@ -178,7 +181,7 @@ public:
     /**
      * @brief Creates a neural network with the specified configuration.
      */
-    void CreateNetwork(NetworkArchitecture* network_arch);
+    void CreateNetwork(NetworkArchitecture *network_arch);
 
     void saveHistoryData();
 
@@ -189,7 +192,7 @@ public:
      * @struct Networks
      * @brief A structure to store multiple neural network models and their names.
      */
-    
+
     std::string m_model_id;
     std::string m_model_name;
     float m_learning_rate;
@@ -201,7 +204,7 @@ public:
     int sample_image_label;
     int m_current_epoch;
 
-    //training related
+    // training related
     int current_batch;
     std::vector<float> m_accuracy_history;
     std::vector<float> m_accuracy_testdata_history;
@@ -213,12 +216,42 @@ public:
     float m_averageTimePerBatch;
 
     MetalPlatform metalPlatform;
-    
 
-
-// private:
+    // private:
     std::vector<int> MNN_Layers_size;      ///< Sizes of the layers in the neural network.
-    std::vector<Mann::Matrix> MNN_Nodes;      ///< Nodes (activations) for each layer.
-    std::vector<Mann::Matrix> MNN_Weights;    ///< Weights between layers.
-    std::vector<Mann::Matrix> MNN_Bias;       ///< Biases for each layer.
+    std::vector<Mann::Matrix> MNN_Nodes;   ///< Nodes (activations) for each layer.
+    std::vector<Mann::Matrix> MNN_Weights; ///< Weights between layers.
+    std::vector<Mann::Matrix> MNN_Bias;    ///< Biases for each layer.
+
+    struct NetworkGradients
+    {
+        std::vector<Mann::Matrix> weights; ///< Gradients for weights.
+        std::vector<Mann::Matrix> biases;  ///< Gradients for biases.
+
+        NetworkGradients() = default;
+
+        NetworkGradients(const std::vector<Mann::Matrix> &network_weights, const std::vector<Mann::Matrix> &network_biases)
+        {
+            for (const auto &w : network_weights)
+            {
+                weights.emplace_back(Mann::Matrix(w.rows(), w.cols()));
+            }
+
+            for (const auto &b : network_biases)
+            {
+                biases.emplace_back(Mann::Matrix(b.rows(), b.cols()));
+            }
+
+            zero();
+        }
+
+        void zero()
+        {
+            for (auto &w : weights)
+                w.nullMatrix();
+
+            for (auto &b : biases)
+                b.nullMatrix();
+        }
+    };
 };

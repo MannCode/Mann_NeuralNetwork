@@ -171,6 +171,9 @@ namespace Mann
          */
         friend std::ostream& operator<<(std::ostream& os, const std::vector<float>& row);
 
+
+        std::string display();
+
         /**
          * @brief Randomizes the matrix elements with values between -1.0 and 1.0.
          * @return A reference to the modified matrix.
