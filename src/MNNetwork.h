@@ -113,8 +113,8 @@ public:
      */
     void feedForward(std::vector<Mann::Matrix> &nodes,
                      std::vector<Mann::Matrix> &weighted_sum,
-                     std::vector<Mann::Matrix> weights,
-                     std::vector<Mann::Matrix> biases);
+                     std::vector<Mann::Matrix> &weights,
+                     std::vector<Mann::Matrix> &biases);
 
     /**
      * @brief Performs backpropagation to compute gradients for weight updates.

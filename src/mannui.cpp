@@ -842,8 +842,15 @@ void TrainingWindow_2(UIContext* ui_context, bool &is_training, std::thread &tra
             // ImPlot::SetupAxisLimits(ImAxis_X1, std::max(0.0, static_cast<double>(ui_context->selected_model->network->m_batch_accuracy_history.size())-100), std::max(100.0, static_cast<double>(ui_context->selected_model->network->m_batch_accuracy_history.size())), ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_X1, 0, 100, ImGuiCond_Always);
             ImPlot::SetupAxisLimits(ImAxis_Y1, 0.0, 100.0, ImGuiCond_Always);
+            
+            std::queue<float> batch_history_copy;
+            
+            {
+                ui_context->selected_model->network->training_threads_mutex.lock();
+                batch_history_copy = ui_context->selected_model->network->m_batch_accuracy_history;
+                ui_context->selected_model->network->training_threads_mutex.unlock();
+            }
 
-            std::queue<float> batch_history_copy = ui_context->selected_model->network->m_batch_accuracy_history;
             std::vector<float> batch_history_vector;
             while(!batch_history_copy.empty())
             {

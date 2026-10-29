@@ -53,17 +53,6 @@ MNNetwork::~MNNetwork() {};
  */
 void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data, bool *is_training)
 {
-    auto start_time = std::chrono::high_resolution_clock::now();
-
-    training_threads_mutex.lock();
-    // Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size() - 1], 1);
-    std::vector<Mann::Matrix> MNN_weighted_sum = MNN_Bias;
-
-    // std::vector<Mann::Matrix> MNN_Nodes_local = MNN_Nodes;
-    training_threads_mutex.unlock();
-
-    // return;
-
     for (int epoch = 0; epoch < iterations; epoch++)
     {
         // float avg_cost_bulk = 0.0f;
@@ -72,12 +61,6 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
             if (!(*is_training)) return;
 
             auto batch_start_time = std::chrono::high_resolution_clock::now();
-
-            // for (int j = 0; j < MNN_d_weights.size(); j++)
-            // {
-            //     MNN_d_weights[j].nullMatrix();
-            //     MNN_d_biases[j].nullMatrix();
-            // }
 
             const int batch_end = std::min(batch_start + m_batch_size, static_cast<int>(image_data->mnist_images_data.size()));
             const int actual_batch_size = batch_end - batch_start;
@@ -89,7 +72,7 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
             training_threads_mutex.unlock();
 
             // get worker count
-            const unsigned int worker_count = std::min(4u, static_cast<unsigned int>(m_batch_size));
+            const unsigned int worker_count = std::min(8u, static_cast<unsigned int>(m_batch_size));
 
             // pre-worker gradients
             std::vector<NetworkGradients> worker_gradients;
@@ -108,6 +91,8 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
             {
                 workers.emplace_back([&, worker]()
                 {
+                    auto start_time_worker = std::chrono::high_resolution_clock::now();
+
                     int start = batch_start + (actual_batch_size * worker) / worker_count;
                     int end = batch_start + (actual_batch_size * (worker + 1)) / worker_count;
 
@@ -138,6 +123,7 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
 
                         feedForward(nodes, weighted_sum, weights, biases);
 
+
                         if (IsPredictionCorrect(nodes.back(), target))
                         {
                             worker_correct[worker]++;
@@ -153,6 +139,10 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
                             gradients.biases[j] = gradients.biases[j] + sample_gradients.biases[j];
                         }
                     }
+
+                    auto end_time_worker = std::chrono::high_resolution_clock::now();
+                    auto duration_worker = std::chrono::duration<float>(end_time_worker - start_time_worker).count();
+                    // std::cout << "Total time: " << duration_worker << " s" << std::endl;
                 });
             }
 
@@ -210,87 +200,6 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
             m_averageTimePerBatch -= difference * 0.05f; // moving average with weight 0.05
         }
 
-
-
-
-
-        //     auto start = std::chrono::high_resolution_clock::now();
-
-        //     for (int i = (batch * m_batch_size); i < ((batch + 1) * m_batch_size); i++)
-        //     {
-
-        //         // load image data in network
-        //         for (int j = 0; j < MNN_Nodes_local[0].rows(); j++)
-        //         {
-        //             MNN_Nodes_local[0][j] = image_data->mnist_images_data[i][j];
-        //         }
-        //         for (int j = 0; j < MNN_y.rows(); j++)
-        //         {
-        //             MNN_y[j] = image_data->mnist_labels_data[i][j];
-        //         }
-
-        //         feedForward(MNN_Nodes_local, MNN_weighted_sum, MNN_d_weights, MNN_d_biases);
-
-        //         Mann::Matrix MNN_cost = (MNN_Nodes_local[MNN_Nodes_local.size() - 1] - MNN_y);
-        //         MNN_cost = MNN_cost ^ MNN_cost;
-        //         float avg_cost = 0;
-        //         for (int j = 0; j < MNN_cost.rows(); j++)
-        //         {
-        //             avg_cost += MNN_cost[j];
-        //         }
-
-        //         if (IsPredictionCorrect(MNN_Nodes_local[MNN_Nodes_local.size() - 1], MNN_y))
-        //             correct_pred++;
-
-        //         std::vector<std::vector<Mann::Matrix>> MNN_d_weights_biases = backPropagation(MNN_Nodes_local, MNN_weighted_sum, MNN_Weights, MNN_Bias, MNN_y);
-        //         for (int j = 0; j < MNN_d_weights.size(); j++)
-        //         {
-        //             MNN_d_weights[j] = (MNN_d_weights[j] + MNN_d_weights_biases[0][j]) / 2;
-        //             MNN_d_biases[j] = (MNN_d_biases[j] + MNN_d_weights_biases[1][j]) / 2;
-        //         }
-
-        //         training_threads_mutex.lock();
-        //         MNN_Nodes = MNN_Nodes_local;
-        //         training_threads_mutex.unlock();
-        //     }
-
-        //     auto end = std::chrono::high_resolution_clock::now();
-        //     std::chrono::duration<float> duration = end - start;
-
-        //     std::cout << "Batch " << batch << " took " << duration.count() << " seconds" << std::endl;
-
-        //     // time to update the weights and biases
-        //     training_threads_mutex.lock();
-        //     for (int j = 0; j < MNN_Weights.size(); j++)
-        //     {
-        //         MNN_Weights[j] = MNN_Weights[j] - (MNN_d_weights[j] * m_learning_rate);
-        //         MNN_Bias[j] = MNN_Bias[j] - (MNN_d_biases[j] * m_learning_rate);
-        //     }
-        //     training_threads_mutex.unlock();
-
-        //     auto end_time = std::chrono::high_resolution_clock::now();
-        //     m_total_training_time += std::chrono::duration<float>(end_time - start_time).count();
-        //     start_time = end_time;
-
-        //     m_batch_accuracy = (static_cast<float>(correct_pred) / static_cast<float>(m_batch_size)) * 100.0f;
-        //     m_batch_accuracy_history.push(m_batch_accuracy);
-        //     if (m_batch_accuracy_history.size() - 1 > 100)
-        //     {
-        //         m_batch_accuracy_history.pop();
-        //     }
-
-        //     saveNetwork();
-
-        //     auto batch_end_time = std::chrono::high_resolution_clock::now();
-        //     float difference = m_averageTimePerBatch - std::chrono::duration<float>(batch_end_time - batch_start_time).count();
-        //     m_averageTimePerBatch -= difference * 0.05f; // moving average with weight 0.05
-
-        //     if (is_training && !(*is_training))
-        //     {
-        //         return;
-        //     }
-        // }
-
         m_current_epoch += 1;
     }
 }
@@ -323,6 +232,7 @@ Mann::Matrix MNNetwork::predictSingleImage(std::vector<double> &image_data)
  */
 float MNNetwork::testNetwork(Mnist::MnistData *image_data)
 {
+    auto start_time = std::chrono::high_resolution_clock::now();
 
     if (MNN_Layers_size.empty())
     {
@@ -332,8 +242,8 @@ float MNNetwork::testNetwork(Mnist::MnistData *image_data)
     // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
 
     training_threads_mutex.lock();
-    std::vector<Mann::Matrix> MNN_WEIGHTS_COPY = MNN_Weights;
-    std::vector<Mann::Matrix> MNN_BIAS_COPY = MNN_Bias;
+    std::vector<Mann::Matrix> weights = MNN_Weights;
+    std::vector<Mann::Matrix> biases = MNN_Bias;
     training_threads_mutex.unlock();
 
     float avg_cost_bulk = 0;
@@ -346,7 +256,7 @@ float MNNetwork::testNetwork(Mnist::MnistData *image_data)
 
         // load image data in network
         std::vector<Mann::Matrix> MNN_NODES_COPY = MNN_Nodes;
-        std::vector<Mann::Matrix> MNN_WEIGHTED_SUM_COPY = MNN_BIAS_COPY;
+        std::vector<Mann::Matrix> MNN_WEIGHTED_SUM_COPY = weights;
         Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size() - 1], 1);
 
         for (int j = 0; j < MNN_NODES_COPY[0].rows(); j++)
@@ -359,7 +269,7 @@ float MNNetwork::testNetwork(Mnist::MnistData *image_data)
         }
 
         // std::cout<<MNN_NODES_COPY[0].display()<<std::endl;
-        feedForward(MNN_NODES_COPY, MNN_WEIGHTED_SUM_COPY, MNN_WEIGHTS_COPY, MNN_BIAS_COPY);
+        feedForward(MNN_NODES_COPY, MNN_WEIGHTED_SUM_COPY, weights, biases);
 
         Mann::Matrix MNN_cost = (MNN_NODES_COPY[MNN_NODES_COPY.size() - 1] - MNN_y);
         MNN_cost = MNN_cost ^ MNN_cost;
@@ -374,6 +284,10 @@ float MNNetwork::testNetwork(Mnist::MnistData *image_data)
         if (IsPredictionCorrect(MNN_NODES_COPY[MNN_NODES_COPY.size() - 1], MNN_y))
             correct_pred++;
     }
+
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration<float>(end_time - start_time).count();
+    std::cout << "Total time to test: " << duration << " s" << std::endl;
 
     m_average_cost = avg_cost_bulk / static_cast<float>(image_data->mnist_images_data.size()) * 100.0f;
     return (static_cast<float>(correct_pred) / static_cast<float>(image_data->mnist_images_data.size())) * 100.0f;
@@ -413,8 +327,8 @@ void MNNetwork::initializeNetwork(NetworkInitialization *network_initialization)
  */
 void MNNetwork::feedForward(std::vector<Mann::Matrix> &nodes,
                             std::vector<Mann::Matrix> &weighted_sum,
-                            std::vector<Mann::Matrix> weights,
-                            std::vector<Mann::Matrix> biases)
+                            std::vector<Mann::Matrix> &weights,
+                            std::vector<Mann::Matrix> &biases)
 {
     for (int i = 0; i < nodes.size() - 1; ++i)
     {
