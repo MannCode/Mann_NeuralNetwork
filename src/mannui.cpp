@@ -201,16 +201,12 @@ void MannUI::Render(std::stringstream &outputText)
         {
             std::thread test_thread([&entry, &outputText]()
             {
-
-                float accuracy = entry.network->testNetwork(&mnist->mnist_testData);
-                entry.network->m_accuracy_testdata = accuracy;
-                entry.calculatingAccuracy = false;
-
-                accuracy = entry.network->testNetwork(&mnist->mnist_trainingData);
+                float accuracy = entry.network->testNetwork(&mnist->mnist_trainingData);
                 entry.network->m_accuracy = accuracy;
 
-                MannLogger::info(outputText) << entry.network->m_model_name << " --- Accuracy: " << entry.network->m_accuracy_testdata << "%" << std::endl;
-                // std::lock_guard<std::mutex> lock(resultsMutex);
+                accuracy = entry.network->testNetwork(&mnist->mnist_testData);
+                entry.network->m_accuracy_testdata = accuracy;
+                entry.calculatingAccuracy = false;
             });
             test_thread.detach();
         }
@@ -253,12 +249,13 @@ void MannUI::Render(std::stringstream &outputText)
         ShowAvalModels(ui_context);
         ImGui::End();
 
-        ImGui::Begin("Model Details");
-        ShowModelDetails(ui_context);
-        ImGui::End();
 
         ImGui::Begin("Network Visualizer");
         NetworkVisualizationWindow(ui_context);
+        ImGui::End();
+
+        ImGui::Begin("Model Details");
+        ShowModelDetails(ui_context);
         ImGui::End();
         break;
     case MannUI::TRAINING_WINDOW:

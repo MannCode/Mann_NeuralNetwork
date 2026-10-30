@@ -58,7 +58,8 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
         // float avg_cost_bulk = 0.0f;
         for (int batch_start = 0; batch_start < image_data->mnist_images_data.size(); batch_start += m_batch_size)
         {
-            if (!(*is_training)) return;
+            if (!(*is_training))
+                return;
 
             auto batch_start_time = std::chrono::high_resolution_clock::now();
 
@@ -90,64 +91,64 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
             for (unsigned int worker = 0; worker < worker_count; ++worker)
             {
                 workers.emplace_back([&, worker]()
-                {
-                    auto start_time_worker = std::chrono::high_resolution_clock::now();
+                                     {
+                                         auto start_time_worker = std::chrono::high_resolution_clock::now();
 
-                    int start = batch_start + (actual_batch_size * worker) / worker_count;
-                    int end = batch_start + (actual_batch_size * (worker + 1)) / worker_count;
+                                         int start = batch_start + (actual_batch_size * worker) / worker_count;
+                                         int end = batch_start + (actual_batch_size * (worker + 1)) / worker_count;
 
-                    NetworkGradients& gradients = worker_gradients[worker];
+                                         NetworkGradients &gradients = worker_gradients[worker];
 
-                    for (int i = start; i < end; ++i)
-                    {
-                        if (!(*is_training)) return;
+                                         for (int i = start; i < end; ++i)
+                                         {
+                                             if (!(*is_training))
+                                                 return;
 
-                        // Local network state
-                        // training_threads_mutex.lock();
-                        std::vector<Mann::Matrix> nodes = MNN_Nodes;
-                        std::vector<Mann::Matrix> weighted_sum = MNN_Bias;
-                        Mann::Matrix target(MNN_Layers_size.back(), 1);
-                        // training_threads_mutex.unlock();
+                                             // Local network state
+                                             // training_threads_mutex.lock();
+                                             std::vector<Mann::Matrix> nodes = MNN_Nodes;
+                                             std::vector<Mann::Matrix> weighted_sum = MNN_Bias;
+                                             Mann::Matrix target(MNN_Layers_size.back(), 1);
+                                             // training_threads_mutex.unlock();
 
-                        // Input
-                        for (int j = 0; j < nodes[0].rows(); ++j)
-                        {
-                            nodes[0][j] = image_data->mnist_images_data[i][j];
-                        }
+                                             // Input
+                                             for (int j = 0; j < nodes[0].rows(); ++j)
+                                             {
+                                                 nodes[0][j] = image_data->mnist_images_data[i][j];
+                                             }
 
-                        // Target
-                        for (int j = 0; j < target.rows(); ++j)
-                        {
-                            target[j] = image_data->mnist_labels_data[i][j];
-                        }
+                                             // Target
+                                             for (int j = 0; j < target.rows(); ++j)
+                                             {
+                                                 target[j] = image_data->mnist_labels_data[i][j];
+                                             }
 
-                        feedForward(nodes, weighted_sum, weights, biases);
+                                             feedForward(nodes, weighted_sum, weights, biases);
 
+                                             if (IsPredictionCorrect(nodes.back(), target))
+                                             {
+                                                 worker_correct[worker]++;
+                                             }
 
-                        if (IsPredictionCorrect(nodes.back(), target))
-                        {
-                            worker_correct[worker]++;
-                        }
+                                             NetworkGradients sample_gradients(weights, biases);
 
-                        NetworkGradients sample_gradients(weights, biases);
+                                             backPropagation(nodes, weighted_sum, weights, biases, target, sample_gradients);
 
-                        backPropagation(nodes, weighted_sum, weights, biases, target, sample_gradients);
+                                             for (size_t j = 0; j < gradients.weights.size(); ++j)
+                                             {
+                                                 gradients.weights[j] = gradients.weights[j] + sample_gradients.weights[j];
+                                                 gradients.biases[j] = gradients.biases[j] + sample_gradients.biases[j];
+                                             }
+                                         }
 
-                        for (size_t j = 0; j < gradients.weights.size(); ++j)
-                        {
-                            gradients.weights[j] = gradients.weights[j] + sample_gradients.weights[j];
-                            gradients.biases[j] = gradients.biases[j] + sample_gradients.biases[j];
-                        }
-                    }
-
-                    auto end_time_worker = std::chrono::high_resolution_clock::now();
-                    auto duration_worker = std::chrono::duration<float>(end_time_worker - start_time_worker).count();
-                    // std::cout << "Total time: " << duration_worker << " s" << std::endl;
-                });
+                                         auto end_time_worker = std::chrono::high_resolution_clock::now();
+                                         auto duration_worker = std::chrono::duration<float>(end_time_worker - start_time_worker).count();
+                                         // std::cout << "Total time: " << duration_worker << " s" << std::endl;
+                                     });
             }
 
             // wait for all worker threads to finish
-            for (auto& worker : workers)
+            for (auto &worker : workers)
             {
                 worker.join();
             }
@@ -198,6 +199,7 @@ void MNNetwork::trainNetwork(const int iterations, Mnist::MnistData *image_data,
             auto batch_end_time = std::chrono::high_resolution_clock::now();
             float difference = m_averageTimePerBatch - std::chrono::duration<float>(batch_end_time - batch_start_time).count();
             m_averageTimePerBatch -= difference * 0.05f; // moving average with weight 0.05
+            m_total_training_time += std::chrono::duration<float>(batch_end_time - batch_start_time).count();
         }
 
         m_current_epoch += 1;
@@ -232,66 +234,99 @@ Mann::Matrix MNNetwork::predictSingleImage(std::vector<double> &image_data)
  */
 float MNNetwork::testNetwork(Mnist::MnistData *image_data)
 {
-    auto start_time = std::chrono::high_resolution_clock::now();
+    // auto start_time = std::chrono::high_resolution_clock::now();
 
     if (MNN_Layers_size.empty())
     {
         std::cerr << "ERROR: MNN_Layers_size is empty" << std::endl;
         std::abort();
     }
-    // loadNetwork(MNN_Layers_size, MNN_Nodes, MNN_Weights, MNN_Bias, filename);
 
     training_threads_mutex.lock();
     std::vector<Mann::Matrix> weights = MNN_Weights;
     std::vector<Mann::Matrix> biases = MNN_Bias;
     training_threads_mutex.unlock();
 
-    float avg_cost_bulk = 0;
-    int correct_pred = 0;
+    const unsigned int worker_count = 4u;
 
-    std::vector<std::future<void>> tasks;
+    std::vector<std::thread> workers;
 
-    for (int i = 0; i < image_data->mnist_images_data.size(); i++)
+    std::vector<int> worker_correct(worker_count, 0);
+    
+    // average cost
+    std::vector<float> worker_costs(worker_count, 0.0f);
+
+    for (unsigned int worker = 0; worker < worker_count; ++worker)
     {
-
-        // load image data in network
-        std::vector<Mann::Matrix> MNN_NODES_COPY = MNN_Nodes;
-        std::vector<Mann::Matrix> MNN_WEIGHTED_SUM_COPY = weights;
-        Mann::Matrix MNN_y(MNN_Layers_size[MNN_Layers_size.size() - 1], 1);
-
-        for (int j = 0; j < MNN_NODES_COPY[0].rows(); j++)
+        workers.emplace_back([&, worker]()
         {
-            MNN_NODES_COPY[0][j] = image_data->mnist_images_data[i][j];
-        }
-        for (int j = 0; j < MNN_y.rows(); j++)
-        {
-            MNN_y[j] = image_data->mnist_labels_data[i][j];
-        }
+            int start = worker * image_data->mnist_images_data.size() / worker_count;
+            int end = (worker + 1) * image_data->mnist_images_data.size() / worker_count;
 
-        // std::cout<<MNN_NODES_COPY[0].display()<<std::endl;
-        feedForward(MNN_NODES_COPY, MNN_WEIGHTED_SUM_COPY, weights, biases);
+            for (int i = start; i < end; ++i)
+            {
+                // Local network state
+                std::vector<Mann::Matrix> nodes = MNN_Nodes;
+                std::vector<Mann::Matrix> weighted_sum = biases;
+                Mann::Matrix target(MNN_Layers_size.back(), 1);
 
-        Mann::Matrix MNN_cost = (MNN_NODES_COPY[MNN_NODES_COPY.size() - 1] - MNN_y);
-        MNN_cost = MNN_cost ^ MNN_cost;
-        float avg_cost = 0;
-        for (int j = 0; j < MNN_cost.cols(); j++)
-        {
-            avg_cost += MNN_cost[j];
-        }
+                for (int j = 0; j < nodes[0].rows(); j++)
+                {
+                    nodes[0][j] = image_data->mnist_images_data[i][j];
+                }
+                for (int j = 0; j < target.rows(); j++)
+                {
+                    target[j] = image_data->mnist_labels_data[i][j];
+                }
 
-        avg_cost_bulk += avg_cost;
+                // std::cout<<MNN_NODES_COPY[0].display()<<std::endl;
+                feedForward(nodes, weighted_sum, weights, biases);
 
-        if (IsPredictionCorrect(MNN_NODES_COPY[MNN_NODES_COPY.size() - 1], MNN_y))
-            correct_pred++;
+                Mann::Matrix MNN_cost = (nodes[nodes.size() - 1] - target);
+
+                float avg_cost = 0.0f;
+                for (int j = 0; j < MNN_cost.rows(); j++)
+                {
+                    avg_cost += std::abs(MNN_cost[j]);
+                }
+
+                avg_cost /= static_cast<float>(MNN_cost.rows());                
+                worker_costs[worker] += avg_cost;
+
+                if (IsPredictionCorrect(nodes[nodes.size() - 1], target))
+                    worker_correct[worker]++;
+            } 
+
+            worker_costs[worker] /= static_cast<float>(end - start);
+        });
     }
 
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration<float>(end_time - start_time).count();
-    std::cout << "Total time to test: " << duration << " s" << std::endl;
+    for (auto &worker : workers)
+    {
+        if (worker.joinable())
+            worker.join();
+    }
 
-    m_average_cost = avg_cost_bulk / static_cast<float>(image_data->mnist_images_data.size()) * 100.0f;
+    int correct_pred = 0;
+
+    for (unsigned int worker = 0; worker < worker_count; ++worker)
+    {
+        correct_pred += worker_correct[worker];
+    }
+
+    m_average_cost = 0.0f;
+    for (unsigned int worker = 0; worker < worker_count; ++worker)
+    {
+        m_average_cost += worker_costs[worker];
+    }
+    m_average_cost /= static_cast<float>(worker_count);
+
+    // auto end_time = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration<float>(end_time - start_time).count();
+    // std::cout << "Total time to test: " << duration << " s" << std::endl;
+
+    // m_average_cost =  / static_cast<float>(image_data->mnist_images_data.size()) * 100.0f;
     return (static_cast<float>(correct_pred) / static_cast<float>(image_data->mnist_images_data.size())) * 100.0f;
-    // return static_cast<float>(m_average_cost);
 }
 
 /**

@@ -12,6 +12,7 @@
 
 #include <queue>
 #include <chrono>
+#include <cmath>
 
 /**
  * @file MNNetwork.h
