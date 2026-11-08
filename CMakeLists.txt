@@ -23,7 +23,7 @@ file(GLOB_RECURSE SOURCES
     "src/*.cpp"
     "src/*.mm"
 )
-list(FILTER SOURCES EXCLUDE REGEX "src/test_.*\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "/test_.*\\.cpp$")
 list(FILTER SOURCES EXCLUDE REGEX "src/platforms/MAC/.*")
 list(FILTER SOURCES EXCLUDE REGEX "src/platforms/WINDOWS/.*")
 

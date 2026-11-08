@@ -1152,6 +1152,17 @@ void TestingWindowCanvas_1(UIContext* ui_context, std::vector<std::vector<float>
     }
 }
 
+void savePrediction(int prediction)
+{
+    std::cout << "Saving prediction: " << prediction << std::endl;
+    std::ofstream file("src/TCPSender/prediction.txt");
+    if (file.is_open())
+    {
+        file << prediction << '\n';
+        file.close();
+    }
+}
+
 void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, int &response_index)
 {
     ImGui::Text("Testing Output Panel");
@@ -1181,6 +1192,7 @@ void TestingWindowCanvas_2(UIContext* ui_context, Mann::Matrix &output_layer, in
         }
     }
     ImGui::Text(AI_responses[response_index].c_str(), predicted_number);
+    savePrediction(predicted_number);
 
     ImGui::Separator();
 
